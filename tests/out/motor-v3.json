@@ -1,0 +1,548 @@
+{
+ "N": 1000,
+ "version": "3.0.0-e1",
+ "fallas": [],
+ "errores": [],
+ "tiempo": {
+  "promedioMs": 336.65,
+  "medianaMs": 331.58,
+  "maxMs": 525.67,
+  "totalSeg": 336.65
+ },
+ "estadisticas": {
+  "golesPorPartido": 4.7,
+  "maxGoles": 22,
+  "local": 0.41,
+  "empate": 0.13,
+  "visitante": 0.46,
+  "rematesPorEquipo": 17.33,
+  "alArcoPct": 0.49,
+  "conversion": 0.14,
+  "xgPorPartido": 5.14,
+  "pasesPorEquipo": 434.33,
+  "precisionPases": 0.65,
+  "pasesAltosPct": 0.27,
+  "posesionLocalPromedio": 50.14,
+  "posesionDesvio": 5.2,
+  "cornersPorEquipo": 7.83,
+  "lateralesPorEquipo": 48.01,
+  "quitesPorEquipo": 79.46,
+  "intercepcionesPorEquipo": 59.48,
+  "gambetasPorEquipo": 50.94,
+  "gambetasExito": 0.63,
+  "cabezazosPorPartido": 31.03,
+  "atajadasPorPartido": 7.54,
+  "palosPorPartido": 0.31,
+  "minutosEnJuego": 70.35,
+  "kmPorJugadorDeCampo": 12.35,
+  "marcadores": [
+   "1-2 6.1%",
+   "1-1 5.3%",
+   "2-1 5.2%",
+   "2-2 4.6%",
+   "1-3 3.9%",
+   "0-2 3.9%",
+   "3-1 3.8%",
+   "1-0 3.7%"
+  ]
+ },
+ "determinismo": {
+  "mismaSemilla": true,
+  "semillasDistintasDistinto": true,
+  "huellas": [
+   "7047de73465bbd84",
+   "2be4c1ea3dc270b6",
+   "a75e3245f7a18322"
+  ],
+  "huellaTexto": "872ee85554eb0591"
+ },
+ "nota": "Estadísticas informativas: el motor v3 todavía no está calibrado (etapa 4).",
+ "partidos": 1000,
+ "fisica": {
+  "raso15": {
+   "recorridoM": 71.5,
+   "frenaSiempre": true,
+   "sedetiene": true
+  },
+  "alto": {
+   "alturaMaxM": 4.78,
+   "primerPiqueM": 29.59,
+   "segundoPiqueM": 36.98,
+   "alturasPicos": [
+    4.78,
+    0.89,
+    0.17
+   ]
+  },
+  "velPaseRaso": {
+   "10m": 11,
+   "30m": 15.7
+  }
+ },
+ "atributos": {
+  "origen": [
+   "estimado"
+  ],
+  "vmaxMin": 6.15,
+  "vmaxMax": 7.45,
+  "sinCinta": true,
+  "sinMCAtributos": {
+   "ok": true,
+   "origen": "grl"
+  }
+ },
+ "ejemplo": {
+  "partido": "3K FC 2-3 AC Port of Spain",
+  "stats": {
+   "posesion": [
+    53,
+    47
+   ],
+   "pases": [
+    471,
+    445
+   ],
+   "pasesOk": [
+    320,
+    283
+   ],
+   "pasesAltos": [
+    135,
+    122
+   ],
+   "remates": [
+    14,
+    10
+   ],
+   "alArco": [
+    3,
+    3
+   ],
+   "atajadas": [
+    4,
+    1
+   ],
+   "bloqueos": [
+    1,
+    6
+   ],
+   "palos": [
+    0,
+    0
+   ],
+   "corners": [
+    8,
+    7
+   ],
+   "laterales": [
+    60,
+    45
+   ],
+   "saquesArco": [
+    8,
+    4
+   ],
+   "quites": [
+    64,
+    79
+   ],
+   "intercepciones": [
+    63,
+    64
+   ],
+   "gambetas": [
+    50,
+    32
+   ],
+   "gambetasOk": [
+    33,
+    24
+   ],
+   "cabezazos": [
+    12,
+    10
+   ],
+   "xg": [
+    1.52,
+    1.42
+   ],
+   "minutosEnJuego": 69.7
+  },
+  "goles": [
+   {
+    "t": 5623,
+    "parte": 1,
+    "min": 10,
+    "seg": 562,
+    "tipo": "gol",
+    "equipo": 0,
+    "jugador": "Glen Kariuki",
+    "jid": 9,
+    "enContra": false,
+    "asistencia": null,
+    "aid": null,
+    "marcador": [
+     1,
+     0
+    ],
+    "xg": 0.207,
+    "x": 105.1,
+    "y": 36.6
+   },
+   {
+    "t": 15995,
+    "parte": 1,
+    "min": 27,
+    "seg": 1599,
+    "tipo": "gol",
+    "equipo": 1,
+    "jugador": "Brian Chasimba",
+    "jid": 4,
+    "enContra": true,
+    "asistencia": null,
+    "aid": null,
+    "marcador": [
+     1,
+     1
+    ],
+    "xg": null,
+    "x": -0.2,
+    "y": 36.7
+   },
+   {
+    "t": 20510,
+    "parte": 1,
+    "min": 35,
+    "seg": 2051,
+    "tipo": "gol",
+    "equipo": 0,
+    "jugador": "Joshua Peters",
+    "jid": 15,
+    "enContra": true,
+    "asistencia": null,
+    "aid": null,
+    "marcador": [
+     2,
+     1
+    ],
+    "xg": null,
+    "x": 105.2,
+    "y": 33.2
+   },
+   {
+    "t": 28877,
+    "parte": 2,
+    "min": 47,
+    "seg": 67,
+    "tipo": "gol",
+    "equipo": 1,
+    "jugador": "Brian Chasimba",
+    "jid": 4,
+    "enContra": true,
+    "asistencia": null,
+    "aid": null,
+    "marcador": [
+     2,
+     2
+    ],
+    "xg": null,
+    "x": 105.2,
+    "y": 36.6
+   },
+   {
+    "t": 47499,
+    "parte": 2,
+    "min": 78,
+    "seg": 1929,
+    "tipo": "gol",
+    "equipo": 1,
+    "jugador": "Onesmus Kevenluke Otiala",
+    "jid": 0,
+    "enContra": true,
+    "asistencia": null,
+    "aid": null,
+    "marcador": [
+     2,
+     3
+    ],
+    "xg": null,
+    "x": 105.3,
+    "y": 30.8
+   }
+  ],
+  "remates": [
+   {
+    "t": 1606,
+    "parte": 1,
+    "min": 3,
+    "seg": 160,
+    "tipo": "remate",
+    "equipo": 0,
+    "jugador": "Henry Eli Oballa",
+    "jid": 8,
+    "aPuerta": false,
+    "cabeza": false,
+    "xg": 0.016,
+    "dist": 27.8,
+    "arquero": "Jaden Ramlogan",
+    "x": 101.4,
+    "y": 5.9
+   },
+   {
+    "t": 5419,
+    "parte": 1,
+    "min": 10,
+    "seg": 541,
+    "tipo": "remate",
+    "equipo": 0,
+    "jugador": "Glen Kariuki",
+    "jid": 9,
+    "aPuerta": false,
+    "cabeza": false,
+    "xg": 0.086,
+    "dist": 13,
+    "arquero": "Jaden Ramlogan",
+    "x": 102.3,
+    "y": 46.3
+   },
+   {
+    "t": 5618,
+    "parte": 1,
+    "min": 10,
+    "seg": 561,
+    "tipo": "remate",
+    "equipo": 0,
+    "jugador": "Glen Kariuki",
+    "jid": 9,
+    "aPuerta": true,
+    "cabeza": false,
+    "xg": 0.207,
+    "dist": 10.4,
+    "arquero": "Jaden Ramlogan",
+    "x": 95.8,
+    "y": 30.2
+   },
+   {
+    "t": 9709,
+    "parte": 1,
+    "min": 17,
+    "seg": 970,
+    "tipo": "remate",
+    "equipo": 1,
+    "jugador": "Adrian Mitchell",
+    "jid": 20,
+    "aPuerta": false,
+    "cabeza": false,
+    "xg": 0.124,
+    "dist": 13.3,
+    "arquero": "Onesmus Kevenluke Otiala",
+    "x": 9.9,
+    "y": 25.7
+   },
+   {
+    "t": 9739,
+    "parte": 1,
+    "min": 17,
+    "seg": 973,
+    "tipo": "remate",
+    "equipo": 1,
+    "jugador": "Adrian Mitchell",
+    "jid": 20,
+    "aPuerta": true,
+    "cabeza": false,
+    "xg": 0.541,
+    "dist": 4.5,
+    "arquero": "Onesmus Kevenluke Otiala",
+    "x": 2.3,
+    "y": 30.7
+   },
+   {
+    "t": 10309,
+    "parte": 1,
+    "min": 18,
+    "seg": 1030,
+    "tipo": "remate",
+    "equipo": 0,
+    "jugador": "Glen Kariuki",
+    "jid": 9,
+    "aPuerta": false,
+    "cabeza": false,
+    "xg": 0.018,
+    "dist": 29.5,
+    "arquero": "Jaden Ramlogan",
+    "x": 77.6,
+    "y": 43.6
+   },
+   {
+    "t": 14057,
+    "parte": 1,
+    "min": 24,
+    "seg": 1405,
+    "tipo": "remate",
+    "equipo": 0,
+    "jugador": "David Simiyu",
+    "jid": 10,
+    "aPuerta": false,
+    "cabeza": false,
+    "xg": 0.106,
+    "dist": 12.1,
+    "arquero": "Jaden Ramlogan",
+    "x": 101.1,
+    "y": 44.9
+   },
+   {
+    "t": 14059,
+    "parte": 1,
+    "min": 24,
+    "seg": 1405,
+    "tipo": "remate",
+    "equipo": 0,
+    "jugador": "Glen Kariuki",
+    "jid": 9,
+    "aPuerta": false,
+    "cabeza": true,
+    "xg": 0.197,
+    "dist": 6.5,
+    "arquero": "Jaden Ramlogan",
+    "x": 100,
+    "y": 38.7
+   },
+   {
+    "t": 14791,
+    "parte": 1,
+    "min": 25,
+    "seg": 1479,
+    "tipo": "remate",
+    "equipo": 0,
+    "jugador": "Ali Sally Yipoh",
+    "jid": 5,
+    "aPuerta": true,
+    "cabeza": false,
+    "xg": 0.181,
+    "dist": 9.5,
+    "arquero": "Jaden Ramlogan",
+    "x": 100.2,
+    "y": 26.3
+   },
+   {
+    "t": 22286,
+    "parte": 1,
+    "min": 38,
+    "seg": 2228,
+    "tipo": "remate",
+    "equipo": 0,
+    "jugador": "Glen Kariuki",
+    "jid": 9,
+    "aPuerta": true,
+    "cabeza": false,
+    "xg": 0.23,
+    "dist": 9.2,
+    "arquero": "Jaden Ramlogan",
+    "x": 98.2,
+    "y": 39.3
+   }
+  ],
+  "cuadros": 11400,
+  "hz": 2,
+  "cuadro100": {
+   "t": 500,
+   "pelota": {
+    "x": 102.8,
+    "y": 37.6,
+    "z": 1,
+    "dueno": 11,
+    "enJuego": true
+   },
+   "jugadores": [
+    [
+     5.3,
+     35
+    ],
+    [
+     46.1,
+     16.8
+    ],
+    [
+     45.9,
+     30.5
+    ],
+    [
+     45.8,
+     44.2
+    ],
+    [
+     45.9,
+     57.7
+    ],
+    [
+     59.3,
+     21.7
+    ],
+    [
+     58.8,
+     37.8
+    ],
+    [
+     59.4,
+     52.9
+    ],
+    [
+     92.5,
+     35.7
+    ],
+    [
+     74.1,
+     42.7
+    ],
+    [
+     86.3,
+     50.3
+    ],
+    [
+     102.8,
+     37.6
+    ],
+    [
+     92,
+     62.4
+    ],
+    [
+     93,
+     45
+    ],
+    [
+     92.6,
+     27.4
+    ],
+    [
+     92.3,
+     9.7
+    ],
+    [
+     77.9,
+     54.5
+    ],
+    [
+     77.9,
+     36.1
+    ],
+    [
+     78,
+     18.2
+    ],
+    [
+     63.2,
+     53.8
+    ],
+    [
+     62.9,
+     36.1
+    ],
+    [
+     63.1,
+     18.1
+    ]
+   ]
+  }
+ }
+}

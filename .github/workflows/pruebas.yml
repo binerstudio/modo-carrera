@@ -23,6 +23,8 @@ jobs:
           sleep 2
       - name: Motor v2 · validación masiva (miles de partidos)
         run: node tests/motor.mjs 1000
+      - name: Motor v3 · etapa 1 (1000 partidos simulados en la cancha, determinismo, tiempo)
+        run: node tests/motor-v3.mjs 1000
       - name: Jugar temporadas con semilla fija
         run: node tests/regresion.mjs http://localhost:8080/index.html ${{ github.ref_name }}
       - name: Auditoría de eventos del motor v2 (30 partidos)
