@@ -1,3 +1,12 @@
+MODO CARRERA 12.4.0 · ETAPA 2: MOTOR DE PARTIDOS v2 (todo lo anterior se conserva)
+=================================================================================
+Detalle: INFORME_ETAPA_2.md
+- 25 atributos de campo + 5 de arquero por jugador (ESTIMADOS a partir de posición, GRL y edad; marcados como tales).
+- Motor v2: fatiga individual, moral, química, entrenador, clima, césped, importancia, árbitro, VAR,
+  errores individuales y arbitrales, rebotes, tiros libres. Validado con miles de partidos (tests/motor.mjs).
+- Carreras nuevas usan v2; las existentes siguen con v1 (se cambia en Configuración → Motor de partidos).
+- El motor v1 no cambió (huella de regresión idéntica: b6e76d8864c3a1f4).
+
 MODO CARRERA 12.3.0 · ETAPA 1: FUNDACIÓN TÉCNICA (todo lo anterior se conserva)
 ==============================================================================
 Detalle: INFORME_ETAPA_1.md

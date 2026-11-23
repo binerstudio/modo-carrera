@@ -60,7 +60,8 @@ function info(e){
 function at(e){if(!e._at){const i=info(e);e._at=A().de(i);e._inf=i}return e._at}
 /* energía 0..1: estado físico previo menos el desgaste del partido */
 function energia(e){const i=e._inf||(at(e),e._inf);return clamp(i.fit/100-(e._fat||0),.2,1)}
-function cond(e){return .86+.14*energia(e)}
+/* mismo peso del estado físico que v1 (.88 + .12 × físico), más el desgaste propio del partido */
+function cond(e){return .88+.12*energia(e)}
 function moral(e){const i=e._inf||(at(e),e._inf);return 1+(clamp(i.mor,30,99)-70)*.0007}
 /* valor del jugador en la línea en que juega (castiga jugar fuera de puesto, con un tope) */
 const LINEA={POR:'arquero',DEF:'defensa',MED:'medio',DEL:'ataque'};
