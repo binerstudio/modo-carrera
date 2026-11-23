@@ -1,0 +1,17 @@
+{
+  "name": "MODO CARRERA",
+  "short_name": "Modo Carrera",
+  "description": "Juego de gestión futbolística: dirigí tu club, temporada tras temporada.",
+  "lang": "es",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#08111e",
+  "theme_color": "#08111e",
+  "icons": [
+    { "src": "assets/icons/icono-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icons/icono-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/icons/icono-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

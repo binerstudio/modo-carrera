@@ -135,16 +135,34 @@ async function pruebaEspacio(browser) {
   return { ok, snap, res, errors };
 }
 
+async function pruebaPWA(browser) {
+  const errors = [], missing = new Set();
+  const { ctx, page } = await newPage(browser, errors, missing);
+  await page.goto(URL, { waitUntil: 'load' }); await page.waitForTimeout(2500);
+  const r = await page.evaluate(async () => {
+    const man = await fetch('manifest.webmanifest').then(x => x.ok ? x.json() : null).catch(() => null);
+    const sw = await fetch('sw.js').then(x => x.ok).catch(() => false);
+    const reg = navigator.serviceWorker ? !!(await navigator.serviceWorker.getRegistration()) : false;
+    const cats = typeof CAT !== 'undefined' ? Object.keys(CAT) : null;
+    const visibles = typeof SS !== 'undefined' ? Object.values(SS).flatMap(x => x[2].map(r => r[3])) : null;
+    return { manifest: man && man.name, sw, reg, cats, visibles, version: window.MCStore && MCStore.APP_VERSION, title: document.title };
+  });
+  await ctx.close();
+  const ok = r.manifest === 'MODO CARRERA' && r.sw && r.reg && errors.length === 0;
+  return { ok, ...r, errors };
+}
+
 const browser = await chromium.launch();
 const results = [];
 for (const cs of CASES) {
   try { results.push(await playCase(browser, cs)); }
   catch (e) { results.push({ case: cs, ok: false, crash: String(e && e.stack || e) }); }
 }
+const pwa = await pruebaPWA(browser).catch(e => ({ ok: false, crash: String(e && e.stack || e) }));
 const espacio = await pruebaEspacio(browser).catch(e => ({ ok: false, crash: String(e && e.stack || e) }));
 await browser.close();
 const fingerprint = sha(results.map(r => (r.seasons || []).map(s => s.hash)));
-const out = { name: NAME, seed: SEED, fingerprint, ok: results.every(r => r.ok) && espacio.ok !== false, results, espacio };
+const out = { name: NAME, seed: SEED, fingerprint, ok: results.every(r => r.ok) && espacio.ok !== false && pwa.ok !== false, results, espacio, pwa };
 mkdirSync('tests/out', { recursive: true });
 writeFileSync(`tests/out/${NAME}.json`, JSON.stringify(out, null, 1));
 // Resumen legible en el registro de GitHub Actions
@@ -159,5 +177,6 @@ for (const r of results) {
   console.log('  archivos inexistentes pedidos:', (r.missing || []).length, (r.missing || []).slice(0, 5).join(' | '));
   console.log('  errores:', r.errors ? r.errors.length : '-'); (r.errors || []).slice(0, 15).forEach(e => console.log('   ', e.slice(0, 300)));
 }
+console.log('\n== App instalable y ajustes:', JSON.stringify(pwa));
 console.log('\n== Almacenamiento lleno (recuperación):', JSON.stringify(espacio));
 process.exit(out.ok ? 0 : 1);

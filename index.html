@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#08111e"><title>MODO CARRERA 12.2</title>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#08111e"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Modo Carrera"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><title>MODO CARRERA 12.3</title>
 <style>
 :root{--bg:#08111e;--panel:#111e2f;--panel2:#182940;--line:#2b405b;--gold:#e2bd70;--muted:#91a2b8;--white:#f5f7fb;--green:#50c58d;--red:#e2767d;--blue:#6ea6e8}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#1d3552 0,transparent 38%),var(--bg);color:var(--white);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:88px}button,input,select{font:inherit}button{cursor:pointer}
@@ -194,13 +194,13 @@ input,select{background:#061534;color:#fff;border:1px solid #3a86ff99;border-rad
 .mc-std-vig{position:absolute;inset:0;z-index:5;background:radial-gradient(ellipse 85% 70% at 50% 62%,transparent 55%,#020818cc),linear-gradient(#0000 85%,#020818aa)}
 .mc-std-glow{position:absolute;left:0;right:0;top:30%;height:22%;z-index:1;background:radial-gradient(ellipse 60% 100% at 50% 100%,#9fd0ff22,transparent 70%)}
 </style>
-<!-- MODO CARRERA 12.2: rediseño visual (solo apariencia) --><link rel="stylesheet" href="css/mc12-diseno.css?v=12.2.2">
+<!-- MODO CARRERA 12.2: rediseño visual (solo apariencia) --><link rel="stylesheet" href="css/mc12-diseno.css?v=12.3.0">
 </head><body>
 <div class="x-bg"></div>
 <header><div class="x-chip x-club"><div class="av" id="xCrest"></div><div style="min-width:0"><b id="homeProfileName">Mi Club</b><small id="homeProfileLevel">Nivel 1</small><div class="x-xp"><i id="xXp" style="width:10%"></i></div></div></div><div class="x-chip x-coin" id="homeCoins">—</div><div class="x-chip x-gem" id="xRep">—</div><button class="x-gear" onclick="go('more')" aria-label="Configuración"><i data-i="gear"></i></button><span id="seasonText" style="display:none"></span></header>
 <main>
 <section id="home" class="page active">
-<div class="x-logo"><i data-i="ball" style="width:62px;height:62px"></i><div><b>MODO</b><b>CARRERA <em>10.0</em></b></div></div>
+<div class="x-logo"><i data-i="ball" style="width:62px;height:62px"></i><div><b>MODO</b><b>CARRERA <em>12.3</em></b></div></div>
 <div class="x-menu">
 <button class="gold" onclick="go('newcareer')"><i data-i="play"></i><span>Nueva Carrera</span><i data-i="trophy" class="t"></i></button>
 <button onclick="go('saves')"><i data-i="folder"></i><span>Cargar Partida</span></button>
@@ -244,7 +244,7 @@ input,select{background:#061534;color:#fff;border:1px solid #3a86ff99;border-rad
 <label class="mk-aff"><input type="checkbox" id="mkAff" onchange="renderMarket()"> Solo los que puedo pagar</label><button class="nb mk-clear" onclick="mcClearFilters()">LIMPIAR</button></div></div>
 <div id="mBody"></div><div class="x-two" id="mSum"></div></section>
 <section id="match" class="page">
-<div style="text-align:center;font:900 22px var(--f);margin:2px 0 6px">MODO CARRERA <span style="color:var(--gold)">6.2</span></div>
+<div style="text-align:center;font:900 22px var(--f);margin:2px 0 6px">MODO <span style="color:var(--gold)">CARRERA</span></div>
 <div class="x-pill"><i data-i="screen" style="vertical-align:-3px;margin-right:8px"></i>SIMULADOR DEL PARTIDO</div>
 <div class="x-st"><span class="x-st-b" id="matchMinute">PREVIA</span><span class="x-st-b" id="matchState">EN VESTUARIOS</span></div>
 <div class="x-panel x-score"><div class="tm"><span id="homeCrest"></span><span id="homeTeam">LOCAL</span></div><div class="mid"><div class="sc" id="score">0 - 0</div><div class="ck" id="matchClock">00:00</div></div><div class="tm"><span id="awayCrest"></span><span id="awayTeam">VISITANTE</span></div></div>
@@ -269,7 +269,7 @@ input,select{background:#061534;color:#fff;border:1px solid #3a86ff99;border-rad
 <section id="players" class="page"><div class="eyebrow">BASE DE DATOS</div><h1>Administrador de jugadores</h1><div id="mcPlayersBody"></div></section>
 <section id="backup" class="page"><div class="eyebrow">TUS DATOS</div><h1>Copias de seguridad</h1><div id="mcBackupBody"></div><input type="file" id="mcImportFile" accept=".json,application/json" style="display:none" onchange="mcImportFile(this)"></section>
 <section id="advanced" class="page">
-<div class="eyebrow">MODO CARRERA 5.0</div><h1>Gestión integral</h1>
+<div class="eyebrow">MODO CARRERA</div><h1>Gestión integral</h1>
 <p>Desarrollo de juveniles, scouting internacional, personal, prensa y competiciones.</p>
 <div class="tabs" id="advancedTabs">
 <button class="active" onclick="advancedTab('academy',this)">Academia</button><button onclick="advancedTab('scouting',this)">Scouting</button><button onclick="advancedTab('staff',this)">Staff</button><button onclick="advancedTab('press',this)">Prensa</button><button onclick="advancedTab('world',this)">Copas</button><button onclick="advancedTab('history',this)">Historia</button>
@@ -285,10 +285,10 @@ input,select{background:#061534;color:#fff;border:1px solid #3a86ff99;border-rad
 <script id="market-engine-51" src="js/core/03-market-engine-51.js?v=12.3.0"></script>
 
 <script id="mc6-ui-js" src="js/core/04-mc6-ui-js.js?v=12.3.0"></script>
-<script src="data/jugadores.js"></script>
-<script src="js/mc13-arg-grl.js?v=12.2"></script>
-<script src="data/mundo.js"></script>
-<script src="js/mc10-datos.js"></script>
+<script src="data/jugadores.js?v=12.3.0"></script>
+<script src="js/mc13-arg-grl.js?v=12.3.0"></script>
+<script src="data/mundo.js?v=12.3.0"></script>
+<script src="js/mc10-datos.js?v=12.3.0"></script>
 <script id="mc9-datos" src="js/core/05-mc9-datos.js?v=12.3.0"></script>
 <script id="mc7-core" src="js/core/06-mc7-core.js?v=12.3.0"></script>
 <script id="mc7-match" src="js/core/07-mc7-match.js?v=12.3.0"></script>
@@ -315,15 +315,16 @@ input,select{background:#061534;color:#fff;border:1px solid #3a86ff99;border-rad
 </style>
 <script id="mc7-boot" src="js/core/11-mc7-boot.js?v=12.3.0"></script>
 <script id="mc-global-no-fake-players" src="js/core/12-mc-global-no-fake-players.js?v=12.3.0"></script>
-<script src="js/mc10-liga.js"></script>
-<script src="js/mc10-mundo.js"></script>
-<script src="js/mc10-ui.js"></script>
-<script src="js/mc11-nombres.js"></script>
-<script src="js/mc13-arg-nombres.js?v=12.2"></script>
+<script src="js/mc10-liga.js?v=12.3.0"></script>
+<script src="js/mc10-mundo.js?v=12.3.0"></script>
+<script src="js/mc10-ui.js?v=12.3.0"></script>
+<script src="js/mc11-nombres.js?v=12.3.0"></script>
+<script src="js/mc13-arg-nombres.js?v=12.3.0"></script>
 <script id="mc10-boot" src="js/core/13-mc10-boot.js?v=12.3.0"></script>
 <script id="mc-respaldo" src="js/core/14-mc-respaldo.js?v=12.3.0"></script>
+<script id="mc-ajustes" src="js/core/15-mc-ajustes.js?v=12.3.0"></script>
 <!-- MODO CARRERA 12.2: la hoja se repite al final para quedar por encima de los estilos anteriores; el script solo cambia la presentación -->
-<link rel="stylesheet" href="css/mc12-diseno.css?v=12.2.2">
-<script src="assets/jugadores/fotos.js?v=12.2.2"></script>
-<script src="js/mc12-diseno.js?v=12.2.2"></script>
+<link rel="stylesheet" href="css/mc12-diseno.css?v=12.3.0">
+<script src="assets/jugadores/fotos.js?v=12.3.0"></script>
+<script src="js/mc12-diseno.js?v=12.3.0"></script>
 </body></html>
