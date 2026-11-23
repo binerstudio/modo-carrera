@@ -73,6 +73,17 @@ Todavía **no está conectado al juego** (eso es la etapa 5): `index.html` no lo
 
 Los partidos de la prueba cruzan clubes de todo el mundo, de niveles muy distintos, así que hay goleadas (como máximo hubo 22 goles en un partido). Los números grandes están en la cancha que se esperaba para una primera base. Sobran laterales, quites y gambetas, y faltan precisión de pase y tiempo muerto. Ajustar eso es la **etapa 4 (calibración)**, y ninguna de estas cifras hace fallar la prueba.
 
+### Resultados en CI (run 37, commit `32ef3b0`)
+- Motor v2, validación masiva: OK.
+- **Motor v3, etapa 1: OK.** 1000 partidos sin errores y determinismo OK, en 6 min. Mismas estadísticas que en la corrida local.
+- Temporadas con semilla fija: **HUELLA `b6e76d8864c3a1f4` · OK**, 0 errores, guardado y recarga OK.
+- Auditoría de eventos: OK · Simulador 2D: OK · Tres temporadas sin intervención: OK.
+- Carrera guardada en `main` que se abre con esta versión: **FALLÓ**, pero **no por esta rama**:
+  - falla exactamente igual en el CI de `main` (run 36, commit `ff72d96`);
+  - `main` ya es la misma versión 12.6 que esta rama, y la prueba da por hecho que `main` es una versión anterior. Por eso espera una copia automática "Antes de actualizar" y el motor v1;
+  - los datos de la carrera quedan idénticos y no hay errores;
+  - no se modificó la prueba, para no falsearla. Hay que adaptarla a la nueva situación de `main`, aparte.
+
 ## Lo que falta (a propósito, para las etapas siguientes)
 - Faltas, tarjetas, offside sancionado, penales, tiros libres y cambios (etapa 3).
 - Táctica (mentalidad, presión, ancho, profundidad, estilos) y un orden de juego más fino (etapa 2).
