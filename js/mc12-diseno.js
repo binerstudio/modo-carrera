@@ -620,6 +620,13 @@ function lastEv(m){const E=m.events||[];for(let i=E.length-1;i>=0;i--){if(E[i].t
 function evIcon(t){t=String(t||'');return /GOL/i.test(t)?sv('ball','ei'):/ROJA/i.test(t)?'<span class="cd r"></span>':/AMARILLA|TARJETA/i.test(t)?'<span class="cd"></span>':/CAMBIO/i.test(t)?sv('swap','ei y'):/LESI/i.test(t)?'<span class="ei x">+</span>':/(ARCO|REMATE|OCASI|ATAJ|PALO|TIRO)/i.test(t)?sv('target','ei'):/(⏱|⏸|FINAL|COMIENZA|DESCANSO)/.test(t)?'<span class="ei w">⏱</span>':'<span class="ei w">•</span>'}
 const clean=t=>String(t||'').replace(/^[^A-Za-zÁÉÍÓÚÑ¡]+/,'').trim();
 const first=s=>{s=String(s||'');const i=s.search(/[.!?](\s|$)/);return i>0?s.slice(0,i+1):s};
+/* 12.5 · los goles muestran autor, asistencia y cómo fue (antes se veía solo "¡GOOOL de ...!") */
+const isGoal=t=>/GOL (LOCAL|VISITANTE)/i.test(String(t||''));
+const GTIPO={cabezazo:'de cabeza',corner:'de cabeza tras un córner',centro:'tras un centro',filtrado:'tras un pase filtrado',area:'dentro del área',contra:'de contraataque',afuera:'remate de afuera del área',individual:'jugada individual',rebote:'de rebote',tirolibre:'de tiro libre',pen:'de penal'};
+function golTxt(e){const g=e.gol;let rest=String(e.msg||'').replace(/^¡GO+L de [^!]*!\s*/,'');
+ if(!g)return rest;if(g.asist)rest=rest.replace(/\s*\(asistencia de [^)]*\)/,'');
+ const head=`${g.autor}${g.asist?' (asistencia: '+g.asist+')':''}${GTIPO[g.tipo]?' · '+GTIPO[g.tipo]:''}`;return head+'. '+rest}
+const evTxt=e=>isGoal(e.title)?golTxt(e):first(e.msg);
 function matchBuild(){const s=$('match'),m=curMatch(),c=C();if(!s||!c)return;let box=$('m12M');
  if(!box){box=document.createElement('div');box.id='m12M';box.className='m12x';s.insertBefore(box,s.firstChild)}
  if(!m){box.innerHTML='<div class="w"><p class="em">No hay un partido en juego.</p></div>';return}
@@ -628,8 +635,8 @@ function matchBuild(){const s=$('match'),m=curMatch(),c=C();if(!s||!c)return;let
  const isL=/^LIGA/i.test(String(m.compLabel||''));const comp=isL?`${lgName(c.country)} - ${String(m.compLabel).replace(/^LIGA\s*·\s*/i,'').replace(/^FECHA/i,'Fecha')}`:(m.compLabel||'Partido');
  const ph=m.done?'Final':(PH[m.phase]||'');const mn=m.phase==='pre'?"0'":(m.lbl||m.minute||0)+"'";
  const R=rows(m),hot=(m.scorers||[]).slice(-1)[0];
- const le=lastEv(m);let leH='';if(le){const g=/GOL/i.test(le.title);const team=/LOCAL/i.test(le.title)?m.home:/VISIT/i.test(le.title)?m.away:'';
-  leH=`<div class="le">${evIcon(le.title)}<b>${esc(le.lbl!=null?le.lbl+"'":'')}</b><strong>${g&&team?'¡GOL DE '+esc(team.toUpperCase())+'!':esc(clean(le.title))}</strong></div><p class="lm">${esc(first(le.msg))}</p>`}
+ const le=lastEv(m);let leH='';if(le){const g=isGoal(le.title);const team=/LOCAL/i.test(le.title)?m.home:/VISIT/i.test(le.title)?m.away:'';
+  leH=`<div class="le">${evIcon(le.title)}<b>${esc(le.lbl!=null?le.lbl+"'":'')}</b><strong>${g&&team?'¡GOL DE '+esc(team.toUpperCase())+'!':esc(clean(le.title))}</strong></div><p class="lm">${esc(evTxt(le))}</p>`}
  const prog=Math.max(0,Math.min(100,(m.done?90:(m.minute||0))/90*100));
  const running=!m.done&&(m.phase==='first'||m.phase==='second');let paused=false;try{paused=matchPaused}catch(e){}
  let sp=2;try{sp=matchSpeed}catch(e){}
@@ -637,7 +644,7 @@ function matchBuild(){const s=$('match'),m=curMatch(),c=C();if(!s||!c)return;let
  const ST=[['Posesión',Math.round(m.pos||50),100-Math.round(m.pos||50),'%'],['Tiros',m.shotsH,m.shotsA],['Tiros al arco',m.onH,m.onA],['Goles esperados (xG)',(m.xgH||0).toFixed(1),(m.xgA||0).toFixed(1)],['Saques de esquina',m.cornersH,m.cornersA]];
  const stH=ST.map(r=>{const p=r[3]?r[1]:pct(r[1],r[2]);return `<div class="sr"><b>${r[1]}${r[3]||''}</b><div><span>${r[0]}</span><div class="sb"><i style="width:${p}%"></i></div></div><b>${r[2]}${r[3]||''}</b></div>`}).join('');
  const E=(m.events||[]).slice().reverse();const key=E.filter(e=>/GOL|TARJETA|AMARILLA|ROJA|ARCO|CAMBIO|LESI|OCASI/i.test(e.title||''));
- const evRow=(e,i)=>`<div class="er${i===0&&/GOL/i.test(e.title)?' hl':''}"><b>${esc(e.lbl!=null?e.lbl+"'":'')}</b>${evIcon(e.title)}<span><strong>${esc(clean(e.title))}</strong> · ${esc(first(e.msg))}</span></div>`;
+ const evRow=(e,i)=>`<div class="er${i===0&&/GOL/i.test(e.title)?' hl':''}"><b>${esc(e.lbl!=null?e.lbl+"'":'')}</b>${evIcon(e.title)}<span><strong>${esc(clean(e.title))}</strong> · ${esc(evTxt(e))}</span></div>`;
  const evP=`<div class="pn ev"><h4>EVENTOS DEL PARTIDO</h4>${(key.length?key:E).slice(0,4).map(evRow).join('')||'<p class="em">Todavía no hubo eventos.</p>'}</div>`;
  let body='';
  if(MT==='stats')body=`<div class="g2"><div class="pn st">${stH}</div>${evP}</div>`;

@@ -147,7 +147,7 @@ function coachView(){const w=mcWorld();let h='';
  return h}
 function movesView(){const w=mcWorld();const A=w.aiMoves||[];let h=`<div class="card"><div class="eyebrow">MERCADO MUNDIAL</div><h2>Traspasos</h2><p class="tiny">Al cerrar cada temporada los clubes del mundo hacen sus fichajes. El club del jugador se actualiza en toda la base: planteles, mercado y selecciones.</p>
  ${(career.transferHistory||[]).slice().reverse().slice(0,15).map(x=>`<div class="statsrow"><span>${esc(x.name)}</span><b>${esc(x.detail)}</b></div>`).join('')}</div>`;
- A.forEach(s=>{h+=`<div class="card"><h2>Verano ${s.season+1}</h2>${s.moves.map(m=>`<div class="statsrow"><span><b>${esc(m[0])}</b><span class="tiny muted" style="display:block">${esc(m[1])} → ${esc(m[2])}</span></span><b>${money(m[3])}</b></div>`).join('')}</div>`});
+ A.forEach(s=>{h+=`<div class="card"><h2>Verano ${s.season+1}</h2>${s.moves.map(m=>`<div class="statsrow"><span><b>${esc(m[0])}</b><span class="tiny muted" style="display:block">${esc(m[1])} → ${esc(m[2])}</span></span><b>${m[4]&&m[4]!=='traspaso'?esc(m[4]):money(m[3])}</b></div>`).join('')}</div>`});
  if(!A.length)h+='<div class="card"><p class="tiny">Los traspasos de la IA aparecen después de la primera temporada.</p></div>';return h}
 /* navegación: la página Mundo necesita una carrera activa */
 (function(){const o=window.go;window.go=function(id){if(id==='world'&&!career)id='newcareer';const r=o.apply(this,arguments);if(id==='world'){ensureWorldPage();document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='world'));renderWorld();window.scrollTo(0,0)}if(id==='newcareer'){installFinder();renderFinder()}return r}})();

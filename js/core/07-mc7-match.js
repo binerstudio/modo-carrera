@@ -125,6 +125,7 @@ function goal(m,side,scorer,assist,kind,type,defN,gkN){
  const club=clubOf(m,side),local=(m.venue==='a')!==home;
  const body=kind==='pen'?`${sn} cambia el penal por gol: ${P_(['remate fuerte a un costado','la pica suave al medio','abre el pie y la pone junto al palo'])}, sin chances para ${gkN}.`:goalText(type,sn,an||'un compañero',defN,gkN);
  ev(m,local?'⚽ GOL LOCAL':'⚽ GOL VISITANTE',`¡GOOOL de ${club}! ${body}${an&&!body.includes(an)?` (asistencia de ${an})`:''} ${scoreTxt(m)}.`,true,side);
+ const GE=m.events[m.events.length-1];if(GE)GE.gol={autor:sn,asist:an||null,tipo:kind==='pen'?'pen':type};
 }
 function resolveAttack(m,side,kind){
  const home=side==='o',mine=home?m.own:m.riv,theirs=home?m.riv:m.own,other=home?'r':'o';

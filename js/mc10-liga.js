@@ -81,7 +81,7 @@ function ensure(){
  if(window.mcSeasonStart)try{mcSeasonStart(career)}catch(e){console.error('mcSeasonStart',e)}
  sync();return L}
 window.mcEnsureLeague=ensure;
-function simFx(L,f){const s=simScore(L.teams[f[0]],L.teams[f[1]]);f[2]=s[0];f[3]=s[1];if(window.mcStatHook)try{mcStatHook(L.teams[f[0]],L.teams[f[1]],s[0],s[1],L.country)}catch(e){}if(f[4]&&f[4].ko&&f[4].single&&f[2]===f[3]){f[4].pen=pens(L.teams[f[0]],L.teams[f[1]])}}
+function simFx(L,f){const s=(window.mcSimV2&&mcSimV2(L.teams[f[0]],L.teams[f[1]]))||simScore(L.teams[f[0]],L.teams[f[1]]);f[2]=s[0];f[3]=s[1];if(window.mcStatHook)try{mcStatHook(L.teams[f[0]],L.teams[f[1]],s[0],s[1],L.country)}catch(e){}if(f[4]&&f[4].ko&&f[4].single&&f[2]===f[3]){f[4].pen=pens(L.teams[f[0]],L.teams[f[1]])}}
 /* ---------- tablas ---------- */
 function table(L,opt){L=L||ensure();if(!L)return[];opt=opt||{};
  const kinds=opt.kinds||(L.fmt.apcl?[curHalf(L)]:['L']);

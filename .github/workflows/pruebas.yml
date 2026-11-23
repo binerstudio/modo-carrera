@@ -5,7 +5,7 @@ on:
 jobs:
   pruebas:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
@@ -23,6 +23,8 @@ jobs:
         run: node tests/motor.mjs 1000
       - name: Jugar temporadas con semilla fija
         run: node tests/regresion.mjs http://localhost:8080/index.html ${{ github.ref_name }}
+      - name: Tres temporadas sin intervención (IA y mercado)
+        run: node tests/temporadas.mjs http://localhost:8080/index.html 3
       - name: Carrera guardada con la versión publicada (main) se abre con esta versión
         run: node tests/actualizacion.mjs http://localhost:8081/app/index.html /tmp/srvroot/app "$PWD/_base" "$PWD"
       - uses: actions/upload-artifact@v4

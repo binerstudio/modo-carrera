@@ -409,7 +409,7 @@ window.mcSeasonEnd=function(c,L){const w=W(),s=c.season;
   else{c.players.splice(i,1);w.moves[fold(p.name)]=l.from;c.inbox.unshift(`${p.name} terminó su préstamo y volvió a ${l.from}.`)}});
  w.loans=(w.loans||[]).filter(l=>l.until>s);
  /* traspasos entre clubes de la IA (mercado de verano) */
- aiTransfers(s);
+ if(!(window.mcIAMercado&&mcIAMercado(s)))aiTransfers(s);
  /* mudanza de club elegida en las ofertas */
  if(c.pendingMove){changeClub(c.pendingMove);c.pendingMove=null}
  c.firedPending=false;bump();try{fitXI()}catch(e){}};
