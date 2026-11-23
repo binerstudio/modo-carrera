@@ -24,7 +24,7 @@ jobs:
       - name: Preparar carpeta del sitio (sin archivos internos del repositorio)
         run: |
           mkdir _sitio
-          rsync -a --exclude '.git' --exclude '.github' --exclude '_sitio' ./ _sitio/
+          rsync -a --exclude '.git' --exclude '.github' --exclude '_sitio' --exclude 'tests' --exclude 'node_modules' --exclude 'package*.json' ./ _sitio/
 
       - name: Publicar
         uses: cloudflare/wrangler-action@v3
