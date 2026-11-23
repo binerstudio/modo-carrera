@@ -14,6 +14,7 @@ const CASES = [
   { country: 'Argentina', club: 'River Plate', seasons: 2 },
   { country: 'España', club: 'Real Madrid', seasons: 1 },
   { country: 'Inglaterra', club: 'Arsenal', seasons: 1 },
+  { country: 'Argentina', club: 'Boca Juniors', seasons: 1, motor: 'v1' },   // comparación v1 vs v2 (fuera de la huella)
   { country: 'Argentina', club: 'Boca Juniors', seasons: 1, motor: 'v2' },   // motor v2: no entra en la huella v1
 ];
 

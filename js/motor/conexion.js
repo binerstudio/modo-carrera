@@ -45,14 +45,12 @@ if(typeof oMatch==='function')window.createMatch=function(){
  }catch(e){console.warn('MC motor v2',e);if(match)delete match.v2}
  return r};
 
-/* al terminar: guardar el once titular (química) y bajar el estado físico según la fatiga real del partido */
+/* al terminar: guardar el once titular (química). El estado físico posterior lo sigue calculando finishMatch (v1). */
 const oFinish=window.finishMatch;
 if(typeof oFinish==='function')window.finishMatch=function(){
- const m=match,v2=m&&m.v2&&!m.done;
+ const m=match;
  const r=oFinish.apply(this,arguments);
  try{if(career&&m){career._xiPrev=(m.ownPlayers||career.players.slice(0,11)).map(p=>p.id)}
-  if(v2&&m.own){m.own.forEach(e=>{if(!e.p)return;const en=MCMotor.energia(e);/* energía 0.2–1 → el estado físico no baja más que lo que el partido gastó */
-   const gasto=Math.round(Math.max(0,(e.p.fitness==null?90:e.p.fitness)/100-en)*100);if(gasto>12)e.p.fitness=Math.max(40,(e.p.fitness||90)-Math.round(gasto*.25))})}
  }catch(e){console.warn('MC motor v2',e)}
  return r};
 
