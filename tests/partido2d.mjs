@@ -34,7 +34,7 @@ await page.evaluate(() => { mcSpeed(4); });           // arranca el partido en x
 const muestras = []; let adelantado = 0, retuvo = 0, i = 0; const t0 = Date.now();
 const cams = ['tv', 'cen', 'seg', 'tac'];
 let fotoRep = false;
-while (Date.now() - t0 < 240000) {
+while (Date.now() - t0 < 420000) {
   await page.waitForTimeout(400);
   const s = await page.evaluate(() => { const m = match, st = MC2D.estado(), sc = document.querySelector('#m12M .cl strong'); return { min: m.minute, phase: m.phase, done: m.done, h: m.h, a: m.a, vis: sc ? sc.textContent.trim() : '', st }; });
   const [vh, va] = s.vis.split('-').map(x => +x.trim());

@@ -554,7 +554,7 @@ function draw(){const ctx=S.cx,dpr=S.dpr;ctx.setTransform(dpr,0,0,dpr,0,0);drawP
 /* ---------- bucle ---------- */
 function speed(){let v=1;try{v=matchSpeed||1}catch(e){}return v}
 function frame(ts){S.raf=0;if(!S.cv||!S.cv.isConnected){return}
- const now=ts/1000,real=Math.min(.05,S.last?now-S.last:.016);S.last=now;const dt=real*speed();S.t+=dt;
+ const now=ts/1000,crudo=S.last?now-S.last:.016,real=Math.min(.05,crudo);S.last=now;const tf0=performance.now();if(S.perf){S.perf.real+=crudo;if(crudo>.05)S.perf.lentos++}const dt=real*speed();S.t+=dt;
  resize();const m=S.m;
  if(m&&!S.rep){syncPlayers();
   /* la circulación de posesión se corta en cuanto el motor produce un evento */
@@ -576,7 +576,7 @@ function frame(ts){S.raf=0;if(!S.cv||!S.cv.isConnected){return}
  if(S.rep){S.rep.t+=real*S.rep.v;if(S.rep.t>=S.rep.fin){S.rep=null;S.zoom=1.1;if(!S.play)next()}else{const L=S.rep.L;let i=0;while(i<L.length-2&&L[i+1].t<S.rep.t)i++;const A=L[i].b,B=(L[i+1]||L[i]).b;S.rep.b={x:(A.x+B.x)/2,y:(A.y+B.y)/2,fly:null}}}
  camara(real);
  if(visible()){const t0=performance.now();if(S.rep)dibujarRepeticion();else draw();const ms=performance.now()-t0;S.perf.n++;S.perf.tot+=ms;if(ms>S.perf.max&&S.perf.n>30)S.perf.max=ms}
- S.raf=requestAnimationFrame(frame)}
+ if(S.perf)S.perf.frame+=performance.now()-tf0;S.raf=requestAnimationFrame(frame)}
 /* ---------- repetición: se graban posiciones reales (20 por segundo) y se vuelven a dibujar en cámara lenta ---------- */
 function prims(o){const r={};for(const k in o){const v=o[k];if(v===null||typeof v!=='object'&&typeof v!=='function')r[k]=v}return r}
 let recT=0;function grabar(){if(S.t-recT<.05)return;recT=S.t;S.rec.push({t:S.t,sp:S.sp.map(prims),ref:S.ref?prims(S.ref):null,b:prims(S.ball),cx:S.camX,cy:S.camY});
@@ -594,7 +594,7 @@ function dibujarRepeticion(){const R=S.rep,L=R.L;let i=0;while(i<L.length-2&&L[i
  finally{S.sp.forEach((s,j)=>Object.assign(s,guard[j]));if(gref)Object.assign(S.ref,gref);Object.assign(S.ball,gb);S.owner=go;S.camX=gcx;S.camY=gcy;S.banner=gbn;S.big=gbig}}
 
 function init(m){S.m=m;S.sp=[];S.byKey=new Map();S.queue=[];S.play=null;S.owner=null;S.ball=newBall();S.half=(m.clock&&m.clock.half)||1;
- S.phase=m.phase||'pre';S.goles=[0,0];S.banner=null;S.big=null;S.reset=false;S.rec=[];S.rep=null;S.golT=null;S.repN=0;S.zoom=1.1;S.camY=34;S.camT=null;S.perf={n:0,tot:0,max:0};
+ S.phase=m.phase||'pre';S.goles=[0,0];S.banner=null;S.big=null;S.reset=false;S.rec=[];S.rep=null;S.golT=null;S.repN=0;S.zoom=1.1;S.camY=34;S.camT=null;S.perf={n:0,tot:0,max:0,real:0,lentos:0,frame:0};
  try{const loc=m.venue==='a'?m.away:m.home,vis=m.venue==='a'?m.home:m.away;const k=window.MCCamisetas?MCCamisetas.partido(loc,vis):null;S.kits=k}catch(e){S.kits=null}
  S.ref={key:'ref',team:-1,name:'Árbitro',num:'',x:50,y:44,vx:0,vy:0,vmax:6.5,acc:4,ph:0,pose:'run',poseT:0,poseD:0,alpha:1,face:1,skin:'#d9a87e',reg:50,vis:50,cad:1,estado:'quieto'};
  /* lo que ya pasó antes de montar el visor se muestra sin animar */
@@ -639,7 +639,7 @@ const API={
   const med={};{const b=S.ball;med.cerca=S.sp.filter(s=>!s.out&&Math.hypot(s.x-b.x,s.y-b.y)<8).length;
    [0,1].forEach(t=>{const L=S.sp.filter(s=>s.team===t&&!s.out&&!s.gk);if(!L.length)return;const xs=L.map(s=>s.x),ys=L.map(s=>s.y);med['largo'+t]=+(Math.max(...xs)-Math.min(...xs)).toFixed(1);med['ancho'+t]=+(Math.max(...ys)-Math.min(...ys)).toFixed(1);
     const g=S.sp.find(s=>s.team===t&&s.gk&&!s.out);if(g)med['arq'+t]=+Math.abs(g.x-(dirOf(t)>0?0:PW)).toFixed(1)});med.suelta=!!S.chaser;med.sueltaMax=+(S.sueltaMax||0).toFixed(1);med.enJugada=!!(S.play&&!S.play.filler)}
-  const rend=S.perf&&S.perf.n?{msPromedio:+(S.perf.tot/S.perf.n).toFixed(2),msMax:+S.perf.max.toFixed(1),cuadros:S.perf.n}:null;
+  const rend=S.perf&&S.perf.n?{msPromedio:+(S.perf.tot/S.perf.n).toFixed(2),msMax:+S.perf.max.toFixed(1),cuadros:S.perf.n,msCuadroTotal:+(S.perf.frame/S.perf.n).toFixed(2),fps:+(S.perf.n/Math.max(1,S.perf.real)).toFixed(0),cuadrosLentos:S.perf.lentos,tiempoJuego:+S.t.toFixed(0),tiempoReal:+S.perf.real.toFixed(0)}:null;
   return{rend,repeticiones:S.repN||0,enRepeticion:!!S.rep,zoom:+(S.zoom||1).toFixed(2),med,saltosJugadores:S.ptele||0,saltoLog:S.pteleLog||null,jugada:S.play?S.play.label:null,mostrados:S.shown,eventos:S.m?(S.m.events||[]).length:0,camara:S.cam,jugadores:S.sp.filter(s=>!s.out).length,goles:S.goles.slice(),cuadros:S.t,teletransportes:S.tele,teleLog:S.teleLog||null,estados:est,tacticos:tac,acciones:acc,posesionId:S.posId}}
 };
 window.MC2D=API;
