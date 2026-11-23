@@ -19,13 +19,14 @@ const CASES = [
 const seedScript = `(()=>{let s=${SEED}>>>0;Math.random=function(){s=(s+0x6D2B79F5)>>>0;let t=s;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296};})();`;
 const sha = o => createHash('sha256').update(JSON.stringify(o)).digest('hex').slice(0, 16);
 
-async function newPage(browser, errors) {
+async function newPage(browser, errors, missing) {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const page = await ctx.newPage();
   await page.clock.setFixedTime(new Date('2026-11-23T12:00:00Z'));
   await page.addInitScript(seedScript);
   page.on('pageerror', e => errors.push('pageerror: ' + e.message));
-  page.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
+  page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('console: ' + m.text()); });
+  page.on('response', r => { if (r.status() >= 400) missing.add(r.status() + ' ' + new globalThis.URL(r.url()).pathname); });
   page.on('dialog', d => d.accept());
   // Sin red externa: fuentes y escudos en línea no deben afectar el resultado.
   await ctx.route(u => !u.href.startsWith(new globalThis.URL(URL).origin), r => r.abort());
@@ -33,8 +34,8 @@ async function newPage(browser, errors) {
 }
 
 async function playCase(browser, cs) {
-  const errors = [];
-  const { ctx, page } = await newPage(browser, errors);
+  const errors = [], missing = new Set();
+  const { ctx, page } = await newPage(browser, errors, missing);
   const t0 = Date.now();
   await page.goto(URL, { waitUntil: 'load' });
   await page.waitForTimeout(1500);
@@ -56,7 +57,7 @@ async function playCase(browser, cs) {
     createCareer();
     return { ok: !!career && career.club === opt.value, club: career && career.club, squad: career && career.players.length };
   }, cs);
-  if (!created.ok) { await ctx.close(); return { case: cs, boot, created, errors, ok: false }; }
+  if (!created.ok) { await ctx.close(); return { case: cs, boot, created, errors, missing: [...missing], ok: false }; }
 
   const seasons = [];
   for (let s = 0; s < cs.seasons; s++) {
@@ -101,7 +102,7 @@ async function playCase(browser, cs) {
 
   await ctx.close();
   for (const s of seasons) delete s.allResults;
-  return { case: cs, boot, created, seasons, save: { before, after, reloadOk }, errors, ms: Date.now() - t0,
+  return { case: cs, boot, created, seasons, save: { before, after, reloadOk }, errors, missing: [...missing].sort(), ms: Date.now() - t0,
     ok: errors.length === 0 && reloadOk && seasons.every(s => s.userMatches > 0) };
 }
 
@@ -124,6 +125,7 @@ for (const r of results) {
   if (r.created && !r.created.ok) console.log('NO SE CREÓ', JSON.stringify(r.created));
   for (const s of r.seasons || []) console.log(`  temporada ${s.season}: partidos usuario ${s.userMatches} (goles/p ${s.userGoalsPerMatch}), liga ${s.league.matches} partidos, goles/p ${s.league.goalsPerMatch}, local ${s.league.homeWin}, empates ${s.league.draw}, dif>=5: ${s.league.diff5plus}, máx goles ${s.league.maxGoals}, puesto ${s.position}, pts ${s.points}, presupuesto ${s.budget}, hash ${s.hash}`);
   if (r.save) console.log('  guardado/recarga:', r.save.reloadOk ? 'OK' : 'FALLÓ', JSON.stringify(r.save.after));
+  console.log('  archivos inexistentes pedidos:', (r.missing || []).length, (r.missing || []).slice(0, 5).join(' | '));
   console.log('  errores:', r.errors ? r.errors.length : '-'); (r.errors || []).slice(0, 15).forEach(e => console.log('   ', e.slice(0, 300)));
 }
 process.exit(out.ok ? 0 : 1);
