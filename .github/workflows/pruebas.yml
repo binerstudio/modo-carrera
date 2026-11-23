@@ -8,13 +8,21 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with: { ref: main, path: _base }
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - run: npm install --no-save playwright@1.48.2 && npx playwright install --with-deps chromium
-      - name: Servidor local
-        run: (python3 -m http.server 8080 >/dev/null 2>&1 &) && sleep 2
+      - name: Servidores locales
+        run: |
+          (python3 -m http.server 8080 >/dev/null 2>&1 &)
+          mkdir -p /tmp/srvroot && ln -sfn "$PWD/_base" /tmp/srvroot/app
+          (cd /tmp/srvroot && python3 -m http.server 8081 >/dev/null 2>&1 &)
+          sleep 2
       - name: Jugar temporadas con semilla fija
         run: node tests/regresion.mjs http://localhost:8080/index.html ${{ github.ref_name }}
+      - name: Carrera guardada con la versión publicada (main) se abre con esta versión
+        run: node tests/actualizacion.mjs http://localhost:8081/app/index.html /tmp/srvroot/app "$PWD/_base" "$PWD"
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: resultados, path: tests/out/ }
