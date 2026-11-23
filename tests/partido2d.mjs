@@ -33,6 +33,7 @@ await page.screenshot({ path: 'tests/out/2d-0-previa.png' });
 await page.evaluate(() => { mcSpeed(4); });           // arranca el partido en x4
 const muestras = []; let adelantado = 0, retuvo = 0, i = 0; const t0 = Date.now();
 const cams = ['tv', 'cen', 'seg', 'tac'];
+let fotoRep = false;
 while (Date.now() - t0 < 240000) {
   await page.waitForTimeout(400);
   const s = await page.evaluate(() => { const m = match, st = MC2D.estado(), sc = document.querySelector('#m12M .cl strong'); return { min: m.minute, phase: m.phase, done: m.done, h: m.h, a: m.a, vis: sc ? sc.textContent.trim() : '', st }; });
@@ -40,7 +41,9 @@ while (Date.now() - t0 < 240000) {
   if (!s.done && (vh > s.h || va > s.a)) adelantado++;
   if (s.st.jugada && muestras.length && muestras[muestras.length - 1].st.jugada === s.st.jugada && muestras[muestras.length - 1].min === s.min) retuvo++;
   muestras.push(s);
+  if (s.st.enRepeticion && !fotoRep) { fotoRep = true; await page.screenshot({ path: 'tests/out/2d-repeticion.png' }); }
   if (i % 12 === 6 && i / 12 < 8) { const c = cams[Math.floor(i / 12) % 4]; await page.evaluate(c => { const b = document.querySelector(`.m2d-cams button[data-c="${c}"]`); if (b) b.click(); }, c); await page.waitForTimeout(250); await page.screenshot({ path: `tests/out/2d-${Math.floor(i / 12) + 1}-${c}-${s.min}min.png` }); }
+  if (i === 12 * 8) await page.evaluate(() => { const b = document.querySelector('.m2d-cams button[data-c="tv"]'); if (b) b.click(); });
   if (s.phase === 'ht') await page.evaluate(() => mcMainAction());
   if (s.done) break; i++;
 }
@@ -70,6 +73,14 @@ for (const t of [0, 1]) { if (realismo.largo[t] < 18 || realismo.largo[t] > 60) 
 realismo.sueltaMaxSeg = fin.estado.med ? fin.estado.med.sueltaMax : null;
 if (realismo.pctSuelta > 15) fallas.push(`La pelota quedó suelta en juego el ${realismo.pctSuelta}% del tiempo`);
 if (realismo.sueltaMaxSeg > 6) fallas.push(`Una pelota suelta tardó ${realismo.sueltaMaxSeg} s en ser recuperada`);
+/* Etapa 4: cámara, repetición y rendimiento */
+const zooms = muestras.map(x => x.st.zoom).filter(z => z != null);
+realismo.camara = { zoomMin: Math.min(...zooms), zoomMax: Math.max(...zooms) };
+realismo.repeticiones = fin.estado.repeticiones; realismo.rendimiento = fin.estado.rend;
+const golesVistos = fin.h + fin.a;
+if (golesVistos > 0 && !(fin.estado.repeticiones >= 1)) fallas.push(`Hubo ${golesVistos} goles y ninguna repetición`);
+if (!(realismo.camara.zoomMax - realismo.camara.zoomMin > .1)) fallas.push('La cámara de TV nunca cambió el zoom');
+if (fin.estado.rend && fin.estado.rend.msPromedio > 16) fallas.push(`Dibujo lento: ${fin.estado.rend.msPromedio} ms por cuadro de promedio`);
 if (errors.length) fallas.push(`${errors.length} errores de JavaScript`);
 const out = { ok: !fallas.length, realismo, montado, fin, estadosVistos: out_union, segundosReales: Math.round(ms / 1000), muestras: muestras.length, retuvoDuranteJugadas: retuvo, adelantado, errores: errors.slice(0, 15), fallas };
 writeFileSync('tests/out/partido2d.json', JSON.stringify(out, null, 1));
