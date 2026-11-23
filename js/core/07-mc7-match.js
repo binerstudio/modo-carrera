@@ -402,8 +402,10 @@ window.finishMatch=function(){
  mcReplaceUnavailable();
  career.lastResult=scoreTxt(m);
  const baja=career.players.filter(p=>mcUnavailable(p)).map(p=>`${p.name} (${p.injury?p.injury.split(' · ')[0].toLowerCase():'suspendido'})`);
- m.events.push({lbl:'90',min:90,title:'FINAL DEL PARTIDO',msg:`${scoreTxt(m)}. ${res==='W'?'Gran victoria.':res==='D'?'Reparto de puntos.':'Derrota. A trabajar.'}`,key:true});
- if(baja.length)m.events.push({lbl:'90',min:90,title:'📋 BAJAS PARA LA PRÓXIMA FECHA',msg:`No disponibles: ${baja.join(', ')}.${out.length?' Salieron del once titular: '+out.join(', ')+'.':''}`,key:true});
+ /* 12.7: resumen con identificador y minuto real (antes repetía "FINAL" con minuto 90 fijo) */
+ const EVX=o=>{m.evSeq=(m.evSeq||0)+1;m.events.push(Object.assign({id:m.evSeq,lbl:label(m),min:m.clock.base+m.clock.x},o))};
+ EVX({title:'📊 RESUMEN DEL PARTIDO',msg:`${scoreTxt(m)}. ${res==='W'?'Gran victoria.':res==='D'?'Reparto de puntos.':'Derrota. A trabajar.'}`,key:true});
+ if(baja.length)EVX({title:'📋 BAJAS PARA LA PRÓXIMA FECHA',msg:`No disponibles: ${baja.join(', ')}.${out.length?' Salieron del once titular: '+out.join(', ')+'.':''}`,key:true});
  const row=s=>`<div class="statsrow"><span>${s.name} <span class="muted">${s.pos}${s.gl?' · '+'⚽'.repeat(s.gl):''}${s.a?' · 🅰'+s.a:''}${s.y?' · 🟨':''}${s.r?' · 🟥':''}</span></span><b>${s.rating.toFixed(1)}</b></div>`;
  $('ratingsList').innerHTML=`<div class="tiny gold" style="margin:4px 0">${m.home.toUpperCase()}</div>`+rat.o.map(row).join('')+`<div class="tiny gold" style="margin:10px 0 4px">${m.away.toUpperCase()}</div>`+rat.r.slice(0,8).map(row).join('');
  save();renderMatch();try{renderHome();renderDashboard()}catch(e){}

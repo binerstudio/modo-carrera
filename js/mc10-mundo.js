@@ -236,7 +236,7 @@ const compMod={
  record(car,ev,m){const c=W().comps.list.find(x=>x.id===ev.compId);if(!c)return;const u=userFxOf(c);if(!u)return;
   const gh=u.fx.home===car.club?m.h:m.a,ga=u.fx.home===car.club?m.a:m.h;let pen=null;
   if(u.fx.t&&(u.st.legs===1||u.di===1)){const agg=aggOf(u.fx.t,[gh,ga],u.fx);if(agg[0]===agg[1]){pen=pens(u.fx.home,u.fx.away);const mine=u.fx.home===car.club?pen[0]:pen[1],th=u.fx.home===car.club?pen[1]:pen[0];
-   m.events&&m.events.push({lbl:'120',min:120,title:'🥅 DEFINICIÓN POR PENALES',msg:`${car.club} ${mine}-${th}. ${mine>th?'¡Pasa de ronda!':'Eliminado.'}`,key:true})}}
+   m.events&&m.events.push({id:(m.evSeq=(m.evSeq||0)+1),lbl:'PEN',min:Math.max(120,(m.clock?m.clock.base+m.clock.x:90)),title:'🥅 DEFINICIÓN POR PENALES',msg:`${car.club} ${mine}-${th}. ${mine>th?'¡Pasa de ronda!':'Eliminado.'}`,key:true})}}
   setResult(u.st,u.fx,gh,ga,pen);stat(c,u.fx.home,u.fx.away,gh,ga);
   if(window.mcStatHookUser)try{mcStatHookUser(m,c.id)}catch(e){}
   if(u.fx.t&&(u.st.legs===1||u.di===1)){const t=u.fx.t;resolveKOone(t);if(t.w)car.inbox.unshift(`${c.name} · ${u.st.name}: ${t.w===car.club?'¡'+car.club+' avanza!':car.club+' quedó eliminado ante '+t.w+'.'}${t.agg&&u.st.legs===2?' Global '+t.agg[0]+'-'+t.agg[1]+'.':''}`)}},

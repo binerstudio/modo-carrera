@@ -200,7 +200,7 @@ window.mcLeagueRecord=function(m){const L=ensure();if(!L)return false;const c=cu
  if(f[0]===u){f[2]=m.h;f[3]=m.a}else{f[2]=m.a;f[3]=m.h}
  if(window.mcStatHookUser)try{mcStatHookUser(m,L.country)}catch(e){}
  if(f[4]&&f[4].ko&&f[4].single&&f[2]===f[3]){f[4].pen=pens(L.teams[f[0]],L.teams[f[1]]);const me=f[0]===u?f[4].pen[0]:f[4].pen[1],th=f[0]===u?f[4].pen[1]:f[4].pen[0];
-  m.events&&m.events.push({lbl:'120',min:120,title:'🥅 DEFINICIÓN POR PENALES',msg:`${career.club} ${me}-${th} ${m.away}. ${me>th?'¡Clasificado!':'Eliminado.'}`,key:true})}
+  m.events&&m.events.push({id:(m.evSeq=(m.evSeq||0)+1),lbl:'PEN',min:Math.max(120,(m.clock?m.clock.base+m.clock.x:90)),title:'🥅 DEFINICIÓN POR PENALES',msg:`${career.club} ${me}-${th} ${m.away}. ${me>th?'¡Clasificado!':'Eliminado.'}`,key:true})}
  L.rounds[career.round].forEach(x=>{if(x!==f&&x[2]==null)simFx(L,x)});
  career.round++;afterRound(L);
  /* si era la vuelta de un cruce, avisar el resultado global */
