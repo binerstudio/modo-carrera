@@ -183,9 +183,9 @@ function autoSubOwn(m,reason){
  const cand=m.own.map((e,i)=>({e,i})).filter(o=>o.e.g!=='POR').sort((a,b)=>(a.e.p.fitness*.6+effRating(a.e.p,a.e.g)*.4)-(b.e.p.fitness*.6+effRating(b.e.p,b.e.g)*.4));
  for(const c of cand){const p=bestBenchFor(m,c.e.g);if(p&&(p.rating-posPenalty(p.pos,c.e.g))>=effRating(c.e.p,c.e.g)-6){doSubOwn(m,c.i,p,reason||'cambio táctico');return}}
 }
-function injure(m,side){
+function injure(m,side,pre){
  const L=side==='o'?m.own:m.riv;if(!L.length)return;
- const e=weightedPick(L,x=>x.g==='POR'?.25:1),i=L.indexOf(e),n=nm(m,e,side),club=clubOf(m,side);
+ const e=pre&&L.includes(pre)?pre:weightedPick(L,x=>x.g==='POR'?.25:1),i=L.indexOf(e),n=nm(m,e,side),club=clubOf(m,side);
  const opp=side==='o'?m.riv:m.own,vE=opp.length?pick(opp):null,vN=vE?nm(m,vE,side==='o'?'r':'o'):'un rival';
  const t=weightedPick(INJ,x=>x[3]),w=t[1]+Math.floor(R()*(t[2]-t[1]+1));
  const how=t[4].replace('{v}',vN);
@@ -196,7 +196,32 @@ function injure(m,side){
   else{L.splice(i,1);m.ownPlayers=m.own.map(x=>x.p);ev(m,'🩹 SIN CAMBIOS',`${club} ya no tiene cambios disponibles y queda con ${L.length} jugadores.`,true,'o')}}
  else{ev(m,'🩹 LESIÓN',`${n} (${club}) ${how}: no puede continuar.`,true,'r');if(!doSubRival(m,true,e)){L.splice(i,1);ev(m,'🩹 SIN CAMBIOS',`${club} queda con ${L.length} jugadores.`,true,'r')}}
 }
+/* ===== 12.4 · MOTOR v2 (js/motor/motor-v2.js) =====
+   Si el partido es v2 (match.v2), cada minuto lo calcula MCMotor.minuto con estas funciones de relato y
+   registro de este archivo. Si no, todo sigue exactamente igual que en v1. */
+const OTRO=s=>s==='o'?'r':'o';
+const API2={
+ ev:(m,t,msg,key,side)=>ev(m,t,msg,key,side),
+ club:(m,side)=>clubOf(m,side),
+ tacO:()=>ownTac(),
+ label:m=>label(m),
+ injMult:()=>({Baja:.5,Normal:1,Alta:1.8}[$('injuries')?$('injuries').value:'Normal']||1),
+ relato:(m,side,e)=>{const n=nm(m,e,side),cl=clubOf(m,side);ev(m,'JUEGO EN DESARROLLO',P_([`${n} maneja los tiempos de ${cl} en mitad de cancha.`,`${cl} hace circular la pelota con paciencia; ${n} busca el hueco entre líneas.`,`${n} recupera en campo propio y ${cl} intenta salir rápido.`,`${cl} adelanta líneas y empuja al rival contra su área.`]),false,side)},
+ ps:(m,e,side)=>ps(m,e.key,nm(m,e,side),e.p?e.p.pos:e.pos,e.g,side),
+ goal:(m,side,sc,as,kind,type,defN,gkN)=>goal(m,side,sc,as,kind,type==='error'?'area':type,defN,gkN),
+ miss:(m,side,type,sh,defE,gkE,onT)=>{const o=OTRO(side);ev(m,onT?'ATAJADA':'OCASIÓN DE GOL',missText(type==='error'?'area':type,nm(m,sh,side),nm(m,defE,o),nm(m,gkE,o),onT),false,side)},
+ foul:(m,v,side,vic)=>ev(m,'FALTA',P_(FOULS)(nm(m,v,side),vic),false,side),
+ yellow:(m,v,side,why,vic)=>{const L=side==='o'?m.own:m.riv,n=nm(m,v,side),st=ps(m,v.key,n,v.p?v.p.pos:v.pos,v.g,side);st.y++;if(side==='o')m.yH++;else m.yA++;
+  if(st.y>=2){st.rk='double';card(m,L,v,side,n,true,'doble amarilla',`${n} ya tenía amarilla y ve la segunda.`)}
+  else ev(m,'🟨 TARJETA AMARILLA',why?`Amarilla para ${n} (${clubOf(m,side)}) ${why}.`:`${P_(YEL)(n,vic||'un rival')} Amarilla para ${n} (${clubOf(m,side)}).`,true,side)},
+ red:(m,v,side,why,vic)=>{const L=side==='o'?m.own:m.riv,n=nm(m,v,side),st=ps(m,v.key,n,v.p?v.p.pos:v.pos,v.g,side);st.r=1;st.rk='direct';card(m,L,v,side,n,true,'roja directa',P_(RED)(n,vic||'un rival'))},
+ injure:(m,side,e)=>injure(m,side,e),
+ subR:m=>doSubRival(m),
+ subO:m=>autoSubOwn(m)
+};
+window.mcMatchEv=ev;
 function minuteStep(m){
+ if(m.v2&&window.MCMotor)return MCMotor.minuto(m,API2);
  const c=m.clock;if(c.base<c.limit){c.base++;c.x=0}else c.x++;
  m.minute=c.base+c.x;m.lbl=label(m);m.moments++;m.tick++;
  if(!m.tacR)m.tacR=rivalTac(0);

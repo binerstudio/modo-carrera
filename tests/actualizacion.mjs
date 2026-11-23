@@ -33,13 +33,13 @@ const despues = await page.evaluate(async () => {
   const resp = window.MCRespaldo ? await MCRespaldo.ready : null;
   return { title: document.title, id: career && career.id, round: career && career.round, points: career && career.points, gf: career && career.gf, ga: career && career.ga,
     squad: career && career.players.map(p => p.name).join('|'), budget: career && career.budget, transfers: career && (career.transferHistory || []).length,
-    snapshot: snaps.map(s => s.reason).filter(r => /12\.3/.test(r)), respaldo: resp };
+    snapshot: snaps.map(s => s.reason).filter(r => /Antes de actualizar/.test(r)), respaldo: resp, motor: window.mcMotorDe ? mcMotorDe(career) : 'v1' };
 });
 // seguir jugando con la versión nueva
 const sigue = await page.evaluate(() => { const r0 = career.round; openMatch(); mcSimEnd(); match.finished = true; save(); return career.round > r0 || career.round === r0; });
 await browser.close();
 const mismos = ['id', 'round', 'points', 'gf', 'ga', 'squad', 'budget', 'transfers'].every(k => antes[k] === despues[k]);
-const ok = mismos && despues.snapshot.length > 0 && despues.respaldo === 'copiada' && sigue && errors.length === 0;
+const ok = mismos && despues.motor === 'v1' && despues.snapshot.length > 0 && despues.respaldo === 'copiada' && sigue && errors.length === 0;
 console.log('ACTUALIZACIÓN', ok ? 'OK' : 'FALLÓ');
 console.log(' antes  ', antes.title, JSON.stringify({ ...antes, squad: antes.squad.split('|').length + ' jugadores' }));
 console.log(' después', despues.title, JSON.stringify({ ...despues, squad: (despues.squad || '').split('|').length + ' jugadores' }));

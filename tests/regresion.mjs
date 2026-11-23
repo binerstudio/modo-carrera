@@ -14,6 +14,7 @@ const CASES = [
   { country: 'Argentina', club: 'River Plate', seasons: 2 },
   { country: 'España', club: 'Real Madrid', seasons: 1 },
   { country: 'Inglaterra', club: 'Arsenal', seasons: 1 },
+  { country: 'Argentina', club: 'Boca Juniors', seasons: 1, motor: 'v2' },   // motor v2: no entra en la huella v1
 ];
 
 const seedScript = `(()=>{let s=${SEED}>>>0;Math.random=function(){s=(s+0x6D2B79F5)>>>0;let t=s;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296};})();`;
@@ -44,7 +45,7 @@ async function playCase(browser, cs) {
     players: (window.MC_PLAYERS || {}).rows?.length || 0,
     leagues: Object.keys(window.LEAGUES || {}).length,
   }));
-  const created = await page.evaluate(({ country, club }) => {
+  const created = await page.evaluate(({ country, club, motor }) => {
     go('newcareer');
     const c = document.getElementById('country');
     if (![...c.options].some(o => o.value === country)) c.add(new Option(country, country));
@@ -54,8 +55,9 @@ async function playCase(browser, cs) {
     if (!opt) return { ok: false, options: [...s.options].slice(0, 8).map(o => o.value) };
     s.value = opt.value;
     document.getElementById('manager').value = 'Prueba';
+    window.MC_MOTOR_NUEVAS = motor || 'v1';
     createCareer();
-    return { ok: !!career && career.club === opt.value, club: career && career.club, squad: career && career.players.length };
+    return { ok: !!career && career.club === opt.value && (!window.mcMotorDe || mcMotorDe(career) === (motor || 'v1')), club: career && career.club, squad: career && career.players.length, motor: career && career.motor };
   }, cs);
   if (!created.ok) { await ctx.close(); return { case: cs, boot, created, errors, missing: [...missing], ok: false }; }
 
@@ -68,6 +70,7 @@ async function playCase(browser, cs) {
         if (!match) break;
         mcSimEnd();
         user.push([match.home || '', match.away || '', match.h, match.a]);
+        if (match.v2) { window.__v2 = window.__v2 || { partidos: 0, previa: 0, var: 0, errores: 0, arbitrales: 0, climas: {} }; const V = window.__v2; V.partidos++; if (match.events.some(e => /PREVIA/.test(e.title))) V.previa++; V.var += match.v2.var.revisiones; V.errores += match.v2.errores.o + match.v2.errores.r; V.arbitrales += match.v2.arbitrales; V.climas[match.v2.clima] = (V.climas[match.v2.clima] || 0) + 1; }
         match.finished = true;
       }
       const L = career.league; const all = [];
@@ -85,7 +88,7 @@ async function playCase(browser, cs) {
         userGoalsPerMatch: +(ug / Math.max(1, user.length)).toFixed(3),
         position: typeof rank === 'function' ? rank() : null,
         points: career.points, budget: career.budget, squad: career.players.length,
-        allResults: all, guard,
+        allResults: all, guard, v2: window.__v2 || null,
       };
     });
     res.hash = sha([res.user, res.allResults]);
@@ -170,7 +173,8 @@ for (const cs of CASES) {
 const pwa = await pruebaPWA(browser).catch(e => ({ ok: false, crash: String(e && e.stack || e) }));
 const espacio = await pruebaEspacio(browser).catch(e => ({ ok: false, crash: String(e && e.stack || e) }));
 await browser.close();
-const fingerprint = sha(results.map(r => (r.seasons || []).map(s => s.hash)));
+const fingerprint = sha(results.filter(r => !r.case.motor).map(r => (r.seasons || []).map(s => s.hash)));
+for (const r of results.filter(r => r.case.motor === 'v2')) { const s = (r.seasons || [])[0]; const v = s && s.v2; const ok = !!v && v.partidos > 0 && v.previa === v.partidos && s.userGoalsPerMatch > 1 && s.userGoalsPerMatch < 4.5; if (!ok) r.ok = false; r.v2check = { ok, v }; }
 const out = { name: NAME, seed: SEED, fingerprint, ok: results.every(r => r.ok) && espacio.ok !== false && pwa.ok !== false, results, espacio, pwa };
 mkdirSync('tests/out', { recursive: true });
 writeFileSync(`tests/out/${NAME}.json`, JSON.stringify(out, null, 1));
@@ -182,6 +186,7 @@ for (const r of results) {
   if (r.created && !r.created.ok) console.log('NO SE CREÓ', JSON.stringify(r.created));
   for (const s of r.seasons || []) console.log(`  temporada ${s.season}: partidos usuario ${s.userMatches} (goles/p ${s.userGoalsPerMatch}), liga ${s.league.matches} partidos, goles/p ${s.league.goalsPerMatch}, local ${s.league.homeWin}, empates ${s.league.draw}, dif>=5: ${s.league.diff5plus}, máx goles ${s.league.maxGoals}, puesto ${s.position}, pts ${s.points}, presupuesto ${s.budget}, hash ${s.hash}`);
   if (r.size) console.log('  tamaño: carrera ' + r.size.careerKB + ' KB · localStorage total ' + r.size.localStorageKB + ' KB');
+  if (r.v2check) console.log('  motor v2:', JSON.stringify(r.v2check));
   if (r.save) console.log('  guardado/recarga:', r.save.reloadOk ? 'OK' : 'FALLÓ', JSON.stringify(r.save.after));
   console.log('  archivos inexistentes pedidos:', (r.missing || []).length, (r.missing || []).slice(0, 5).join(' | '));
   console.log('  errores:', r.errors ? r.errors.length : '-'); (r.errors || []).slice(0, 15).forEach(e => console.log('   ', e.slice(0, 300)));

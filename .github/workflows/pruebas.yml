@@ -19,6 +19,8 @@ jobs:
           mkdir -p /tmp/srvroot && ln -sfn "$PWD/_base" /tmp/srvroot/app
           (cd /tmp/srvroot && python3 -m http.server 8081 >/dev/null 2>&1 &)
           sleep 2
+      - name: Motor v2 · validación masiva (miles de partidos)
+        run: node tests/motor.mjs 1000
       - name: Jugar temporadas con semilla fija
         run: node tests/regresion.mjs http://localhost:8080/index.html ${{ github.ref_name }}
       - name: Carrera guardada con la versión publicada (main) se abre con esta versión
