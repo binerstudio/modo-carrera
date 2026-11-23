@@ -64,7 +64,7 @@ function formPos(s){const dir=dirOf(s.team),b=S.ball||{x:52.5,y:34};
                         cayendo · levantandose · desequilibrio · amague · celebrando · abrazo · protesta · lamento
                         pide · atajando · estirada · saque · tarjeta
    táctico:             atacando · defendiendo · presionando · marcando · desmarcandose · apoyo                  */
-const ACC_D={pasando:.32,rematando:.38,cabeceando:.55,saltando:.5,controlando:.3,entrada:.55,barrida:.75,cayendo:.9,levantandose:.6,
+const ACC_D={volea:.42,proteccion:.6,pasando:.32,rematando:.38,cabeceando:.55,saltando:.5,controlando:.3,entrada:.55,barrida:.75,cayendo:.9,levantandose:.6,
  desequilibrio:.45,amague:.4,celebrando:2.4,abrazo:1.6,protesta:1.3,lamento:2,pide:.8,atajando:.6,estirada:.95,saque:.45,tarjeta:1.4};
 function accion(s,a,d){if(!s)return;s.pose=a;s.poseT=0;s.poseD=d||ACC_D[a]||.5}
 const BLOQUEA=a=>a==='cayendo'||a==='estirada'||a==='barrida'||a==='levantandose';
@@ -84,7 +84,11 @@ function step(s,dt){
  if(al>amax){s.vx+=ax/al*amax;s.vy+=ay/al*amax}else{s.vx=wx;s.vy=wy}
  s.x+=s.vx*dt;s.y+=s.vy*dt;const sp=Math.hypot(s.vx,s.vy);s.ph+=dt*(1.6+sp*1.75)*s.cad;
  s.estado=turn?'girando':(sp<sp0-s.acc*dt*.6&&sp>1)?'frenando':sp<.3?'quieto':sp<1.8?'caminando':sp<3.8?'trotando':sp<6.2?'corriendo':'esprintando';
- if(sp>.25)s.face=s.vx>=0?1:-1;else if(S.ball&&s.pose==='run')s.face=S.ball.x>=s.x?1:-1;
+ const mira=(s.tactico==='marcando'||s.tactico==='defendiendo'||s.tactico==='presionando'||s.gk)&&S.ball&&S.owner!==s;
+ if(mira&&sp<6.5)s.face=S.ball.x>=s.x?1:-1;else if(sp>.25)s.face=s.vx>=0?1:-1;else if(S.ball&&s.pose==='run')s.face=S.ball.x>=s.x?1:-1;
+ s.back=sp>.6&&s.vx*s.face<-.4;s.lat=sp>.8&&Math.abs(s.vy)>1.8*Math.abs(s.vx);
+ if(s.back&&s.estado!=='girando')s.estado='retrocediendo';else if(s.lat&&s.estado==='trotando')s.estado='lateral';
+ s.espera=!!(s.gk&&S.ball&&S.owner!==s&&Math.abs(S.ball.x-(dirOf(s.team)>0?0:PW))<35);
  s.dBall=S.ball?Math.hypot(S.ball.x-s.x,S.ball.y-s.y):99;
  if(s.out&&s.y>PH+1.5)s.alpha=Math.max(0,s.alpha-dt)}
 
@@ -122,7 +126,8 @@ function ballStep(dt){const b=S.ball,px=b.x,py=b.y;
 function patear(x,y,o){o=o||{};const b=S.ball;S.owner=null;const d=Math.hypot(x-b.x,y-b.y);const v=o.v||(o.h>2?17:19);
  b.fly={x0:b.x,y0:b.y,x1:x,y1:y,h:o.h||0,z1:o.z1||0,keep:o.keep,t:0,d:Math.max(.2,d/v),ease:!o.lin,cb:o.cb}}
 /* tomar la pelota solo si está cerca (si no, no se puede: evita teletransportes) */
-function tomar(s){if(!s)return false;const d=Math.hypot(S.ball.x-s.x,S.ball.y-s.y);if(d>2.6||S.ball.fly)return false;S.owner=s;S.posTeam=s.team;accion(s,'controlando');return true}
+function tomar(s){if(!s)return false;const d=Math.hypot(S.ball.x-s.x,S.ball.y-s.y);if(d>2.6||S.ball.fly)return false;S.owner=s;S.posTeam=s.team;
+ const c=rasgos(s).control;accion(s,'controlando',c>=78?.2:c<55?.5:.32);return true}
 /* rodar la pelota hasta un punto (reposiciones: saques, penal, córner, mitad de cancha) */
 function rodar(x,y,cb){patear(x,y,{v:15,cb})}
 
@@ -165,7 +170,7 @@ function asegurar(s){const W=[];if(!s)return W;
 function reflejos(gk){const a=atr(gk.e)||{};return a.reflejos||60}
 function remateSteps(team,a,ev){const opp=1-team,dir=dirOf(team),gx=goalX(team);const sh=quien(team,a.j,'att'),gk=quien(opp,a.arq,'gk');if(!sh)return[];
  const res=a.res||'afuera',head=a.t==='cabezazo',alto=a.zona==='alto';const W=[];
- W.push(P(.05,()=>{accion(sh,head?'cabeceando':'rematando')}));
+ W.push(P(.05,()=>{accion(sh,head?'cabeceando':(S.ball.z>.8?'volea':'rematando'))}));
  W.push(P(1.2,()=>{
   const gy=res==='gol'||res==='anulado'?(rnd()<.5?rr(30.9,32.6):rr(35.4,37.1)):res==='palo'?(rnd()<.5?30.4:37.6):res==='afuera'?(rnd()<.5?rr(26,29.8):rr(38.2,42)):rr(31.6,36.4);
   const gxx=res==='gol'||res==='anulado'?gx+dir*1.4:res==='afuera'?gx+dir*3.5:res==='palo'?gx:gx-dir*.9;
@@ -178,7 +183,7 @@ function remateSteps(team,a,ev){const opp=1-team,dir=dirOf(team),gx=goalX(team);
    if(Math.abs(tgt-gk.y)>1.2||res==='atajada'){accion(gk,Math.abs(tgt-gk.y)>1.2?'estirada':'atajando');gk.vy=(tgt-gk.y)*2.4;gk.ov=null}},delay*1000/Math.max(1,speed()))}},
   ()=>!S.ball.fly&&(res!=='atajada'||S.owner===gk)));
  if(res==='gol'||res==='anulado')W.push(P(2,()=>{bigTxt('¡GOL!','#e2bd70',1.6);banner(`⚽ ${corto(sh.name)}`,'#e2bd70',2.6);
-   sh.ov={x:gx-dir*rr(8,13),y:rnd()<.5?7:61,run:1};accion(sh,'celebrando');
+   sh.ov={x:gx-dir*rr(8,13),y:rnd()<.5?7:61,run:1};sh.celeb=(rasgos(sh).var+S.goles[0]+S.goles[1])%4;accion(sh,'celebrando');
    S.sp.filter(s=>s.team===team&&s!==sh&&!s.gk&&!s.out).slice(0,4).forEach((s,i)=>{s.ov={x:sh.ov.x-dir*(1+i*.6),y:sh.ov.y+(i%2?1.2:-1.2),run:.95};setTimeout(()=>accion(s,'abrazo'),900)});
    S.sp.filter(s=>s.team===opp&&!s.out).slice(0,4).forEach(s=>accion(s,'lamento'));if(gk)accion(gk,'lamento')}));
  else if(res==='atajada')W.push(P(.9,()=>{accion(sh,'lamento',1);banner(`🧤 ${corto(gk?gk.name:'')}`,'#ffffff',1.6)}),
@@ -326,7 +331,7 @@ function drawPitch(ctx){const w=S.w,h=S.h;ctx.fillStyle='#0b1a10';ctx.fillRect(0
   ctx.fillStyle='rgba(255,255,255,.12)';ctx.beginPath();ctx.moveTo(g1[0],g1[1]);ctx.lineTo(b1[0],b1[1]);ctx.lineTo(b2[0],b2[1]);ctx.lineTo(g2[0],g2[1]);ctx.closePath();ctx.fill();
   ctx.strokeStyle='#fff';ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(g1[0],g1[1]);ctx.lineTo(gt1[0],gt1[1]);ctx.lineTo(gt2[0],gt2[1]);ctx.lineTo(g2[0],g2[1]);ctx.stroke();ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=1.3})}
 function kitOf(s){const K=S.kits;if(!K)return{d:'liso',c1:s.team?'#1747b0':'#f4f4f4',c2:'#d3212f',sh:'#111',me:'#111'};
- const home=S.m.venue==='a'?1:0;/* local real del partido */const isHome=s.team===home;
+ const home=S.m&&S.m.venue==='a'?1:0;/* local real del partido */const isHome=s.team===home;
  if(s.gk)return isHome?K.arqL:K.arqV;return isHome?K.local:K.visita}
 function torso(ctx,k,x,y,w,h){ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();ctx.fillStyle=k.c1;ctx.fillRect(x,y,w,h);ctx.fillStyle=k.c2;
  const n=Math.max(3,Math.round(w/1.6));
@@ -342,43 +347,111 @@ function torso(ctx,k,x,y,w,h){ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.c
 function seg(ctx,x0,y0,x1,y1,c,wd){ctx.strokeStyle=c;ctx.lineWidth=wd;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke()}
 /* figura de cuerpo entero: piernas, brazos, torso y cabeza animados según la acción */
 const FIG=2.1;/* las figuras se dibujan más grandes que la escala real, como en las transmisiones de juegos */
-function figura(ctx,s,P,isRef){const k=isRef?{d:'liso',c1:'#ffd400',c2:'#111',sh:'#111',me:'#111'}:kitOf(s);const sc=P[2],H=1.85*sc*FIG;if(H<3)return;
- const sp=Math.hypot(s.vx,s.vy),sw=Math.sin(s.ph)*clamp(sp/6,0,1)*.9,f=s.face||1;let x=P[0],y=P[1],rot=0,lift=0;
- const pz=s.pose,pt=s.poseD?clamp(s.poseT/s.poseD,0,1):0;
- if(pz==='cabeceando'||pz==='saltando'||pz==='celebrando'&&pt<.3)lift=Math.sin(pt*Math.PI)*H*.35;
- if(pz==='estirada'){rot=f*(s.vy>0?1:-1)*1.25*Math.min(1,pt*3);lift=Math.sin(Math.min(1,pt*1.6)*Math.PI)*H*.3}
- if(pz==='barrida')rot=-f*1.2;if(pz==='entrada')rot=-f*.45*Math.sin(pt*Math.PI);if(pz==='cayendo')rot=f*1.45*Math.min(1,pt*4);if(pz==='levantandose')rot=f*1.45*(1-pt);
- if(pz==='desequilibrio')rot=f*.35*Math.sin(pt*Math.PI);if(pz==='amague')rot=f*.18*Math.sin(pt*Math.PI*2);if(pz==='controlando')lift=-H*.03;
- ctx.globalAlpha=s.alpha;
- ctx.fillStyle='rgba(0,0,0,.33)';ctx.beginPath();ctx.ellipse(x,y,H*.28,H*.08,0,0,Math.PI*2);ctx.fill();
- ctx.save();ctx.translate(x,y-lift);ctx.rotate(rot);
- const hip=-H*.48,sh=-H*.8,lw=Math.max(1,H*.11),aw=Math.max(1,H*.085);
- let la=sw*.8,ra=-sw*.8,lArm=-sw*.9,rArm=sw*.9;
- if(pz==='pasando'||pz==='rematando'){const k=f*((pz==='rematando'?1.35:1)-pt*1.7);if(s.pie==='izq'){ra=f*-.2;la=k}else{la=f*-.2;ra=k}lArm=-f*.9;rArm=f*.7}
- if(pz==='cabeceando'||pz==='saltando'||pz==='celebrando'){lArm=-2.6*f;rArm=2.6*f}if(pz==='abrazo'){lArm=f*1.4;rArm=f*1.2}if(pz==='pide'){rArm=-f*2.8}if(pz==='saque'){lArm=rArm=-f*3}
- if(pz==='atajando'){lArm=f*1.6;rArm=f*1.5}if(pz==='barrida'||pz==='entrada'){ra=f*1.3;la=f*.4}
- if(pz==='protesta'){lArm=-1.7;rArm=1.7}if(pz==='lamento'){lArm=-2.9;rArm=2.9;la=ra=0}if(pz==='tarjeta'){rArm=-f*2.9}
- if(pz==='estirada'){lArm=-f*2.8;rArm=-f*2.4}
- const leg=(a,c)=>{const kx=Math.sin(a)*H*.24,ky=hip+Math.cos(a)*H*.24,fx=kx+Math.sin(a*1.3)*H*.22,fy=ky+H*.24;seg(ctx,0,hip,kx,ky,k.sh,lw*1.15);seg(ctx,kx,ky,fx,fy,k.me,lw);ctx.fillStyle='#111';ctx.fillRect(fx-lw*.6+(f>0?0:-lw*.4),fy-lw*.3,lw*1.6,lw*.7)};
- leg(la,k);leg(ra,k);
- const tw=H*.3,th=H*.36;
- const sleeve=k.d==='mangas'?k.c2:k.c1;
- const arm=a=>{const ex=Math.sin(a)*H*.2,ey=sh+H*.03+Math.cos(a)*H*.2;seg(ctx,0,sh+H*.03,ex,ey,sleeve,aw*1.1);seg(ctx,ex,ey,ex+Math.sin(a)*H*.13,ey+Math.cos(a)*H*.13,s.skin||'#e0ac83',aw)};
- arm(lArm);
- ctx.fillStyle=k.sh;ctx.fillRect(-tw*.5,hip-H*.02,tw,H*.13);
- torso(ctx,k,-tw/2,sh,tw,th);
- arm(rArm);
- if(pz==='tarjeta'&&s.cardC){}
- ctx.fillStyle=s.skin||'#e0ac83';ctx.beginPath();ctx.arc(0,sh-H*.1,H*.095,0,Math.PI*2);ctx.fill();
- ctx.fillStyle='#2b1d14';ctx.beginPath();ctx.arc(0,sh-H*.12,H*.095,Math.PI,0);ctx.fill();
+/* ---------- esqueleto 2D ----------
+   Cada futbolista se arma con articulaciones: pelvis, torso (con inclinación), cuello y cabeza; hombro → codo → mano;
+   cadera → rodilla → tobillo → botín. Los ángulos salen de la marcha (según velocidad y estado) o de la acción.
+   Ángulos en radianes desde la vertical; positivo = hacia donde mira el jugador. */
+const PEINADOS=['corto','rapado','largo','rulos','pelado','corto','rodete'];
+const PELOS=['#1b120c','#2b1d14','#3b2618','#6b4423','#a0743b','#d8b26a','#111111'];
+const BOTINES=['#111111','#f4f4f4','#ff3b30','#2f80ed','#f5c400','#00c389','#ff7a00','#111111'];
+function hsh(s){let h=2166136261;s=String(s);for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+/* rasgos de cada jugador: contextura ESTIMADA desde sus atributos (no hay altura real en la base), peinado y botines */
+function rasgos(s){if(s._r)return s._r;const a=(s.e&&atr(s.e))||{},h=hsh(s.name||'x');
+ const alto=clamp(.96+((a.salto||60)-60)/400+((a.cabeceo||60)-60)/500+(s.gk?.04:s.g==='DEF'?.02:s.g==='DEL'?0:-.01)+((h%7)-3)*.006,.92,1.08);
+ const ancho=clamp(.95+((a.fuerza||60)-60)/300+((h>>3)%5-2)*.01,.9,1.1);
+ return s._r={alto,ancho,pelo:PEINADOS[(h>>5)%PEINADOS.length],cpelo:PELOS[(h>>9)%PELOS.length],bot:BOTINES[(h>>13)%BOTINES.length],
+  lean:((h>>17)%5-2)*.015,brazos:.85+((h>>20)%5)*.06,fuerza:a.fuerza||60,control:a.control||60,regate:a.regate||60,var:(h>>22)%4}}
+function marcha(s,sp){/* ciclo de marcha: amplitud y flexión según velocidad; retroceso y desplazamiento lateral */
+ const r=rasgos(s),A=clamp(sp/7.2,0,1),sprint=sp>6.2,ph=s.ph;const back=s.back?-1:1;
+ let th=(sprint?.95:.8)*A,kn=(sprint?1.5:1.15)*A;if(s.lat){th*=.35;kn*=.5}
+ const L=Math.sin(ph)*th*back,R=Math.sin(ph+Math.PI)*th*back;
+ const LK=kn*Math.max(0,Math.sin(ph+1.3)),RK=kn*Math.max(0,Math.sin(ph+Math.PI+1.3));
+ let lean=r.lean+(sprint?.2:.06*A);if(s.estado==='frenando')lean=-.16;if(s.back)lean=-.05;
+ const arm=.85*A*r.brazos;return{la:L,ra:R,lk:LK,rk:RK,lu:-L*arm/th||0,ru:-R*arm/th||0,le:.5+.7*A,re:.5+.7*A,lean,bob:Math.abs(Math.sin(ph))*.025*A,rot:0,lift:0,splay:s.lat?.22:0}}
+function postura(s,sp){const g=marcha(s,sp),pz=s.pose,pt=s.poseD?clamp(s.poseT/s.poseD,0,1):0,f=1,r=rasgos(s),S2=Math.sin(pt*Math.PI);
+ const pieI=s.pie==='izq';const kick=(amp)=>{const k=amp*(1-Math.pow(pt*2-1,2));if(pieI){g.la=k;g.lk=.2;g.ra=-.15}else{g.ra=k;g.rk=.2;g.la=-.15}g.lu=-.7;g.ru=.6;g.lean=-.05};
+ switch(pz){
+  case'pasando':kick(.9);break;
+  case'rematando':kick(1.35);g.lean=-.12;break;
+  case'volea':kick(1.5);g.rot=-.35*S2;g.lift=.1*S2;break;
+  case'controlando':if(pieI){g.la=.5*S2;g.lk=.6}else{g.ra=.5*S2;g.rk=.6}g.lean=.04;break;
+  case'cabeceando':case'saltando':g.lift=.38*S2;g.la=-.2;g.ra=.25;g.lk=g.rk=.7;g.lu=g.ru=-2.4;g.le=g.re=.3;g.lean=pz==='cabeceando'?.22*S2:0;break;
+  case'entrada':g.ra=1.2;g.rk=0;g.la=-.4;g.lk=.9;g.lean=-.35;g.rot=-.4*S2;break;
+  case'barrida':g.rot=-1.15;g.ra=1.1;g.la=.3;g.lk=.8;g.rk=0;g.lu=-1.4;g.ru=.8;break;
+  case'cayendo':g.rot=1.45*Math.min(1,pt*3);g.lu=-2;g.ru=-1.5;g.lk=g.rk=.4;break;
+  case'levantandose':g.rot=1.45*(1-pt);g.lk=g.rk=1.4*(1-pt);break;
+  case'desequilibrio':g.rot=.35*S2;g.lu=-2.2;g.ru=1.8;g.le=g.re=.2;break;
+  case'amague':if(r.regate>=78){/* bicicleta: la pierna pasa por encima de la pelota */g.la=.7*Math.sin(pt*Math.PI*2);g.ra=-.5*Math.sin(pt*Math.PI*2);g.lk=g.rk=.5}g.rot=.2*Math.sin(pt*Math.PI*2);break;
+  case'proteccion':g.lean=-.12;g.lu=1.2;g.le=.2;g.ru=-.4;g.la=-.25;g.ra=.25;g.lk=g.rk=.5;break;
+  case'celebrando':{const v=s.celeb||0;if(v===0){g.lu=g.ru=-2.7;g.le=g.re=.1}else if(v===1){g.lu=-1.6;g.ru=1.6;g.le=g.re=0}/* avión */
+   else if(v===2){g.rot=-.25;g.la=1.4;g.lk=1.6;g.ra=-.6;g.rk=1.4;g.lu=g.ru=-2.5}/* de rodillas */else{g.ru=-2.9;g.re=.9;g.lu=.5}g.lift=pt<.25?.25*S2:0;break}
+  case'abrazo':g.lu=1.3;g.ru=1.1;g.le=g.re=1.2;g.lean=.12;break;
+  case'protesta':g.lu=-1.8;g.ru=1.8;g.le=g.re=.6;break;
+  case'lamento':if((r.var%2)===0){g.lu=g.ru=-2.9;g.le=g.re=2.3;g.la=g.ra=0;g.lk=g.rk=0}else{g.lean=.6;g.lk=g.rk=1.4;g.la=g.ra=.6;g.lu=g.ru=.8}break;
+  case'pide':g.ru=-2.8;g.re=.2;break;
+  case'atajando':g.lu=g.ru=1.6;g.le=g.re=.3;g.lk=g.rk=.6;break;
+  case'estirada':g.rot=(s.vy>0?1:-1)*1.25*Math.min(1,pt*3);g.lift=.3*Math.sin(Math.min(1,pt*1.6)*Math.PI);g.lu=g.ru=-2.9;g.le=g.re=0;g.la=.1;g.ra=-.3;break;
+  case'saque':g.lu=g.ru=-3;g.le=g.re=.4;g.lean=-.15;break;
+  case'tarjeta':g.ru=-3;g.re=0;break;
+  case'pasando-primera':kick(.7);break;
+ }
+ if(!pz||pz==='run'){if(s.gk&&s.espera){g.lk=g.rk=.6;g.lu=.9;g.ru=.9;g.le=g.re=.5;g.lean=.15;g.splay=.25}}
+ return g}
+function figura(ctx,s,P,isRef){const kit=isRef?{d:'liso',c1:'#111111',c2:'#ffd400',sh:'#111111',me:'#111111',cu:'#ffd400',ma:'#111111'}:kitOf(s);const r=isRef?{alto:1,ancho:1,pelo:'corto',cpelo:'#2b1d14',bot:'#111',lean:0,brazos:1}:rasgos(s);
+ const sc=P[2],H=1.85*sc*FIG*r.alto;if(H<3)return;const sp=Math.hypot(s.vx,s.vy),f=s.face||1;const g=postura(s,sp);
+ const x=P[0],y=P[1];ctx.globalAlpha=s.alpha;
+ /* sombra */
+ ctx.fillStyle='rgba(0,0,0,.32)';ctx.beginPath();ctx.ellipse(x+H*.05,y,H*.27*r.ancho,H*.07,0,0,Math.PI*2);ctx.fill();
+ ctx.save();ctx.translate(x,y-H*(g.lift+g.bob));ctx.rotate(g.rot*f);ctx.scale(f,1);
+ const hipY=-H*.5,shY=-H*.8,thL=H*.255,shL=H*.245,uaL=H*.165,faL=H*.15,lw=Math.max(1.2,H*.085*r.ancho),aw=Math.max(1,H*.062*r.ancho);
+ const skin=s.skin||'#e0ac83';
+ const pierna=(a,k,lado)=>{const hx=lado*H*.035+(lado*g.splay*H*.08),kx=hx+Math.sin(a)*thL,ky=hipY+Math.cos(a)*thL,sa=a-k,fx=kx+Math.sin(sa)*shL,fy=ky+Math.cos(sa)*shL;
+  seg(ctx,hx,hipY,kx,ky,kit.sh,lw*1.18);/* muslo con pantalón */
+  seg(ctx,(hx+kx)/2,(hipY+ky)/2,kx,ky,skin,lw*.95);/* rodilla */
+  seg(ctx,kx,ky,fx,fy,kit.me,lw*.95);/* media */
+  ctx.save();ctx.translate(fx,fy);ctx.rotate(sa*.6);ctx.fillStyle=r.bot;ctx.beginPath();ctx.ellipse(lw*.45,0,lw*.95,lw*.48,0,0,Math.PI*2);ctx.fill();ctx.restore()};
+ const brazo=(u,e,lado)=>{const sx=lado*H*.02,sy=shY+H*.035,ex=sx+Math.sin(u)*uaL,ey=sy+Math.cos(u)*uaL,fa=u+e*(u<0?-1:1)*.9,hx=ex+Math.sin(fa)*faL,hy=ey+Math.cos(fa)*faL;
+  seg(ctx,sx,sy,ex,ey,kit.ma||kit.c1,aw*1.25);seg(ctx,sx+(ex-sx)*.55,sy+(ey-sy)*.55,ex,ey,(s.gk&&!isRef)?(kit.ma||kit.c1):skin,aw);seg(ctx,ex,ey,hx,hy,(s.gk&&!isRef)?'#f4f4f4':skin,aw*.95)};
+ /* lado lejano primero */
+ brazo(g.lu,g.le,-1);pierna(g.la,g.lk,-1);
+ /* torso con inclinación */
+ ctx.save();ctx.translate(0,hipY);ctx.rotate(g.lean);
+ const tw=H*.2*r.ancho,ww=H*.155*r.ancho,th=hipY-shY;
+ ctx.fillStyle=kit.sh;ctx.beginPath();ctx.moveTo(-ww*.55,-H*.02);ctx.lineTo(ww*.55,-H*.02);ctx.lineTo(ww*.6,H*.09);ctx.lineTo(-ww*.6,H*.09);ctx.closePath();ctx.fill();
+ ctx.beginPath();ctx.moveTo(-ww/2,0);ctx.lineTo(ww/2,0);ctx.lineTo(tw/2,-th);ctx.lineTo(-tw/2,-th);ctx.closePath();ctx.save();ctx.clip();torso(ctx,kit,-tw/2,-th,tw,th);ctx.restore();
+ ctx.strokeStyle='rgba(0,0,0,.25)';ctx.lineWidth=.6;ctx.stroke();
+ /* cuello de la camiseta */
+ ctx.fillStyle=kit.cu||kit.c2;ctx.beginPath();ctx.moveTo(-tw*.18,-th);ctx.lineTo(tw*.18,-th);ctx.lineTo(0,-th+H*.035);ctx.closePath();ctx.fill();
+ /* cabeza */
+ const hr=H*.066,hy=-th-H*.095;ctx.fillStyle=skin;ctx.fillRect(-H*.018,-th-H*.035,H*.036,H*.04);
+ ctx.beginPath();ctx.arc(H*.008,hy,hr,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle=r.cpelo;const pe=r.pelo;
+ if(pe==='corto'){ctx.beginPath();ctx.arc(H*.004,hy-hr*.15,hr*1.02,Math.PI*1.05,Math.PI*2.02);ctx.fill()}
+ else if(pe==='rapado'){ctx.globalAlpha=s.alpha*.55;ctx.beginPath();ctx.arc(H*.006,hy-hr*.1,hr*.98,Math.PI,Math.PI*2);ctx.fill();ctx.globalAlpha=s.alpha}
+ else if(pe==='largo'){ctx.beginPath();ctx.arc(H*.0,hy-hr*.1,hr*1.08,Math.PI*.9,Math.PI*2.05);ctx.fill();ctx.fillRect(-hr*1.05,hy-hr*.2,hr*.75,hr*1.45)}
+ else if(pe==='rulos'){for(let i=0;i<5;i++){ctx.beginPath();ctx.arc(-hr*.7+i*hr*.35,hy-hr*.75+Math.abs(i-2)*hr*.12,hr*.36,0,Math.PI*2);ctx.fill()}}
+ else if(pe==='rodete'){ctx.beginPath();ctx.arc(H*.004,hy-hr*.15,hr*1.02,Math.PI*1.05,Math.PI*2.02);ctx.fill();ctx.beginPath();ctx.arc(-hr*.9,hy-hr*.55,hr*.38,0,Math.PI*2);ctx.fill()}
+ ctx.fillStyle='rgba(0,0,0,.18)';ctx.beginPath();ctx.arc(hr*.55,hy+hr*.15,hr*.18,0,Math.PI*2);ctx.fill();/* nariz hacia donde mira */
+ ctx.restore();
+ /* lado cercano */
+ pierna(g.ra,g.rk,1);brazo(g.ru,g.re,1);
  ctx.restore();ctx.globalAlpha=1;
- if(s.card&&s.cardT>0){ctx.fillStyle=s.card==='red'?'#e02a2a':'#ffd400';ctx.fillRect(x-H*.08,y-H*1.55,H*.16,H*.22)}}
-function marca(ctx,s,P){/* vistas desde arriba */const k=kitOf(s),r=Math.max(4,P[2]*.95);ctx.globalAlpha=s.alpha;
+ if(s.card&&s.cardT>0){ctx.fillStyle=s.card==='red'?'#e02a2a':'#ffd400';ctx.fillRect(x-H*.06+f*H*.12,y-H*1.25,H*.13,H*.18)}}
+/* vista desde arriba (Cenital): hombros con la camiseta, cabeza y piernas que se alternan; Táctica: fichas con número */
+function marca(ctx,s,P){const k=kitOf(s),r=Math.max(4,P[2]*.95);ctx.globalAlpha=s.alpha;
+ if(S.cam==='cen'){const sp=Math.hypot(s.vx,s.vy),ang=sp>.3?Math.atan2(s.vy,s.vx):((s.face||1)>0?0:Math.PI),A=clamp(sp/7,0,1),sw=Math.sin(s.ph)*r*.55*A,ra=rasgos(s);
+  ctx.save();ctx.translate(P[0],P[1]);ctx.rotate(ang);
+  ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(1.2,1.2,r*.75,r*1.05,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=k.me;ctx.beginPath();ctx.ellipse(sw,-r*.35,r*.3,r*.2,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(-sw,r*.35,r*.3,r*.2,0,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.ellipse(0,0,r*.5,r*.95,0,0,Math.PI*2);ctx.save();ctx.clip();torso(ctx,k,-r,-r,r*2,r*2);ctx.restore();
+  ctx.fillStyle=k.ma||k.c1;ctx.beginPath();ctx.arc(-sw*.6,-r*.95,r*.22,0,Math.PI*2);ctx.arc(sw*.6,r*.95,r*.22,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=ra.cpelo;ctx.beginPath();ctx.arc(r*.05,0,r*.38,0,Math.PI*2);ctx.fill();ctx.restore();ctx.globalAlpha=1;return}
  ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.arc(P[0]+1,P[1]+1.5,r,0,Math.PI*2);ctx.fill();
  ctx.save();ctx.beginPath();ctx.arc(P[0],P[1],r,0,Math.PI*2);ctx.clip();torso(ctx,k,P[0]-r,P[1]-r,r*2,r*2);ctx.restore();
  ctx.strokeStyle='rgba(0,0,0,.6)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(P[0],P[1],r,0,Math.PI*2);ctx.stroke();
- if(S.cam==='tac'){ctx.fillStyle=(k.c1==='#ffffff'||k.c1==='#f4f4f4'||k.c1==='#ffd400'||k.c1==='#ffe500'||k.c1==='#fde100')?'#111':'#fff';ctx.font=`700 ${Math.round(r*1.1)}px "Barlow Semi Condensed",Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(s.num),P[0],P[1]+.5)}
+ const clara=luzK(k.c1);ctx.fillStyle=clara?'#111':'#fff';ctx.font=`700 ${Math.round(r*1.1)}px "Barlow Semi Condensed",Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(s.num),P[0],P[1]+.5);
  ctx.globalAlpha=1}
+function luzK(h){h=String(h||'#000').replace('#','');const c=[0,2,4].map(i=>parseInt(h.slice(i,i+2),16));return(c[0]*.3+c[1]*.59+c[2]*.11)/255>.6}
 function draw(){const ctx=S.cx,dpr=S.dpr;ctx.setTransform(dpr,0,0,dpr,0,0);drawPitch(ctx);
  const top=S.cam==='cen'||S.cam==='tac';
  if(S.cam==='tac'){/* líneas de cada equipo */[0,1].forEach(t=>{const L=S.sp.filter(s=>s.team===t&&!s.out&&!s.gk);['DEF','MED','DEL'].forEach(g=>{const A=L.filter(s=>s.g===g).sort((a,b)=>slot(a).l-slot(b).l);if(A.length<2)return;ctx.strokeStyle=t?'rgba(120,170,255,.35)':'rgba(255,210,120,.35)';ctx.lineWidth=1;ctx.beginPath();A.forEach((s,i)=>{const p=proj(s.x,s.y);i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])});ctx.stroke()})})}
@@ -408,6 +481,7 @@ function frame(ts){S.raf=0;if(!S.cv||!S.cv.isConnected){return}
   if(S.play&&S.play.filler&&S.shown<(m.events||[]).length&&!S.ball.fly){S.play=null;S.sp.forEach(s=>{if(!s.out)s.ov=null})}
   if(!S.play)next();runPlay(dt);
   marcasT-=dt;if(marcasT<=0){marcasT=.4;const o=S.owner;S.pressers=[];if(o&&!S.reset){const pr=((tacOf(1-o.team).pressing??50)>62)?2:1;S.pressers=S.sp.filter(s=>s.team!==o.team&&!s.out&&!s.gk).sort((a,b)=>Math.hypot(a.x-o.x,a.y-o.y)-Math.hypot(b.x-o.x,b.y-o.y)).slice(0,pr)}asignarMarcas()}
+  {const o=S.owner;if(o&&o.pose==='run'&&!S.reset){const pr=S.sp.find(x=>x.team!==o.team&&!x.out&&Math.hypot(x.x-o.x,x.y-o.y)<2);if(pr&&rasgos(o).fuerza>=66)accion(o,'proteccion')}}
   ballStep(dt);S.sp.forEach(s=>{step(s,dt);if(s.cardT>0)s.cardT-=dt;else s.card=null});
   if(S.ref){const r=S.ref;r.ov={x:clamp(S.ball.x-dirOf(0)*8,8,97),y:clamp(S.ball.y+12,6,62),run:.7};step(r,dt)}
   /* cámara: sigue la pelota con suavidad (más cerca en Seguimiento) */
@@ -439,6 +513,24 @@ const API={
  corte(m){if(!m||m!==S.m||!visible()||m.done)return(m&&m.events||[]).length;return Math.min(S.shown,(m.events||[]).length)},
  marcador(m){if(!m||m!==S.m||!visible()||m.done)return[m.h,m.a];return S.goles},
  saltar(){if(!S.m)return;S.play=null;S.queue=[];S.shown=(S.m.events||[]).length;contar();S.owner=null;S.phase=S.m.done?'done':S.phase},
+ /* control de calidad: dibuja todas las poses con las camisetas de dos clubes (no participa del partido) */
+ hojaPoses(cv,local,visita){local=local||'River Plate';visita=visita||'Boca Juniors';const ctx=cv.getContext('2d'),pk=S.kits,pm=S.m,pc=S.cam;
+  try{S.kits=window.MCCamisetas?MCCamisetas.partido(local,visita):null;S.m={venue:'h'};S.cam='tv';
+   const L=[['caminando',{v:1.4}],['trotando',{v:3.2}],['corriendo',{v:5.5}],['esprintando',{v:7.8}],['retrocede',{v:2.5,back:1}],['lateral',{v:2.5,lat:1}],['frenando',{v:3,estado:'frenando'}],
+    ['pasando',{pose:'pasando',pt:.5}],['remate',{pose:'rematando',pt:.5}],['volea',{pose:'volea',pt:.5}],['control',{pose:'controlando',pt:.5}],['cabezazo',{pose:'cabeceando',pt:.5}],
+    ['entrada',{pose:'entrada',pt:.5}],['barrida',{pose:'barrida',pt:.5}],['cae',{pose:'cayendo',pt:.8}],['se levanta',{pose:'levantandose',pt:.5}],['desequilibrio',{pose:'desequilibrio',pt:.5}],
+    ['amague',{pose:'amague',pt:.25,reg:85}],['protege',{pose:'proteccion',pt:.5}],['festejo 1',{pose:'celebrando',pt:.6,celeb:0}],['festejo 2',{pose:'celebrando',pt:.6,celeb:1}],['festejo 3',{pose:'celebrando',pt:.6,celeb:2}],
+    ['abrazo',{pose:'abrazo',pt:.5}],['protesta',{pose:'protesta',pt:.5}],['lamento',{pose:'lamento',pt:.5}],['pide',{pose:'pide',pt:.5}],
+    ['arq. guardia',{gk:1,espera:1}],['arq. ataja',{gk:1,pose:'atajando',pt:.5}],['arq. estirada',{gk:1,pose:'estirada',pt:.45,vy:3}],['arq. saque',{gk:1,pose:'saque',pt:.5}],['árbitro',{ref:1,pose:'tarjeta',pt:.5}]];
+   const cols=8,cw=cv.width/cols,rh=cv.height/Math.ceil(L.length*2/cols);ctx.fillStyle='#2e8a3c';ctx.fillRect(0,0,cv.width,cv.height);
+   const NOM=['Lionel Gómez','Juan Pérez','Marcos Díaz','Lucas Silva','Ángel Romero','Diego Sosa','Pablo Ríos','Nico Paz'];let i=0;
+   for(const team of [0,1])for(const [lab,o] of L){const c=i%cols,rw=Math.floor(i/cols);i++;const nm=NOM[(i*3+team)%NOM.length]+' '+i;
+    const sp={name:nm,team,g:o.gk?'POR':'MED',gk:!!o.gk,e:null,pie:i%3?'der':'izq',skin:skinOf(nm),face:1,vx:o.v||0,vy:o.vy||0,ph:1.1,pose:o.pose||'run',poseT:(o.pt||0)*((ACC_D[o.pose]||1)),poseD:ACC_D[o.pose]||1,alpha:1,cad:1,
+     estado:o.estado||'',back:!!o.back,lat:!!o.lat,espera:!!o.espera,celeb:o.celeb||0};
+    if(o.reg)sp._r=Object.assign({},rasgos(sp),{regate:o.reg});
+    const x=c*cw+cw/2,y=rw*rh+rh*.82;figura(ctx,sp,[x,y,rh*.36/(1.85*FIG)],!!o.ref);
+    ctx.fillStyle='#fff';ctx.font='600 11px Arial';ctx.textAlign='center';ctx.fillText(lab,x,rw*rh+rh*.97)}
+  }finally{S.kits=pk;S.m=pm;S.cam=pc}},
  estado(){const est={},tac={},acc={};S.sp.forEach(s=>{if(s.out)return;est[s.estado]=(est[s.estado]||0)+1;if(s.tactico)tac[s.tactico]=(tac[s.tactico]||0)+1;if(s.pose&&s.pose!=='run')acc[s.pose]=(acc[s.pose]||0)+1});
   return{jugada:S.play?S.play.label:null,mostrados:S.shown,eventos:S.m?(S.m.events||[]).length:0,camara:S.cam,jugadores:S.sp.filter(s=>!s.out).length,goles:S.goles.slice(),cuadros:S.t,teletransportes:S.tele,teleLog:S.teleLog||null,estados:est,tacticos:tac,acciones:acc,posesionId:S.posId}}
 };

@@ -20,6 +20,12 @@ page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/
 page.on('dialog', d => d.accept());
 await page.goto(URL, { waitUntil: 'load' }); await page.waitForTimeout(1500);
 await page.evaluate(() => { go('newcareer'); const c = document.getElementById('country'); c.value = 'Argentina'; fillClubs(); document.getElementById('clubChoice').value = 'River Plate'; window.MC_MOTOR_NUEVAS = 'v2'; createCareer(); });
+/* hoja de poses con camisetas reales (control de calidad visual) */
+for (const [a, b, f] of [['River Plate', 'Boca Juniors', 'poses-river-boca'], ['Barcelona', 'Real Madrid', 'poses-barca-madrid']]) {
+  await page.evaluate(([a, b]) => { let cv = document.getElementById('hojaPoses'); if (!cv) { cv = document.createElement('canvas'); cv.id = 'hojaPoses'; cv.style.cssText = 'position:fixed;left:0;top:0;width:780px;height:1000px;z-index:99999;background:#000'; document.body.appendChild(cv) } cv.width = 1560; cv.height = 2000; MC2D.hojaPoses(cv, a, b); }, [a, b]);
+  await page.locator('#hojaPoses').screenshot({ path: `tests/out/2d-${f}.png` });
+}
+await page.evaluate(() => document.getElementById('hojaPoses').remove());
 await page.evaluate(() => { openMatch(); go('match'); });
 await page.waitForTimeout(800);
 const montado = await page.evaluate(() => ({ host: !!document.getElementById('m2dHost'), canvas: !!document.querySelector('#m2dHost canvas'), cams: [...document.querySelectorAll('.m2d-cams button')].map(b => b.textContent) }));

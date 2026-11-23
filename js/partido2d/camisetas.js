@@ -92,16 +92,28 @@ function dist(a,b){const x=rgb(a),y=rgb(b);return Math.sqrt((x[0]-y[0])**2*.3+(x
 const luz=h=>{const c=rgb(h);return(c[0]*.3+c[1]*.59+c[2]*.11)/255};
 function generico(club){const h=hash(club);let c1=PAL[h%PAL.length],c2=PAL[(h>>>5)%PAL.length];if(dist(c1,c2)<60)c2=luz(c1)>.5?'#1b2a4a':'#ffffff';
  return{d:DIS[(h>>>10)%DIS.length],c1,c2,sh:(h>>>14)%2?c1:(luz(c1)>.5?'#1b2a4a':'#ffffff'),me:c1,origen:'generico'}}
-function titular(club){const k=K[club];return k?{d:k[0],c1:k[1],c2:k[2],sh:k[3],me:k[4],origen:'referencia'}:generico(club)}
-/* segunda camiseta generada: clara si la principal es oscura y viceversa */
-function suplente(club,t){const dark=luz(t.c1)<.45;return{d:'liso',c1:dark?'#f4f4f4':'#14213d',c2:t.c1,sh:dark?'#f4f4f4':'#14213d',me:dark?'#f4f4f4':'#14213d',origen:'generada'}}
+/* cuello y mangas: si no se indican, el cuello va en el color secundario y las mangas en el principal */
+function completar(k){const cu=k.cu||(dist(k.c1,k.c2)>60?k.c2:(luz(k.c1)>.5?'#1b2a4a':'#ffffff'));return Object.assign({ma:k.d==='mangas'?k.c2:k.c1,cu,bo:null},k,{cu})}
+const EXTRA={};/* acá se pueden cargar segundas y terceras camisetas reales: EXTRA['Club']={suplente:[...],tercera:[...]} con el mismo formato */
+function desdeFila(f,origen){return{d:f[0],c1:f[1],c2:f[2],sh:f[3],me:f[4],origen}}
+function titular(club){const k=K[club];return completar(k?desdeFila(k,'referencia'):generico(club))}
+/* segunda camiseta: la real si está cargada; si no, se genera clara u oscura según la principal */
+function suplente(club,t){t=t||titular(club);const x=EXTRA[club];if(x&&x.suplente)return completar(desdeFila(x.suplente,'referencia'));
+ const dark=luz(t.c1)<.45;return completar({d:'liso',c1:dark?'#f4f4f4':'#14213d',c2:t.c1,sh:dark?'#f4f4f4':'#14213d',me:dark?'#f4f4f4':'#14213d',origen:'generada'})}
+/* tercera camiseta: la real si está cargada; si no, se genera con el color secundario del club o un tono de contraste */
+const TER=['#6a1b9a','#00897b','#ef6c00','#37474f','#c2185b','#1e88e5'];
+function tercera(club,t){t=t||titular(club);const x=EXTRA[club];if(x&&x.tercera)return completar(desdeFila(x.tercera,'referencia'));
+ let c=dist(t.c2,t.c1)>90&&luz(t.c2)>.12&&luz(t.c2)<.88?t.c2:TER[hash('3'+club)%TER.length];
+ return completar({d:hash('d3'+club)%3?'liso':'franja',c1:c,c2:luz(c)>.5?'#111111':'#ffffff',sh:luz(c)>.5?'#111111':'#ffffff',me:c,origen:'generada'})}
 const ARQ=['#2fd06a','#ff8a1a','#8e44ad','#f1c40f','#111111','#00b5d8','#e84393'];
-function arquero(club,evitar){const h=hash('gk'+club);for(let i=0;i<ARQ.length;i++){const c=ARQ[(h+i)%ARQ.length];if(evitar.every(x=>dist(x,c)>90))return{d:'liso',c1:c,c2:luz(c)>.5?'#111111':'#ffffff',sh:c,me:c,origen:'generada'}}return{d:'liso',c1:'#2fd06a',c2:'#111',sh:'#2fd06a',me:'#2fd06a',origen:'generada'}}
-/* uniformes de un partido: si se parecen, el visitante usa la segunda */
-function partido(local,visita){const L=titular(local);let V=titular(visita);
- if(dist(L.c1,V.c1)<95||(dist(L.c1,V.c2)<70&&dist(L.c2,V.c1)<70))V=suplente(visita,V);
- if(dist(L.c1,V.c1)<95)V={...V,c1:luz(L.c1)>.5?'#14213d':'#f4f4f4',sh:luz(L.c1)>.5?'#14213d':'#f4f4f4',origen:'generada'};
- const ev=[L.c1,L.c2,V.c1,V.c2];
- return{local:L,visita:V,arqL:arquero(local,ev),arqV:arquero(visita,ev.concat([arquero(local,ev).c1]))}}
-root.MCCamisetas={titular,suplente,partido,tabla:K,generico};
+function arquero(club,evitar){const h=hash('gk'+club);for(let i=0;i<ARQ.length;i++){const c=ARQ[(h+i)%ARQ.length];if(evitar.every(x=>dist(x,c)>90))return completar({d:'liso',c1:c,c2:luz(c)>.5?'#111111':'#ffffff',sh:c,me:c,origen:'generada',arquero:true})}
+ return completar({d:'liso',c1:'#2fd06a',c2:'#111111',sh:'#2fd06a',me:'#2fd06a',origen:'generada',arquero:true})}
+/* contraste entre dos uniformes (camiseta, segundo color y pantalón) */
+function choque(a,b){return Math.min(dist(a.c1,b.c1),(dist(a.c1,b.c2)+dist(a.c2,b.c1))/2+30)+dist(a.sh,b.sh)*.15}
+/* el local usa la titular; el visitante, la de las tres que más contraste con la del local */
+function partido(local,visita){const L=titular(local),T=titular(visita),op=[T,suplente(visita,T),tercera(visita,T)];
+ let V=op[0];if(choque(L,T)<110){V=op.slice().sort((a,b)=>choque(L,b)-choque(L,a))[0]}
+ const ev=[L.c1,L.c2,V.c1,V.c2],aL=arquero(local,ev),aV=arquero(visita,ev.concat([aL.c1]));
+ return{local:L,visita:V,arqL:aL,arqV:aV,usa:V===op[0]?'titular':V===op[1]?'suplente':'tercera'}}
+root.MCCamisetas={titular,suplente,tercera,arquero,partido,tabla:K,extra:EXTRA,generico};
 })(typeof window!=='undefined'?window:globalThis);
