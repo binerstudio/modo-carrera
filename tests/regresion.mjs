@@ -89,7 +89,7 @@ async function playCase(browser, cs) {
         userGoalsPerMatch: +(ug / Math.max(1, user.length)).toFixed(3),
         position: typeof rank === 'function' ? rank() : null,
         points: career.points, budget: career.budget, squad: career.players.length,
-        allResults: all, guard, v2: window.__v2 || null,
+        allResults: all, guard, v2: window.__v2 || null, fisicoXI: Math.round(career.players.slice(0, 11).reduce((s, p) => s + (p.fitness || 0), 0) / 11),
       };
     });
     res.hash = sha([res.user, res.allResults]);
@@ -150,7 +150,8 @@ async function pruebaPWA(browser) {
     const cats = typeof CAT !== 'undefined' ? Object.keys(CAT) : null;
     const visibles = typeof SS !== 'undefined' ? Object.values(SS).flatMap(x => x[2].map(r => r[3])) : null;
     const visible = !document.documentElement.classList.contains('mc-cargando') && getComputedStyle(document.body).visibility === 'visible';
-    return { manifest: man && man.name, sw, reg, cats, visibles, visible, diseno12: document.body.className, version: window.MCStore && MCStore.APP_VERSION, title: document.title };
+    const motorOpc = typeof OP !== 'undefined' && OP.motor ? OP.motor.map(o => o[0]).join('/') : null;
+    return { manifest: man && man.name, sw, reg, cats, visibles, visible, motorOpc, diseno12: document.body.className, version: window.MCStore && MCStore.APP_VERSION, title: document.title };
   });
   await ctx.close();
   // la pantalla de carga debe estar activa ANTES de que cargue el diseño (contexto nuevo, sin service worker)
@@ -160,7 +161,7 @@ async function pruebaPWA(browser) {
   await p2.route('**/js/mc12-diseno.js*', async route => { tapado = await p2.evaluate(() => document.documentElement.classList.contains('mc-cargando')).catch(() => null); route.continue(); });
   await p2.goto(URL, { waitUntil: 'load' });
   await ctx2.close();
-  const ok = r.manifest === 'MODO CARRERA' && r.sw && r.reg && r.visible && tapado === true && errors.length === 0;
+  const ok = r.manifest === 'MODO CARRERA' && r.sw && r.reg && r.visible && r.motorOpc === 'v1/v2' && (r.visibles || []).includes('motor') && tapado === true && errors.length === 0;
   r.tapadoMientrasCarga = tapado;
   return { ok, ...r, errors };
 }
@@ -185,7 +186,7 @@ for (const r of results) {
   console.log(`\n== ${r.case.club} (${r.case.country}) ok=${r.ok} ms=${r.ms}`);
   if (r.crash) console.log('CRASH', r.crash);
   if (r.created && !r.created.ok) console.log('NO SE CREÓ', JSON.stringify(r.created));
-  for (const s of r.seasons || []) console.log(`  temporada ${s.season}: partidos usuario ${s.userMatches} (goles/p ${s.userGoalsPerMatch}), liga ${s.league.matches} partidos, goles/p ${s.league.goalsPerMatch}, local ${s.league.homeWin}, empates ${s.league.draw}, dif>=5: ${s.league.diff5plus}, máx goles ${s.league.maxGoals}, puesto ${s.position}, pts ${s.points}, presupuesto ${s.budget}, hash ${s.hash}`);
+  for (const s of r.seasons || []) console.log(`  temporada ${s.season}: partidos usuario ${s.userMatches} (goles/p ${s.userGoalsPerMatch}), liga ${s.league.matches} partidos, goles/p ${s.league.goalsPerMatch}, local ${s.league.homeWin}, empates ${s.league.draw}, dif>=5: ${s.league.diff5plus}, máx goles ${s.league.maxGoals}, puesto ${s.position}, pts ${s.points}, físico XI ${s.fisicoXI}, presupuesto ${s.budget}, hash ${s.hash}`);
   if (r.size) console.log('  tamaño: carrera ' + r.size.careerKB + ' KB · localStorage total ' + r.size.localStorageKB + ' KB');
   if (r.v2check) console.log('  motor v2:', JSON.stringify(r.v2check));
   if (r.save) console.log('  guardado/recarga:', r.save.reloadOk ? 'OK' : 'FALLÓ', JSON.stringify(r.save.after));
