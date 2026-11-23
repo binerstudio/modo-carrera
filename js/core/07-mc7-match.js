@@ -210,7 +210,7 @@ const API2={
  relato:(m,side,e)=>{const n=nm(m,e,side),cl=clubOf(m,side);ev(m,'JUEGO EN DESARROLLO',P_([`${n} maneja los tiempos de ${cl} en mitad de cancha.`,`${cl} hace circular la pelota con paciencia; ${n} busca el hueco entre líneas.`,`${n} recupera en campo propio y ${cl} intenta salir rápido.`,`${cl} adelanta líneas y empuja al rival contra su área.`]),false,side)},
  ps:(m,e,side)=>ps(m,e.key,nm(m,e,side),e.p?e.p.pos:e.pos,e.g,side),
  goal:(m,side,sc,as,kind,type,defN,gkN)=>goal(m,side,sc,as,kind,type==='error'?'area':type,defN,gkN),
- miss:(m,side,type,sh,defE,gkE,onT)=>{const o=OTRO(side);ev(m,onT?'ATAJADA':'OCASIÓN DE GOL',missText(type==='error'?'area':type,nm(m,sh,side),nm(m,defE,o),nm(m,gkE,o),onT),false,side)},
+ miss:(m,side,type,sh,defE,gkE,onT)=>{const o=OTRO(side);ev(m,onT?'ATAJADA':'OCASIÓN DE GOL',missText(type==='error'?'area':type,nm(m,sh,side),nm(m,defE,o),nm(m,gkE,o),onT),false,side);const E=m.events[m.events.length-1];if(E)E.j={tipo:type,tirador:nm(m,sh,side),def:nm(m,defE,o),arq:nm(m,gkE,o)}},
  foul:(m,v,side,vic)=>ev(m,'FALTA',P_(FOULS)(nm(m,v,side),vic),false,side),
  yellow:(m,v,side,why,vic)=>{const L=side==='o'?m.own:m.riv,n=nm(m,v,side),st=ps(m,v.key,n,v.p?v.p.pos:v.pos,v.g,side);st.y++;if(side==='o')m.yH++;else m.yA++;
   if(st.y>=2){st.rk='double';card(m,L,v,side,n,true,'doble amarilla',`${n} ya tenía amarilla y ve la segunda.`)}
@@ -274,7 +274,7 @@ function card(m,L,v,side,n,red,why,txt){const o=side==='o';if(o){m.rH++;m.rO=(m.
  if(o)m.ownPlayers=m.own.map(x=>x.p);
  ev(m,'🟥 EXPULSIÓN',`${txt?txt+' ':''}${n} (${clubOf(m,side)}) es expulsado (${why}) y ${clubOf(m,side)} queda con ${L.length}.`,true,side)}
 /* ---- control de tiempo ---- */
-function msPerMinute(){const base={1:520,2:260}[matchSpeed]||520,len=$('matchLength')?$('matchLength').value:'normal';return base*({quick:.5,normal:1,long:1.6}[len]||1)}
+function msPerMinute(){const base={1:520,2:260,4:130}[matchSpeed]||520,len=$('matchLength')?$('matchLength').value:'normal';return base*({quick:.5,normal:1,long:1.6}[len]||1)}
 function kickoffTxt(m){const t=m.tacR||{},A=m.venue==='a',L=A?m.away:m.home,V=A?m.home:m.away,TO=ownTac();
  return `Rueda el balón: ${L} (local) recibe a ${V}. GRL ${m.home} ${m.grlO??'-'} · ${m.away} ${m.grlR??'-'}. ${m.home} sale con un planteo ${(STYLE_TXT[TO.style]||TO.style).split(',')[0]} y ${m.away} con uno ${STYLE_TXT[t.style]||'equilibrado'}.`}
 function startHalf(h){
@@ -285,14 +285,14 @@ function startHalf(h){
  matchPaused=false;renderMatch();run();
 }
 function run(){stopTimer();const m=match;if(!m)return;
- tmr=setInterval(()=>{if(match!==m){stopTimer();return}if(matchPaused)return;
+ tmr=setInterval(()=>{if(match!==m){stopTimer();return}if(matchPaused)return;if(window.MC2D&&MC2D.retener(m))return;/* 12.6: espera a que termine la jugada animada */
   const end=minuteStep(m);renderMatch();if(end){stopTimer();endHalf(m)}},msPerMinute())}
 function endHalf(m){
  if(m.clock.half===1){m.phase='ht';ev(m,'⏸ DESCANSO',`Final del primer tiempo: ${scoreTxt(m)}.`,true);renderMatch()}
  else{ev(m,'⏱ FINAL DEL PARTIDO',`Suena el pitazo final. ${scoreTxt(m)}.`,true);finishMatch()}
 }
 window.mcSimEnd=function(){
- if(!career||!match||match.done)return;
+ if(!career||!match||match.done)return;if(window.MC2D)try{MC2D.saltar()}catch(e){}
  const m=match;stopTimer();matchPaused=false;m.autoSubs=true;
  if(m.phase==='pre'){m.phase='first';m.clock={half:1,limit:45,base:0,x:0};m.extra[1]=1+Math.floor(R()*3);ev(m,'⏱ COMIENZA EL PARTIDO',kickoffTxt(m),true)}
  if(m.phase==='first'){while(!minuteStep(m)){}ev(m,'⏸ DESCANSO',`Final del primer tiempo: ${scoreTxt(m)}.`,true);m.phase='ht'}

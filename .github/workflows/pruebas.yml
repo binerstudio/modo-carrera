@@ -23,6 +23,8 @@ jobs:
         run: node tests/motor.mjs 1000
       - name: Jugar temporadas con semilla fija
         run: node tests/regresion.mjs http://localhost:8080/index.html ${{ github.ref_name }}
+      - name: Simulador 2D en vivo (capturas en el artefacto)
+        run: node tests/partido2d.mjs http://localhost:8080/index.html
       - name: Tres temporadas sin intervención (IA y mercado)
         run: node tests/temporadas.mjs http://localhost:8080/index.html 3
       - name: Carrera guardada con la versión publicada (main) se abre con esta versión

@@ -635,7 +635,9 @@ function matchBuild(){const s=$('match'),m=curMatch(),c=C();if(!s||!c)return;let
  const isL=/^LIGA/i.test(String(m.compLabel||''));const comp=isL?`${lgName(c.country)} - ${String(m.compLabel).replace(/^LIGA\s*·\s*/i,'').replace(/^FECHA/i,'Fecha')}`:(m.compLabel||'Partido');
  const ph=m.done?'Final':(PH[m.phase]||'');const mn=m.phase==='pre'?"0'":(m.lbl||m.minute||0)+"'";
  const R=rows(m),hot=(m.scorers||[]).slice(-1)[0];
- const le=lastEv(m);let leH='';if(le){const g=isGoal(le.title);const team=/LOCAL/i.test(le.title)?m.home:/VISIT/i.test(le.title)?m.away:'';
+ /* 12.6 · con el simulador 2D se muestra solo lo que ya se vio en la animación */
+ const CUT=window.MC2D?MC2D.corte(m):(m.events||[]).length,SC=window.MC2D?MC2D.marcador(m):[m.h,m.a];
+ const le=lastEv({events:(m.events||[]).slice(0,CUT)});let leH='';if(le){const g=isGoal(le.title);const team=/LOCAL/i.test(le.title)?m.home:/VISIT/i.test(le.title)?m.away:'';
   leH=`<div class="le">${evIcon(le.title)}<b>${esc(le.lbl!=null?le.lbl+"'":'')}</b><strong>${g&&team?'¡GOL DE '+esc(team.toUpperCase())+'!':esc(clean(le.title))}</strong></div><p class="lm">${esc(evTxt(le))}</p>`}
  const prog=Math.max(0,Math.min(100,(m.done?90:(m.minute||0))/90*100));
  const running=!m.done&&(m.phase==='first'||m.phase==='second');let paused=false;try{paused=matchPaused}catch(e){}
@@ -643,7 +645,7 @@ function matchBuild(){const s=$('match'),m=curMatch(),c=C();if(!s||!c)return;let
  const act=m.done?['mcMainAction()',(($('matchAction')||{}).textContent||'SIGUIENTE FECHA').replace(/→/,'').trim()]:m.phase==='pre'?['mcMainAction()','COMENZAR PARTIDO']:m.phase==='ht'?['mcMainAction()','JUGAR EL 2º TIEMPO']:['mcSimEnd()','SIMULAR HASTA<br>EL FINAL'];
  const ST=[['Posesión',Math.round(m.pos||50),100-Math.round(m.pos||50),'%'],['Tiros',m.shotsH,m.shotsA],['Tiros al arco',m.onH,m.onA],['Goles esperados (xG)',(m.xgH||0).toFixed(1),(m.xgA||0).toFixed(1)],['Saques de esquina',m.cornersH,m.cornersA]];
  const stH=ST.map(r=>{const p=r[3]?r[1]:pct(r[1],r[2]);return `<div class="sr"><b>${r[1]}${r[3]||''}</b><div><span>${r[0]}</span><div class="sb"><i style="width:${p}%"></i></div></div><b>${r[2]}${r[3]||''}</b></div>`}).join('');
- const E=(m.events||[]).slice().reverse();const key=E.filter(e=>/GOL|TARJETA|AMARILLA|ROJA|ARCO|CAMBIO|LESI|OCASI/i.test(e.title||''));
+ const E=(m.events||[]).slice(0,CUT).reverse();const key=E.filter(e=>/GOL|TARJETA|AMARILLA|ROJA|ARCO|CAMBIO|LESI|OCASI/i.test(e.title||''));
  const evRow=(e,i)=>`<div class="er${i===0&&/GOL/i.test(e.title)?' hl':''}"><b>${esc(e.lbl!=null?e.lbl+"'":'')}</b>${evIcon(e.title)}<span><strong>${esc(clean(e.title))}</strong> · ${esc(evTxt(e))}</span></div>`;
  const evP=`<div class="pn ev"><h4>EVENTOS DEL PARTIDO</h4>${(key.length?key:E).slice(0,4).map(evRow).join('')||'<p class="em">Todavía no hubo eventos.</p>'}</div>`;
  let body='';
@@ -656,16 +658,17 @@ function matchBuild(){const s=$('match'),m=curMatch(),c=C();if(!s||!c)return;let
  <div class="top"><div class="sbg"></div>${LOGO}
   <div class="cp">${sv('trophy','ci')}${esc(comp)}</div>
   <div class="sb2"><div class="cr l">${badge(m.home,96)}</div><div class="np l"><b>${esc(m.home)}</b><span>${esc(fH)} ${esc(sH)}</span></div>
-   <div class="cl"><b class="mn">${esc(mn)}</b><small>${esc(ph)}</small><strong>${m.h} - ${m.a}</strong></div>
+   <div class="cl"><b class="mn">${esc(mn)}</b><small>${esc(ph)}</small><strong>${SC[0]} - ${SC[1]}</strong></div>
    <div class="np r"><b>${esc(m.away)}</b><span>${esc(fA)} ${esc(sA)}</span></div><div class="cr r">${badge(m.away,96)}</div></div>
-  <div class="pt">${pitchSVG(m,fH,fA,R,hot)}</div>
+  ${window.MC2D?'<div class="pt pt2d" id="m2dHost"></div>':`<div class="pt">${pitchSVG(m,fH,fA,R,hot)}</div>`}
   ${leH?`<div class="lev">${leH}</div>`:''}</div>
  <div class="ctl"><button class="pz" onclick="${running?'toggleMatchPause()':act[0]}" title="${running&&!paused?'Pausar':'Jugar'}">${sv(running&&!paused?'pause':'play')}</button>
-  <div class="spd"><button class="${sp===1?'on':''}" onclick="mcSpeed(1,this)">x1</button><button class="${sp===2?'on':''}" onclick="mcSpeed(2,this)">x2</button></div>
+  <div class="spd"><button class="${sp===1?'on':''}" onclick="mcSpeed(1,this)">x1</button><button class="${sp===2?'on':''}" onclick="mcSpeed(2,this)">x2</button><button class="${sp===4?'on':''}" onclick="mcSpeed(4,this)">x4</button></div>
   <div class="pg"><div class="tr"><i style="width:${prog}%"></i><span class="bl" style="left:${prog}%">${sv('ball','bs')}</span></div><div class="lb"><span>1ºT</span><span>2ºT</span></div></div>
   <button class="sim" onclick="${act[0]}">${esc(act[1]).replace(/&lt;br&gt;/g,'<br>')} <em>»</em></button></div>
  <div class="tbs">${[['stats','bars','ESTADÍSTICAS'],['form','form','FORMACIONES'],['tac','clip','TÁCTICAS'],['ev','list','EVENTOS']].map(t=>`<button class="${MT===t[0]?'on':''}" onclick="MC12.mTab('${t[0]}')">${sv(t[1],'ti')}${t[2]}</button>`).join('')}</div>
- ${body}</div>`}
+ ${body}</div>`;
+ if(window.MC2D){const h2=$('m2dHost');if(h2)MC2D.montar(h2,m)}}
 M.mTab=t=>{MT=t;matchBuild()};
 
 /* =====================================================================
