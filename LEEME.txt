@@ -1,3 +1,15 @@
+MODO CARRERA 12.3.0 · ETAPA 1: FUNDACIÓN TÉCNICA (todo lo anterior se conserva)
+==============================================================================
+Detalle: INFORME_ETAPA_1.md
+- Mismos resultados que la 12.2.2 (comprobado con la huella de regresión b6e76d8864c3a1f4).
+- El código que estaba dentro de index.html pasó a js/core/ (mismo orden y contenido).
+- Respaldo del guardado en IndexedDB: si el navegador se queda sin espacio, avisa y no se pierde el progreso.
+- App instalable (Agregar a pantalla de inicio) y apertura sin conexión.
+- Se ocultaron ajustes que no hacían nada (clima, sonido, gráficos, notificaciones...).
+- Publicación automática: GitHub (binerstudio/modo-carrera) -> Cloudflare Pages (carreramod0).
+- Pruebas automáticas en cada cambio: tests/regresion.mjs y tests/actualizacion.mjs (GitHub Actions).
+- Al abrir la 12.3.0 se crea la copia automática "Antes de actualizar a la versión 12.3.0".
+
 MODO CARRERA 12.0 · REDISEÑO VISUAL (todo lo anterior se conserva)
 =================================================================
 Detalle: INFORME_MODO_CARRERA_12.0.md
