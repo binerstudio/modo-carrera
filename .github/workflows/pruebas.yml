@@ -5,6 +5,8 @@ on:
 jobs:
   pruebas:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
@@ -32,3 +34,10 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: resultados, path: tests/out/ }
+      - name: Subir capturas del simulador 2D a la rama capturas-ci
+        if: always()
+        run: |
+          mkdir -p /tmp/cap && cp tests/out/*.png tests/out/*.json /tmp/cap/ 2>/dev/null || true
+          cd /tmp/cap && git init -q && git checkout -q -b capturas-ci
+          git -c user.name=ci -c user.email=ci@local add -A && git -c user.name=ci -c user.email=ci@local commit -q -m "capturas ${{ github.ref_name }} ${{ github.sha }}" || exit 0
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" capturas-ci
