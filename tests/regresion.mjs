@@ -145,10 +145,19 @@ async function pruebaPWA(browser) {
     const reg = navigator.serviceWorker ? !!(await navigator.serviceWorker.getRegistration()) : false;
     const cats = typeof CAT !== 'undefined' ? Object.keys(CAT) : null;
     const visibles = typeof SS !== 'undefined' ? Object.values(SS).flatMap(x => x[2].map(r => r[3])) : null;
-    return { manifest: man && man.name, sw, reg, cats, visibles, version: window.MCStore && MCStore.APP_VERSION, title: document.title };
+    const visible = !document.documentElement.classList.contains('mc-cargando') && getComputedStyle(document.body).visibility === 'visible';
+    return { manifest: man && man.name, sw, reg, cats, visibles, visible, diseno12: document.body.className, version: window.MCStore && MCStore.APP_VERSION, title: document.title };
   });
   await ctx.close();
-  const ok = r.manifest === 'MODO CARRERA' && r.sw && r.reg && errors.length === 0;
+  // la pantalla de carga debe estar activa ANTES de que cargue el diseño (contexto nuevo, sin service worker)
+  const ctx2 = await browser.newContext({ serviceWorkers: 'block' });
+  const p2 = await ctx2.newPage(); let tapado = null;
+  await ctx2.route(u => !u.href.startsWith(new globalThis.URL(URL).origin), r => r.abort());
+  await p2.route('**/js/mc12-diseno.js*', async route => { tapado = await p2.evaluate(() => document.documentElement.classList.contains('mc-cargando')).catch(() => null); route.continue(); });
+  await p2.goto(URL, { waitUntil: 'load' });
+  await ctx2.close();
+  const ok = r.manifest === 'MODO CARRERA' && r.sw && r.reg && r.visible && tapado === true && errors.length === 0;
+  r.tapadoMientrasCarga = tapado;
   return { ok, ...r, errors };
 }
 
