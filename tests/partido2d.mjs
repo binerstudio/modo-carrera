@@ -67,7 +67,9 @@ const realismo = { muestras: M.length, cercaPelota: +prom('cerca').toFixed(2), l
 if (fin.estado.saltosJugadores) fallas.push(`Un jugador se movió de golpe ${fin.estado.saltosJugadores} veces (${JSON.stringify(fin.estado.saltoLog)})`);
 if (realismo.cercaPelota > 5) fallas.push(`Amontonamiento: en promedio ${realismo.cercaPelota} jugadores a menos de 8 m de la pelota`);
 for (const t of [0, 1]) { if (realismo.largo[t] < 18 || realismo.largo[t] > 60) fallas.push(`Largo del equipo ${t} irreal (${realismo.largo[t]} m)`); if (realismo.ancho[t] < 28) fallas.push(`Equipo ${t} muy angosto (${realismo.ancho[t]} m)`); if (realismo.arqueroLinea[t] > 12) fallas.push(`Arquero ${t} muy lejos del arco (${realismo.arqueroLinea[t]} m de promedio)`); }
-if (realismo.pctSuelta > 25) fallas.push(`La pelota estuvo suelta sin dueño el ${realismo.pctSuelta}% del tiempo`);
+realismo.sueltaMaxSeg = fin.estado.med ? fin.estado.med.sueltaMax : null;
+if (realismo.pctSuelta > 15) fallas.push(`La pelota quedó suelta en juego el ${realismo.pctSuelta}% del tiempo`);
+if (realismo.sueltaMaxSeg > 6) fallas.push(`Una pelota suelta tardó ${realismo.sueltaMaxSeg} s en ser recuperada`);
 if (errors.length) fallas.push(`${errors.length} errores de JavaScript`);
 const out = { ok: !fallas.length, realismo, montado, fin, estadosVistos: out_union, segundosReales: Math.round(ms / 1000), muestras: muestras.length, retuvoDuranteJugadas: retuvo, adelantado, errores: errors.slice(0, 15), fallas };
 writeFileSync('tests/out/partido2d.json', JSON.stringify(out, null, 1));

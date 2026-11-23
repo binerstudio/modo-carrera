@@ -545,7 +545,7 @@ function frame(ts){S.raf=0;if(!S.cv||!S.cv.isConnected){return}
    /* línea de offside de cada equipo (en sus coordenadas de ataque): el último defensor rival de campo */
    S.offside=[0,1].map(t=>{const A=x=>dirOf(t)>0?x:PW-x;const d=S.sp.filter(s=>s.team!==t&&!s.out&&!s.gk).map(s=>A(s.x));return d.length?Math.max(Math.max(...d),Math.min(52.5,A(S.ball.x))):60});
    asignarMarcas()}
-  buscarSuelta();
+  buscarSuelta();if(S.chaser){S.sueltaT=(S.sueltaT||0)+dt;S.sueltaMax=Math.max(S.sueltaMax||0,S.sueltaT)}else S.sueltaT=0;
   {const o=S.owner;if(o&&o.pose==='run'&&!S.reset){const pr=S.sp.find(x=>x.team!==o.team&&!x.out&&Math.hypot(x.x-o.x,x.y-o.y)<2);if(pr&&rasgos(o).fuerza>=66)accion(o,'proteccion')}}
   ballStep(dt);S.sp.forEach(s=>{step(s,dt);if(s.cardT>0)s.cardT-=dt;else s.card=null});
   if(S.ref){const r=S.ref;r.ov={x:clamp(S.ball.x-dirOf(0)*8,8,97),y:clamp(S.ball.y+12,6,62),run:.7};step(r,dt)}
@@ -599,7 +599,7 @@ const API={
  estado(){const est={},tac={},acc={};S.sp.forEach(s=>{if(s.out)return;est[s.estado]=(est[s.estado]||0)+1;if(s.tactico)tac[s.tactico]=(tac[s.tactico]||0)+1;if(s.pose&&s.pose!=='run')acc[s.pose]=(acc[s.pose]||0)+1});
   const med={};{const b=S.ball;med.cerca=S.sp.filter(s=>!s.out&&Math.hypot(s.x-b.x,s.y-b.y)<8).length;
    [0,1].forEach(t=>{const L=S.sp.filter(s=>s.team===t&&!s.out&&!s.gk);if(!L.length)return;const xs=L.map(s=>s.x),ys=L.map(s=>s.y);med['largo'+t]=+(Math.max(...xs)-Math.min(...xs)).toFixed(1);med['ancho'+t]=+(Math.max(...ys)-Math.min(...ys)).toFixed(1);
-    const g=S.sp.find(s=>s.team===t&&s.gk&&!s.out);if(g)med['arq'+t]=+Math.abs(g.x-(dirOf(t)>0?0:PW)).toFixed(1)});med.suelta=!S.owner&&!b.fly;med.enJugada=!!(S.play&&!S.play.filler)}
+    const g=S.sp.find(s=>s.team===t&&s.gk&&!s.out);if(g)med['arq'+t]=+Math.abs(g.x-(dirOf(t)>0?0:PW)).toFixed(1)});med.suelta=!!S.chaser;med.sueltaMax=+(S.sueltaMax||0).toFixed(1);med.enJugada=!!(S.play&&!S.play.filler)}
   return{med,saltosJugadores:S.ptele||0,saltoLog:S.pteleLog||null,jugada:S.play?S.play.label:null,mostrados:S.shown,eventos:S.m?(S.m.events||[]).length:0,camara:S.cam,jugadores:S.sp.filter(s=>!s.out).length,goles:S.goles.slice(),cuadros:S.t,teletransportes:S.tele,teleLog:S.teleLog||null,estados:est,tacticos:tac,acciones:acc,posesionId:S.posId}}
 };
 window.MC2D=API;
