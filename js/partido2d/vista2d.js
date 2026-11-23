@@ -588,9 +588,9 @@ function dibujarRepeticion(){const R=S.rep,L=R.L;let i=0;while(i<L.length-2&&L[i
  S.sp.forEach((s,j)=>{const a=A.sp[j],c=B.sp[j];if(!a)return;Object.assign(s,a);if(c){s.x=lerp(a.x,c.x,k);s.y=lerp(a.y,c.y,k)}});
  if(S.ref&&A.ref)Object.assign(S.ref,A.ref);Object.assign(S.ball,A.b);S.ball.x=lerp(A.b.x,B.b.x,k);S.ball.y=lerp(A.b.y,B.b.y,k);S.ball.z=lerp(A.b.z||0,B.b.z||0,k);
  S.owner=null;S.banner=null;S.big=null;
- try{draw();const ctx=S.cx;ctx.save();ctx.font='900 italic 13px "Barlow Semi Condensed",Arial';const t='REPETICIÓN',tw=ctx.measureText(t).width+22,x=S.w-tw-8;
-  ctx.fillStyle='rgba(4,8,20,.88)';ctx.fillRect(x,8,tw,22);ctx.fillStyle='#e2bd70';ctx.fillRect(x,8,4,22);ctx.fillStyle='#fff';ctx.textBaseline='middle';ctx.fillText(t,x+12,19.5);
-  ctx.fillStyle='rgba(255,255,255,.75)';ctx.fillRect(x,31,tw*clamp((R.t-L[0].t)/(R.fin-L[0].t),0,1),2);ctx.restore()}
+ try{draw();const ctx=S.cx;ctx.save();ctx.font='900 italic 13px "Barlow Semi Condensed",Arial';const t='REPETICIÓN',tw=ctx.measureText(t).width+22,x=(S.w-tw)/2,y=S.h-34;
+  ctx.fillStyle='rgba(4,8,20,.88)';ctx.fillRect(x,y,tw,22);ctx.fillStyle='#e2bd70';ctx.fillRect(x,y,4,22);ctx.fillStyle='#fff';ctx.textBaseline='middle';ctx.textAlign='left';ctx.fillText(t,x+12,y+11.5);
+  ctx.fillStyle='rgba(255,255,255,.75)';ctx.fillRect(x,y+23,tw*clamp((R.t-L[0].t)/(R.fin-L[0].t),0,1),2);ctx.restore()}
  finally{S.sp.forEach((s,j)=>Object.assign(s,guard[j]));if(gref)Object.assign(S.ref,gref);Object.assign(S.ball,gb);S.owner=go;S.camX=gcx;S.camY=gcy;S.banner=gbn;S.big=gbig}}
 
 function init(m){S.m=m;S.sp=[];S.byKey=new Map();S.queue=[];S.play=null;S.owner=null;S.ball=newBall();S.half=(m.clock&&m.clock.half)||1;
