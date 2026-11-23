@@ -117,12 +117,12 @@ function objetivo(s){const z=formPos(s);let x=z[0],y=z[1],mul=.7;const dir=dirOf
 
 /* ---------- pelota: nunca se teletransporta ---------- */
 function newBall(){return{x:52.5,y:34,z:0,vx:0,vy:0,fly:null}}
-function ballStep(dt){const b=S.ball,px=b.x,py=b.y;
+function ballStep(dt){const b=S.ball,px=b.x,py=b.y,enVuelo=!!b.fly;
  if(b.fly){const f=b.fly;f.t+=dt;const k=clamp(f.t/f.d,0,1),e=f.ease?1-Math.pow(1-k,1.6):k;b.x=lerp(f.x0,f.x1,e);b.y=lerp(f.y0,f.y1,e);b.z=f.h*4*k*(1-k)+(f.z1||0)*k;
   if(k>=1){b.fly=null;b.z=f.z1&&f.keep?f.z1:0;const cb=f.cb;f.cb=null;if(cb)cb()}}
  else if(S.owner){const o=S.owner;b.x+=(o.x+(o.face||1)*.55-b.x)*Math.min(1,dt*14);b.y+=(o.y+.25-b.y)*Math.min(1,dt*14);b.z=0}
  else{b.vx*=Math.pow(.4,dt);b.vy*=Math.pow(.4,dt);b.x+=b.vx*dt;b.y+=b.vy*dt}
- const jump=Math.hypot(b.x-px,b.y-py);if(jump>4.5&&!b.fly){S.tele++;S.teleLog={jugada:S.play?S.play.label:null,paso:S.play?S.play.i:null,salto:+jump.toFixed(1),dueno:S.owner?S.owner.name:null,de:[+px.toFixed(1),+py.toFixed(1)],a:[+b.x.toFixed(1),+b.y.toFixed(1)]}}}
+ const jump=Math.hypot(b.x-px,b.y-py);if(jump>4.5&&!b.fly&&!enVuelo){S.tele++;S.teleLog={jugada:S.play?S.play.label:null,paso:S.play?S.play.i:null,salto:+jump.toFixed(1),dueno:S.owner?S.owner.name:null,de:[+px.toFixed(1),+py.toFixed(1)],a:[+b.x.toFixed(1),+b.y.toFixed(1)]}}}
 function patear(x,y,o){o=o||{};const b=S.ball;S.owner=null;const d=Math.hypot(x-b.x,y-b.y);const v=o.v||(o.h>2?17:19);
  b.fly={x0:b.x,y0:b.y,x1:x,y1:y,h:o.h||0,z1:o.z1||0,keep:o.keep,t:0,d:Math.max(.2,d/v),ease:!o.lin,cb:o.cb}}
 /* tomar la pelota solo si está cerca (si no, no se puede: evita teletransportes) */
