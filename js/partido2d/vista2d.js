@@ -212,7 +212,7 @@ function resize(){const r=S.host.getBoundingClientRect(),dpr=Math.min(2,window.d
 /* proyección: TV/Seguimiento = cámara de transmisión desde la tribuna; Cenital/Táctica = vista desde arriba */
 function proj(x,y,z){const c=S.cam,w=S.w,h=S.h;
  if(c==='cen'||c==='tac'){const s=Math.min((w-16)/PW,(h-14)/PH);return[w/2+(x-52.5)*s,h/2+(y-34)*s-(z||0)*s*.6,s]}
- const viewW=c==='seg'?34:56,dc=38,hc=22,top=8,bot=h-6;
+ const viewW=c==='seg'?28:42,dc=70,hc=30,top=-6,bot=h+4;
  const k1=1/dc,k0=1/(dc+PH),F=(bot-top)/(hc*(k1-k0)),hz=top-hc*F*k0;
  const d=dc+(PH-y),s=F/d,sx=w/(viewW*(F/dc))*s;
  return[w/2+(x-S.camX)*sx,hz+(hc-(z||0))*s,sx]}
@@ -245,7 +245,8 @@ function torso(ctx,k,x,y,w,h){ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.c
  ctx.restore()}
 function seg(ctx,x0,y0,x1,y1,c,wd){ctx.strokeStyle=c;ctx.lineWidth=wd;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke()}
 /* figura de cuerpo entero: piernas, brazos, torso y cabeza animados según la acción */
-function figura(ctx,s,P,isRef){const k=isRef?{d:'liso',c1:'#ffd400',c2:'#111',sh:'#111',me:'#111'}:kitOf(s);const sc=P[2],H=1.85*sc;if(H<3)return;
+const FIG=2.1;/* las figuras se dibujan más grandes que la escala real, como en las transmisiones de juegos */
+function figura(ctx,s,P,isRef){const k=isRef?{d:'liso',c1:'#ffd400',c2:'#111',sh:'#111',me:'#111'}:kitOf(s);const sc=P[2],H=1.85*sc*FIG;if(H<3)return;
  const sp=Math.hypot(s.vx,s.vy),sw=Math.sin(s.ph)*clamp(sp/6,0,1)*.9,f=s.face||1;let x=P[0],y=P[1],rot=0,lift=0;
  const pz=s.pose,pt=s.poseD?clamp(s.poseT/s.poseD,0,1):0;
  if(pz==='head'||pz==='celebra'&&pt<.3)lift=Math.sin(pt*Math.PI)*H*.35;
@@ -281,15 +282,15 @@ function marca(ctx,s,P){/* vistas desde arriba */const k=kitOf(s),r=Math.max(4,P
  ctx.globalAlpha=1}
 function draw(){const ctx=S.cx,dpr=S.dpr;ctx.setTransform(dpr,0,0,dpr,0,0);drawPitch(ctx);
  const top=S.cam==='cen'||S.cam==='tac';
- if(S.cam==='tac'){/* líneas de cada equipo */[0,1].forEach(t=>{const L=S.sp.filter(s=>s.team===t&&!s.out&&!s.gk);['DEF','MED','DEL'].forEach(g=>{const A=L.filter(s=>s.g===g).sort((a,b)=>a.y-b.y);if(A.length<2)return;ctx.strokeStyle=t?'rgba(120,170,255,.55)':'rgba(255,210,120,.55)';ctx.lineWidth=1.2;ctx.beginPath();A.forEach((s,i)=>{const p=proj(s.x,s.y);i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])});ctx.stroke()})})}
+ if(S.cam==='tac'){/* líneas de cada equipo */[0,1].forEach(t=>{const L=S.sp.filter(s=>s.team===t&&!s.out&&!s.gk);['DEF','MED','DEL'].forEach(g=>{const A=L.filter(s=>s.g===g).sort((a,b)=>slot(a).l-slot(b).l);if(A.length<2)return;ctx.strokeStyle=t?'rgba(120,170,255,.35)':'rgba(255,210,120,.35)';ctx.lineWidth=1;ctx.beginPath();A.forEach((s,i)=>{const p=proj(s.x,s.y);i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])});ctx.stroke()})})}
  const all=S.sp.filter(s=>s.alpha>0).concat(S.ref?[S.ref]:[]);all.sort((a,b)=>a.y-b.y);
  const b=S.ball,bp=proj(b.x,b.y,b.z),bs=proj(b.x,b.y,0);
  let ballDrawn=false;const drawBall=()=>{ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.ellipse(bs[0],bs[1],Math.max(1.5,bs[2]*.18),Math.max(.8,bs[2]*.08),0,0,Math.PI*2);ctx.fill();
-  const r=Math.max(2,bp[2]*(top?.32:.14));ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(bp[0],bp[1]-(top?0:r),r,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#222';ctx.lineWidth=.6;ctx.stroke();ballDrawn=true};
+  const r=Math.max(2,bp[2]*(top?.32:.14*FIG));ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(bp[0],bp[1]-(top?0:r),r,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#222';ctx.lineWidth=.6;ctx.stroke();ballDrawn=true};
  for(const s of all){if(!ballDrawn&&s.y>b.y)drawBall();const P=proj(s.x,s.y,0);if(top){if(s===S.ref)continue;marca(ctx,s,P)}else figura(ctx,s,P,s===S.ref)}
  if(!ballDrawn)drawBall();
  /* jugador con la pelota */
- const o=S.owner;if(o&&!top){const P=proj(o.x,o.y,0),H=1.85*P[2];ctx.strokeStyle='#f5e14a';ctx.lineWidth=1.6;ctx.beginPath();ctx.ellipse(P[0],P[1],H*.34,H*.1,0,0,Math.PI*2);ctx.stroke();
+ const o=S.owner;if(o&&!top){const P=proj(o.x,o.y,0),H=1.85*P[2]*FIG;ctx.strokeStyle='#f5e14a';ctx.lineWidth=1.6;ctx.beginPath();ctx.ellipse(P[0],P[1],H*.34,H*.1,0,0,Math.PI*2);ctx.stroke();
   const t=`${o.num} ${corto(o.name)}`;ctx.font='700 11px "Barlow Semi Condensed",Arial';const tw=ctx.measureText(t).width+10,ty=P[1]-H*1.25-14;
   ctx.fillStyle='rgba(4,8,20,.9)';ctx.fillRect(P[0]-tw/2,ty,tw,14);ctx.fillStyle='#e02a2a';ctx.beginPath();ctx.moveTo(P[0]-4,ty+14);ctx.lineTo(P[0]+4,ty+14);ctx.lineTo(P[0],ty+19);ctx.fill();
   ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,P[0],ty+7.5)}
@@ -306,7 +307,7 @@ function frame(ts){S.raf=0;if(!S.cv||!S.cv.isConnected){return}
  if(m){syncPlayers();if(!S.play)next();runPlay(dt);circular(dt);ballStep(dt);S.sp.forEach(s=>{step(s,dt);if(s.cardT>0)s.cardT-=dt;else s.card=null});
   if(S.ref){const r=S.ref;r.ov={x:clamp(S.ball.x-dirOf(0)*8,8,97),y:clamp(S.ball.y+12,6,62),run:.7};step(r,dt)}
   /* cámara: sigue la pelota con suavidad (más cerca en Seguimiento) */
-  const half=(S.cam==='seg'?34:56)/2,tx=clamp(S.ball.x,half-4,PW-half+4);S.camX+=(tx-S.camX)*Math.min(1,real*(S.cam==='seg'?3.2:1.8));
+  const half=(S.cam==='seg'?28:42)/2,tx=clamp(S.ball.x,half-4,PW-half+4);S.camX+=(tx-S.camX)*Math.min(1,real*(S.cam==='seg'?3.2:1.8));
   if(S.banner){S.banner.t-=real;if(S.banner.t<=0)S.banner=null}if(S.big){S.big.t-=real;if(S.big.t<=0)S.big=null}}
  draw();S.raf=requestAnimationFrame(frame)}
 
