@@ -118,7 +118,7 @@ function ballStep(dt){const b=S.ball,px=b.x,py=b.y;
   if(k>=1){b.fly=null;b.z=f.z1&&f.keep?f.z1:0;const cb=f.cb;f.cb=null;if(cb)cb()}}
  else if(S.owner){const o=S.owner;b.x+=(o.x+(o.face||1)*.55-b.x)*Math.min(1,dt*14);b.y+=(o.y+.25-b.y)*Math.min(1,dt*14);b.z=0}
  else{b.vx*=Math.pow(.4,dt);b.vy*=Math.pow(.4,dt);b.x+=b.vx*dt;b.y+=b.vy*dt}
- const jump=Math.hypot(b.x-px,b.y-py);if(jump>4.5&&!b.fly)S.tele++}
+ const jump=Math.hypot(b.x-px,b.y-py);if(jump>4.5&&!b.fly){S.tele++;S.teleLog={jugada:S.play?S.play.label:null,paso:S.play?S.play.i:null,salto:+jump.toFixed(1),dueno:S.owner?S.owner.name:null,de:[+px.toFixed(1),+py.toFixed(1)],a:[+b.x.toFixed(1),+b.y.toFixed(1)]}}}
 function patear(x,y,o){o=o||{};const b=S.ball;S.owner=null;const d=Math.hypot(x-b.x,y-b.y);const v=o.v||(o.h>2?17:19);
  b.fly={x0:b.x,y0:b.y,x1:x,y1:y,h:o.h||0,z1:o.z1||0,keep:o.keep,t:0,d:Math.max(.2,d/v),ease:!o.lin,cb:o.cb}}
 /* tomar la pelota solo si está cerca (si no, no se puede: evita teletransportes) */
@@ -403,7 +403,10 @@ function speed(){let v=1;try{v=matchSpeed||1}catch(e){}return v}
 function frame(ts){S.raf=0;if(!S.cv||!S.cv.isConnected){return}
  const now=ts/1000,real=Math.min(.05,S.last?now-S.last:.016);S.last=now;const dt=real*speed();S.t+=dt;
  resize();const m=S.m;
- if(m){syncPlayers();if(!S.play)next();runPlay(dt);
+ if(m){syncPlayers();
+  /* la circulación de posesión se corta en cuanto el motor produce un evento */
+  if(S.play&&S.play.filler&&S.shown<(m.events||[]).length&&!S.ball.fly){S.play=null;S.sp.forEach(s=>{if(!s.out)s.ov=null})}
+  if(!S.play)next();runPlay(dt);
   marcasT-=dt;if(marcasT<=0){marcasT=.4;const o=S.owner;S.pressers=[];if(o&&!S.reset){const pr=((tacOf(1-o.team).pressing??50)>62)?2:1;S.pressers=S.sp.filter(s=>s.team!==o.team&&!s.out&&!s.gk).sort((a,b)=>Math.hypot(a.x-o.x,a.y-o.y)-Math.hypot(b.x-o.x,b.y-o.y)).slice(0,pr)}asignarMarcas()}
   ballStep(dt);S.sp.forEach(s=>{step(s,dt);if(s.cardT>0)s.cardT-=dt;else s.card=null});
   if(S.ref){const r=S.ref;r.ov={x:clamp(S.ball.x-dirOf(0)*8,8,97),y:clamp(S.ball.y+12,6,62),run:.7};step(r,dt)}
@@ -432,12 +435,12 @@ const API={
   bar.addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;S.cam=b.dataset.c;camPref=S.cam;try{localStorage.setItem('mc_cam',S.cam)}catch(e){}bar.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))});
   host.appendChild(bar);S.cam=S.cam||camPref;S.w=0;resize();if(!S.raf)S.raf=requestAnimationFrame(frame)},
  /* el reloj del motor espera mientras se muestra una jugada (o hay eventos sin mostrar) */
- retener(m){if(!m||m!==S.m||m.done||!visible())return false;return!!S.play||S.shown<(m.events||[]).length},
+ retener(m){if(!m||m!==S.m||m.done||!visible())return false;return!!(S.play&&!S.play.filler)||S.shown<(m.events||[]).length},
  corte(m){if(!m||m!==S.m||!visible()||m.done)return(m&&m.events||[]).length;return Math.min(S.shown,(m.events||[]).length)},
  marcador(m){if(!m||m!==S.m||!visible()||m.done)return[m.h,m.a];return S.goles},
  saltar(){if(!S.m)return;S.play=null;S.queue=[];S.shown=(S.m.events||[]).length;contar();S.owner=null;S.phase=S.m.done?'done':S.phase},
  estado(){const est={},tac={},acc={};S.sp.forEach(s=>{if(s.out)return;est[s.estado]=(est[s.estado]||0)+1;if(s.tactico)tac[s.tactico]=(tac[s.tactico]||0)+1;if(s.pose&&s.pose!=='run')acc[s.pose]=(acc[s.pose]||0)+1});
-  return{jugada:S.play?S.play.label:null,mostrados:S.shown,eventos:S.m?(S.m.events||[]).length:0,camara:S.cam,jugadores:S.sp.filter(s=>!s.out).length,goles:S.goles.slice(),cuadros:S.t,teletransportes:S.tele,estados:est,tacticos:tac,acciones:acc,posesionId:S.posId}}
+  return{jugada:S.play?S.play.label:null,mostrados:S.shown,eventos:S.m?(S.m.events||[]).length:0,camara:S.cam,jugadores:S.sp.filter(s=>!s.out).length,goles:S.goles.slice(),cuadros:S.t,teletransportes:S.tele,teleLog:S.teleLog||null,estados:est,tacticos:tac,acciones:acc,posesionId:S.posId}}
 };
 window.MC2D=API;
 /* estilos del visor (la cancha más alta, cámaras arriba a la derecha) */
