@@ -403,7 +403,7 @@ window.finishMatch=function(){
  career.lastResult=scoreTxt(m);
  const baja=career.players.filter(p=>mcUnavailable(p)).map(p=>`${p.name} (${p.injury?p.injury.split(' · ')[0].toLowerCase():'suspendido'})`);
  /* 12.7: resumen con identificador y minuto real (antes repetía "FINAL" con minuto 90 fijo) */
- const EVX=o=>{m.evSeq=(m.evSeq||0)+1;m.events.push(Object.assign({id:m.evSeq,lbl:label(m),min:m.clock.base+m.clock.x},o))};
+ const EVX=o=>{m.evSeq=(m.evSeq||0)+1;const L=m.events[m.events.length-1],mn=Math.max(m.clock.base+m.clock.x,L&&L.min||0);m.events.push(Object.assign({id:m.evSeq,lbl:L&&L.min>m.clock.base+m.clock.x?L.lbl:label(m),min:mn},o))};
  EVX({title:'📊 RESUMEN DEL PARTIDO',msg:`${scoreTxt(m)}. ${res==='W'?'Gran victoria.':res==='D'?'Reparto de puntos.':'Derrota. A trabajar.'}`,key:true});
  if(baja.length)EVX({title:'📋 BAJAS PARA LA PRÓXIMA FECHA',msg:`No disponibles: ${baja.join(', ')}.${out.length?' Salieron del once titular: '+out.join(', ')+'.':''}`,key:true});
  const row=s=>`<div class="statsrow"><span>${s.name} <span class="muted">${s.pos}${s.gl?' · '+'⚽'.repeat(s.gl):''}${s.a?' · 🅰'+s.a:''}${s.y?' · 🟨':''}${s.r?' · 🟥':''}</span></span><b>${s.rating.toFixed(1)}</b></div>`;
