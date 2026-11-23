@@ -152,10 +152,11 @@ function secuencia(m,side,kind,type,sh,as,defE,gkE,extra){
 /* posesión de un minuto (sin remate): cadena de pases y, a veces, pérdida y recuperación */
 function posesion(m,pO){const V=m.v2,D=drng(m),eq=D()<pO?'o':'r',L=(eq==='o'?m.own:m.riv),O=(eq==='o'?m.riv:m.own);if(!L.length||!O.length)return;
  const pk=A=>A.length?A[Math.floor(D()*A.length)]:null;const camp=L.filter(e=>e.g!=='POR');
- let cur=pk(D()<.12?L.filter(e=>e.g==='POR'):camp.filter(e=>e.g!=='DEL'))||pk(camp);const pases=[nm(cur)];const n=1+Math.floor(D()*4);
+ const ini=D(),inicio=ini<.1?'lateral':ini<.17?'arco':null;
+ let cur=(inicio==='arco'?L.find(e=>e.g==='POR'):null)||pk(D()<.12?L.filter(e=>e.g==='POR'):camp.filter(e=>e.g!=='DEL'))||pk(camp);const pases=[nm(cur)];const n=1+Math.floor(D()*4);
  for(let i=0;i<n;i++){const nx=pk(camp.filter(e=>e!==cur&&(i<1?true:e.g!=='DEF')));if(!nx)break;pases.push(nm(nx));cur=nx}
  const pierde=D()<.38;V.posesion=V.posesion||[];V.pseq=(V.pseq||0)+1;
- V.posesion.push({id:V.pseq,min:m.minute,eq,pases,recupera:pierde?nm(pk(O.filter(e=>e.g!=='POR'))):null});if(V.posesion.length>8)V.posesion.shift()}
+ V.posesion.push({id:V.pseq,min:m.minute,eq,inicio,pases,recupera:pierde?nm(pk(O.filter(e=>e.g!=='POR'))):null});if(V.posesion.length>8)V.posesion.shift()}
 
 function ataque(m,side,API,kind,who){
  const V=m.v2,home=side==='o',mine=home?m.own:m.riv,theirs=home?m.riv:m.own,other=home?'r':'o';

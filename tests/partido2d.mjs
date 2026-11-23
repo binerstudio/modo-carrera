@@ -61,13 +61,21 @@ const union = k => [...new Set(muestras.flatMap(x => Object.keys(x.st[k] || {}))
 out_union = { estados: union('estados'), tacticos: union('tacticos'), acciones: union('acciones') };
 for (const t of ['marcando', 'presionando', 'atacando', 'defendiendo']) if (!out_union.tacticos.includes(t)) fallas.push(`Nunca se vio el estado táctico '${t}'`);
 for (const t of ['corriendo', 'trotando', 'quieto']) if (!out_union.estados.includes(t)) fallas.push(`Nunca se vio el estado '${t}'`);
+/* realismo (Etapa 3): mediciones tomadas cada 0,4 s durante el partido */
+const M = muestras.map(x => x.st.med).filter(Boolean), prom = k => M.length ? M.reduce((t, x) => t + (x[k] || 0), 0) / M.length : 0;
+const realismo = { muestras: M.length, cercaPelota: +prom('cerca').toFixed(2), largo: [+prom('largo0').toFixed(1), +prom('largo1').toFixed(1)], ancho: [+prom('ancho0').toFixed(1), +prom('ancho1').toFixed(1)], arqueroLinea: [+prom('arq0').toFixed(1), +prom('arq1').toFixed(1)], pctSuelta: +(100 * M.filter(x => x.suelta).length / (M.length || 1)).toFixed(1), maxCerca: Math.max(0, ...M.map(x => x.cerca)) };
+if (fin.estado.saltosJugadores) fallas.push(`Un jugador se movió de golpe ${fin.estado.saltosJugadores} veces (${JSON.stringify(fin.estado.saltoLog)})`);
+if (realismo.cercaPelota > 5) fallas.push(`Amontonamiento: en promedio ${realismo.cercaPelota} jugadores a menos de 8 m de la pelota`);
+for (const t of [0, 1]) { if (realismo.largo[t] < 18 || realismo.largo[t] > 60) fallas.push(`Largo del equipo ${t} irreal (${realismo.largo[t]} m)`); if (realismo.ancho[t] < 28) fallas.push(`Equipo ${t} muy angosto (${realismo.ancho[t]} m)`); if (realismo.arqueroLinea[t] > 12) fallas.push(`Arquero ${t} muy lejos del arco (${realismo.arqueroLinea[t]} m de promedio)`); }
+if (realismo.pctSuelta > 25) fallas.push(`La pelota estuvo suelta sin dueño el ${realismo.pctSuelta}% del tiempo`);
 if (errors.length) fallas.push(`${errors.length} errores de JavaScript`);
-const out = { ok: !fallas.length, montado, fin, estadosVistos: out_union, segundosReales: Math.round(ms / 1000), muestras: muestras.length, retuvoDuranteJugadas: retuvo, adelantado, errores: errors.slice(0, 15), fallas };
+const out = { ok: !fallas.length, realismo, montado, fin, estadosVistos: out_union, segundosReales: Math.round(ms / 1000), muestras: muestras.length, retuvoDuranteJugadas: retuvo, adelantado, errores: errors.slice(0, 15), fallas };
 writeFileSync('tests/out/partido2d.json', JSON.stringify(out, null, 1));
 console.log(`SIMULADOR 2D · ${out.ok ? 'OK' : 'FALLÓ'} · ${fin.h}-${fin.a} · ${out.segundosReales}s reales en x4 · retención durante jugadas: ${retuvo} muestras · cámaras ${montado.cams.join('/')}`);
 console.log('goles:', fin.goles.join(' | '));
 console.log('estado final:', JSON.stringify(fin.estado));
 console.log('estados vistos:', JSON.stringify(out_union));
+console.log('realismo:', JSON.stringify(realismo));
 errors.slice(0, 10).forEach(e => console.log('  ', e.slice(0, 300)));
 fallas.forEach(f => console.log('FALLA:', f));
 process.exit(out.ok ? 0 : 1);
