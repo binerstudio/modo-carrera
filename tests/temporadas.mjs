@@ -48,7 +48,7 @@ for (let t = 0; t < N; t++) {
     const d = mcDB(), vistos = new Map(); let dup = 0; const ej = [];
     d.list.forEach(o => { const k = (o._n || o.name) + '#' + o.id; if (vistos.has(k)) { dup++; if (ej.length < 3) ej.push(o.name) } vistos.set(k, o.club) });
     const enDos = []; const porNombre = new Map(); clubes.forEach(c => rosterFor(c).forEach(r => { const k = r[0]; if (porNombre.has(k) && porNombre.get(k) !== c) enDos.push(k + ' (' + porNombre.get(k) + ' y ' + c + ')'); porNombre.set(k, c) }));
-    return { temporada: A.season, ia: A.ia || 'v1', movimientos: M.length, tipos, dinero, ejemplos: M.filter(m => m[4] === 'traspaso').slice(0, 4).map(m => `${m[0]}: ${m[1]} → ${m[2]} (${m[3]}M)`),
+    return { temporada: A.season, ia: A.ia || 'v1', movimientos: A.total || M.length, tipos, dinero, ejemplos: M.filter(m => m[4] === 'traspaso').slice(0, 4).map(m => `${m[0]}: ${m[1]} → ${m[2]} (${m[3]}M)`),
       eco: { clubes: eco.length, noNumericos: malos, min: eco[0], mediana: eco[Math.floor(eco.length / 2)], max: eco[eco.length - 1] },
       prestamosActivos: (w.loansIA || []).length, plantelMin: Math.min(...planteles.map(p => p.n)), arquerosMin: Math.min(...planteles.map(p => p.por)),
       defMin: Math.min(...planteles.map(p => p.def)), medMin: Math.min(...planteles.map(p => p.med)), delMin: Math.min(...planteles.map(p => p.del)), enDosClubes: enDos.slice(0, 5), enDosCount: enDos.length,
@@ -65,6 +65,8 @@ temporadas.forEach((t, i) => {
   if (!(t.movimientos > 20)) fallas.push(`T${i + 1}: muy pocos movimientos (${t.movimientos})`);
   if (t.eco.noNumericos) fallas.push(`T${i + 1}: presupuestos no numéricos`);
   if (t.arquerosMin < 1) fallas.push(`T${i + 1}: un club de la liga quedó sin arquero`);
+  if (t.defMin < 4 || t.medMin < 3 || t.delMin < 2) fallas.push(`T${i + 1}: un club no puede formar un once completo`);
+  if (t.eco.max > 1200) fallas.push(`T${i + 1}: presupuesto desproporcionado (${t.eco.max}M)`);
   if (t.plantelMin < 16) fallas.push(`T${i + 1}: un club quedó con ${t.plantelMin} jugadores`);
   if (t.enDosCount) fallas.push(`T${i + 1}: jugadores en dos clubes: ${t.enDosClubes.join(', ')}`);
   if (!(t.golesLiga >= 2 && t.golesLiga <= 3.2)) fallas.push(`T${i + 1}: goles por partido en la liga fuera de rango (${t.golesLiga})`);

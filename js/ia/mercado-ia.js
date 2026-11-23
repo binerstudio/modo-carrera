@@ -41,6 +41,8 @@ function plantel(){
   let a=by.get(o.club);if(!a)by.set(o.club,a=[]);a.push(o)}
  return by}
 function nivel(a){/* promedio del once ideal 4-3-3 */let s=0,n=0;for(const g in XI){const L=a.filter(o=>o.pos===g).sort((x,y)=>y.rating-x.rating).slice(0,XI[g]);for(const o of L){s+=o.rating;n++}}return n?s/n:50}
+/* jugadores de un puesto que siguen la temporada que viene (los de 38 o más se retiran por edad) */
+function sigue(a,g){let n=0;for(const o of a)if(o.pos===g&&(+o.age||0)<38)n++;return n}
 function titular(a,o){const L=a.filter(x=>x.pos===o.pos).sort((x,y)=>y.rating-x.rating);return L.indexOf(o)<XI[o.pos]}
 
 /* ---------- economía ---------- */
@@ -51,7 +53,7 @@ function valorPlantel(a){return a.slice().sort((x,y)=>(y.value||0)-(x.value||0))
 function eco(club,a,s){const w=W(),sv=valorPlantel(a||[]),lv=nivel(a||[]);
  let e=w.eco[club];
  const base=e?{b:e.b,s:e.s}:{b:+(sv*.18+Math.max(0,lv-55)*.15).toFixed(2),s:BASE-1};
- while(base.s<s){base.s++;base.b=+(clamp(base.b+sv*.05*(1+(lv-65)/40),-sv*.25,sv*1.5)).toFixed(2)}
+ while(base.s<s){base.s++;base.b=+(clamp(base.b+sv*.03*(1+(lv-65)/40),-sv*.25,sv*.8)).toFixed(2)}
  return{b:base.b,s:base.s,club,guardar(){w.eco[club]={b:+this.b.toFixed(2),s:this.s}}}}
 /* ---------- contratos (estimados) ----------
    Vencimiento inicial estimado por jugador; después se renueva en ciclos de 2 a 4 años salvo que
@@ -99,7 +101,7 @@ function mercado(s){
    const C=banda(g,Math.max(lo,L-6),L+6).filter(o=>{const from=where.get(o._n||fold(o.name));return from&&from!==k&&o.age<=32&&(lvl.get(from)||0)<=L+3});
    for(let t=0;t<14&&C.length;t++){const o=C.splice(Math.floor(R()*C.length),1)[0],n=o._n||fold(o.name),from=where.get(n),A=by.get(from)||[];
     if((ventas.get(from)||0)>=3)continue;
-    if(A.filter(x=>x.pos===g).length<=MIN[g])continue;              /* el vendedor necesita a su jugador */
+    if(sigue(A,g)<=MIN[g])continue;                                 /* el vendedor necesita a su jugador */
     const left=fin(o,s)-s,f=(left<=1?.65:left===2?.9:1)*(1+(L-(lvl.get(from)||L))*.01)*(.9+R()*.3);
     const fee=Math.max(0,(+o.value||0)*f);if(fee>E.b*.6)continue;   /* no puede pagarlo */
     if(titular(A,o)&&L<(lvl.get(from)||0)+1&&R()<.6)continue;      /* un titular solo se va a un club mejor */
@@ -110,10 +112,18 @@ function mercado(s){
  let nPr=0;
  for(const k of clubs){if(nPr>=50)break;const a=by.get(k),L=lvl.get(k);if(L<72)continue;
   const jov=a.filter(o=>o.age<=21&&!titular(a,o)&&o.rating<=L-8).sort((x,y)=>y.rating-x.rating).slice(0,2);
-  for(const o of jov){const dest=clubs.filter(x=>x!==k&&Math.abs((lvl.get(x)||0)-o.rating)<=3&&(by.get(x)||[]).filter(y=>y.pos===o.pos).length<MIN[o.pos]+2);
+  for(const o of jov){if(sigue(a,o.pos)<=MIN[o.pos])continue;const dest=clubs.filter(x=>x!==k&&Math.abs((lvl.get(x)||0)-o.rating)<=3&&(by.get(x)||[]).filter(y=>y.pos===o.pos).length<MIN[o.pos]+2);
    if(!dest.length)continue;const to=dest[Math.floor(R()*Math.min(dest.length,10))];w.loansIA.push({name:o.name,from:k,to,until:s+1});mover(o,k,to,0,'préstamo');nPr++}}
+ /* 4) emergencia: ningún club puede quedar sin el mínimo para formar un once (arquero incluido) */
+ for(const k of clubs){const a=by.get(k);if(!a)continue;
+  for(const g in XI){let falta=XI[g]-sigue(a,g);let guard=0;
+   while(falta>0&&guard++<4){const L=lvl.get(k)||60;
+    const don=clubs.filter(x=>x!==k&&sigue(by.get(x)||[],g)>MIN[g]).map(x=>[x,(by.get(x)||[]).filter(o=>o.pos===g&&(+o.age||0)<36&&!titular(by.get(x),o)).sort((p,q)=>Math.abs(p.rating-L)-Math.abs(q.rating-L))[0]]).filter(x=>x[1]);
+    if(!don.length)break;don.sort((p,q)=>Math.abs(p[1].rating-L)-Math.abs(q[1].rating-L));const [from,o]=don[0];
+    w.loansIA.push({name:o.name,from,to:k,until:s+1});mover(o,from,k,0,'préstamo');falta--}}}
  /* registro */
- w.aiMoves=w.aiMoves||[];w.aiMoves.unshift({season:s,moves,ia:'v2'});if(w.aiMoves.length>8)w.aiMoves.length=8;
+ const rel=moves.slice().sort((x,y)=>(y[4]==='traspaso')-(x[4]==='traspaso')||y[3]-x[3]).slice(0,220);
+ w.aiMoves=w.aiMoves||[];w.aiMoves.unshift({season:s,moves:rel,total:moves.length,ia:'v2'});if(w.aiMoves.length>4)w.aiMoves.length=4;
  w.mv=(w.mv||0)+1;try{if(window.mcMovePlayer&&moves.length){const m=moves.find(x=>x[2]!=='Retiro');if(m)mcMovePlayer(m[0],m[2])}}catch(e){}
  try{window.mcClearGRL&&mcClearGRL()}catch(e){}
  const cnt=t=>moves.filter(m=>m[4]===t).length,dinero=moves.reduce((x,m)=>x+m[3],0);
