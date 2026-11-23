@@ -46,13 +46,13 @@ function titular(a,o){const L=a.filter(x=>x.pos===o.pos).sort((x,y)=>y.rating-x.
 /* ---------- economía ---------- */
 function W(){const w=window.mcWorld();w.eco=w.eco||{};w.ctr=w.ctr||{};w.loansIA=w.loansIA||[];return w}
 function valorPlantel(a){return a.slice().sort((x,y)=>(y.value||0)-(x.value||0)).slice(0,20).reduce((s,o)=>s+(+o.value||0),0)}
-/* presupuesto del club, actualizado hasta la temporada s (se crea la primera vez que se lo necesita) */
-function eco(club,a,s){const w=W();let e=w.eco[club];
- const sv=valorPlantel(a||[]),lv=nivel(a||[]);
- if(!e){e=w.eco[club]={b:+(sv*.18+Math.max(0,lv-55)*.15).toFixed(2),s:s}}
- while(e.s<s){e.s++;/* resultado neto de una temporada: los clubes grandes generan más, con tope de deuda */
-  e.b=+(clamp(e.b+sv*.05*(1+(lv-65)/40),-sv*.25,sv*1.5)).toFixed(2)}
- return e}
+/* presupuesto del club a la temporada s. Se calcula sin guardar nada (mismo resultado siempre) y solo
+   se guarda en w.eco cuando el club compra o vende, para que la partida no crezca de más. */
+function eco(club,a,s){const w=W(),sv=valorPlantel(a||[]),lv=nivel(a||[]);
+ let e=w.eco[club];
+ const base=e?{b:e.b,s:e.s}:{b:+(sv*.18+Math.max(0,lv-55)*.15).toFixed(2),s:BASE-1};
+ while(base.s<s){base.s++;base.b=+(clamp(base.b+sv*.05*(1+(lv-65)/40),-sv*.25,sv*1.5)).toFixed(2)}
+ return{b:base.b,s:base.s,club,guardar(){w.eco[club]={b:+this.b.toFixed(2),s:this.s}}}}
 /* ---------- contratos (estimados) ----------
    Vencimiento inicial estimado por jugador; después se renueva en ciclos de 2 a 4 años salvo que
    el club lo deje libre o lo venda (en ese caso se guarda el nuevo vencimiento en w.ctr). */
@@ -81,20 +81,20 @@ function mercado(s){
    if(cnt<MIN[g])out.push([g,3,L-4]);
    else{const weak=P[XI[g]-1];if(weak&&weak.rating<L-5)out.push([g,2,weak.rating+2])}}
   return out.sort((x,y)=>y[1]-x[1])};
- const compras=new Map(),ventas=new Map(),LIM=320;
+ const compras=new Map(),ventas=new Map(),LIM=320,TOPE={libre:140,traspaso:240};let nLib=0,nTr=0;
  /* índice de jugadores por puesto, ordenado por GRL */
  const pool={POR:[],DEF:[],MED:[],DEL:[]};by.forEach((a,k)=>a.forEach(o=>{if(pool[o.pos])pool[o.pos].push(o)}));for(const g in pool)pool[g].sort((x,y)=>x.rating-y.rating);
  const banda=(g,lo,hi)=>{const P=pool[g];let i=0,j=P.length;while(i<j){const m=(i+j)>>1;if(P[m].rating<lo)i=m+1;else j=m}const out=[];for(let k=i;k<P.length&&P[k].rating<=hi;k++)out.push(P[k]);return out};
  /* 2a) libres: firman sin costo con un club de su nivel que necesite ese puesto */
  const nec=new Map(clubs.map(k=>[k,new Set(necesidad(k).map(x=>x[0]))]));
- libres.forEach(([o,from])=>{if(moves.length>=LIM)return;const n=o._n||fold(o.name);
+ libres.forEach(([o,from])=>{if(nLib>=TOPE.libre)return;const n=o._n||fold(o.name);
   if(R()<.45){return}                                   /* muchos renuevan igual con su club */
   const dest=clubs.filter(k=>k!==from&&nec.get(k).has(o.pos)&&Math.abs((lvl.get(k)||0)-o.rating)<=5);
-  if(dest.length&&o.age<=34){const to=dest[Math.floor(R()*Math.min(dest.length,12))];w.ctr[n]=s+1+hash('lib'+n)%3;mover(o,from,to,0,'libre');compras.set(to,(compras.get(to)||0)+1);nec.set(to,new Set(necesidad(to).map(x=>x[0])))}
+  if(dest.length&&o.age<=34){const to=dest[Math.floor(R()*Math.min(dest.length,12))];w.ctr[n]=s+1+hash('lib'+n)%3;mover(o,from,to,0,'libre');nLib++;compras.set(to,(compras.get(to)||0)+1);nec.set(to,new Set(necesidad(to).map(x=>x[0])))}
   else if(o.age>=34){w.retired[n]=s;const A=by.get(from);const i=A?A.indexOf(o):-1;if(i>=0)A.splice(i,1);where.delete(n);moves.push([o.name,from,'Retiro',0,'retiro'])}});
  /* 2b) compras: los clubes con más presupuesto eligen primero */
  const orden=clubs.map(k=>[k,eco(k,by.get(k),s).b]).sort((x,y)=>y[1]-x[1]);
- for(const [k] of orden){if(moves.length>=LIM)break;const E=eco(k,by.get(k),s),L=lvl.get(k);
+ for(const [k] of orden){if(nTr>=TOPE.traspaso)break;const E=eco(k,by.get(k),s),L=lvl.get(k);
   for(const [g,pri,lo] of necesidad(k)){if((compras.get(k)||0)>=3||E.b<=0.05)break;
    const C=banda(g,Math.max(lo,L-6),L+6).filter(o=>{const from=where.get(o._n||fold(o.name));return from&&from!==k&&o.age<=32&&(lvl.get(from)||0)<=L+3});
    for(let t=0;t<14&&C.length;t++){const o=C.splice(Math.floor(R()*C.length),1)[0],n=o._n||fold(o.name),from=where.get(n),A=by.get(from)||[];
@@ -103,8 +103,8 @@ function mercado(s){
     const left=fin(o,s)-s,f=(left<=1?.65:left===2?.9:1)*(1+(L-(lvl.get(from)||L))*.01)*(.9+R()*.3);
     const fee=Math.max(0,(+o.value||0)*f);if(fee>E.b*.6)continue;   /* no puede pagarlo */
     if(titular(A,o)&&L<(lvl.get(from)||0)+1&&R()<.6)continue;      /* un titular solo se va a un club mejor */
-    E.b=+(E.b-fee).toFixed(2);const S=eco(from,A,s);S.b=+(S.b+fee).toFixed(2);
-    w.ctr[n]=s+2+hash('fir'+n+s)%3;mover(o,from,k,fee,'traspaso');
+    E.b=+(E.b-fee).toFixed(2);E.guardar();const S=eco(from,A,s);S.b=+(S.b+fee).toFixed(2);S.guardar();
+    w.ctr[n]=s+2+hash('fir'+n+s)%3;mover(o,from,k,fee,'traspaso');nTr++;
     compras.set(k,(compras.get(k)||0)+1);ventas.set(from,(ventas.get(from)||0)+1);break}}}
  /* 3) préstamos de juveniles sin lugar */
  let nPr=0;
@@ -120,7 +120,7 @@ function mercado(s){
  c.inbox.unshift(`🔁 Mercado de pases: ${cnt('traspaso')} traspasos (${window.mcMoney?mcMoney(dinero):dinero.toFixed(1)+'M'}), ${cnt('libre')} libres, ${cnt('préstamo')} préstamos, ${cnt('retiro')} retiros. Ver Mundo › Traspasos.`);
  return moves}
 window.mcIAMercado=function(s){if(typeof career==='undefined'||!career||iaDe(career)!=='v2')return null;try{return mercado(s)}catch(e){console.warn('MC IA mercado',e);return null}};
-window.mcIAEco=function(club){const by=plantel();return eco(club,by.get(club)||[],career.season)};
+window.mcIAEco=function(club){const by=plantel(),e=eco(club,by.get(club)||[],career.season);return{b:e.b,s:e.s}};
 
 /* ---------- Configuración: Mercado e IA ---------- */
 try{

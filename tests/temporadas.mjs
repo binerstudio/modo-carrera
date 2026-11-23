@@ -54,8 +54,9 @@ for (let t = 0; t < N; t++) {
       defMin: Math.min(...planteles.map(p => p.def)), medMin: Math.min(...planteles.map(p => p.med)), delMin: Math.min(...planteles.map(p => p.del)), enDosClubes: enDos.slice(0, 5), enDosCount: enDos.length,
       tamanoKB: Math.round(JSON.stringify(career).length * 2 / 1024) };
   });
-  const after = await page.evaluate(() => career.players.map(p => p.name).sort().join('|'));
-  temporadas.push({ ...jugada, ...ver, plantelUsuarioIntacto: before === after, ms: Date.now() - t0 });
+  const toque = await page.evaluate(b => { const antes = new Set(b.split('|')); const M = ((mcWorld().aiMoves || [])[0] || { moves: [] }).moves || [];
+    const ahora = new Set(career.players.map(p => p.name)); return { movidos: M.filter(m => antes.has(m[0])).map(m => m[0] + ' → ' + m[2]), salieron: [...antes].filter(n => !ahora.has(n)) }; }, before);
+  temporadas.push({ ...jugada, ...ver, plantelUsuarioIntacto: toque.movidos.length === 0, salieronDelPlantel: toque.salieron, ms: Date.now() - t0 });
 }
 await browser.close();
 const fallas = [];
@@ -75,7 +76,7 @@ if (errors.length) fallas.push(`${errors.length} errores de JavaScript`);
 const out = { creada: { club: creada.club, motor: creada.motor, ia: creada.ia }, temporadas, errores: errors.slice(0, 20), fallas, ok: !fallas.length };
 mkdirSync('tests/out', { recursive: true }); writeFileSync('tests/out/temporadas.json', JSON.stringify(out, null, 1));
 console.log(`TEMPORADAS SIN INTERVENCIÓN · ${out.ok ? 'OK' : 'FALLÓ'} · ${creada.club} · motor ${creada.motor} · IA ${creada.ia}`);
-temporadas.forEach((t, i) => console.log(`T${i + 1} (${t.season}): ${t.partidosUsuario} partidos, liga ${t.golesLiga} goles/p (${t.partidosLiga} partidos, goleadas5 ${t.goleadas5}), goles con detalle ${t.golesConDetalle} | mercado: ${t.movimientos} ${JSON.stringify(t.tipos)} ${t.dinero}M | eco ${JSON.stringify(t.eco)} | préstamos activos ${t.prestamosActivos} | mín plantel ${t.plantelMin} POR ${t.arquerosMin} DEF ${t.defMin} MED ${t.medMin} DEL ${t.delMin} | en dos clubes ${t.enDosCount} | usuario intacto ${t.plantelUsuarioIntacto} | ${t.tamanoKB} KB | ${t.ms} ms\n   ej: ${t.ejemplos.join(' · ')}`));
+temporadas.forEach((t, i) => console.log(`T${i + 1} (${t.season}): ${t.partidosUsuario} partidos, liga ${t.golesLiga} goles/p (${t.partidosLiga} partidos, goleadas5 ${t.goleadas5}), goles con detalle ${t.golesConDetalle} | mercado: ${t.movimientos} ${JSON.stringify(t.tipos)} ${t.dinero}M | eco ${JSON.stringify(t.eco)} | préstamos activos ${t.prestamosActivos} | mín plantel ${t.plantelMin} POR ${t.arquerosMin} DEF ${t.defMin} MED ${t.medMin} DEL ${t.delMin} | en dos clubes ${t.enDosCount} | usuario intacto ${t.plantelUsuarioIntacto} (salieron por retiro/préstamo: ${t.salieronDelPlantel.length}) | ${t.tamanoKB} KB | ${t.ms} ms\n   ej: ${t.ejemplos.join(' · ')}`));
 errors.slice(0, 10).forEach(e => console.log('  ', e.slice(0, 300)));
 fallas.forEach(f => console.log('FALLA:', f));
 process.exit(out.ok ? 0 : 1);
