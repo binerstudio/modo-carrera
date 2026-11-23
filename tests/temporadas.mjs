@@ -39,7 +39,7 @@ for (let t = 0; t < N; t++) {
   await page.waitForTimeout(300);
   const ver = await page.evaluate(() => {
     const w = mcWorld(), A = (w.aiMoves || [])[0] || { moves: [] }, M = A.moves || [];
-    const tipos = {}; M.forEach(m => { tipos[m[4] || 'clásico'] = (tipos[m[4] || 'clásico'] || 0) + 1; });
+    const tipos = A.tipos || {}; if (!A.tipos) M.forEach(m => { tipos[m[4] || 'clásico'] = (tipos[m[4] || 'clásico'] || 0) + 1; });
     const dinero = +M.reduce((a, m) => a + (+m[3] || 0), 0).toFixed(1);
     const eco = Object.values(w.eco || {}).map(e => e.b), malos = eco.filter(b => !Number.isFinite(b)).length; eco.sort((a, b) => a - b);
     const L = career.league, clubes = L ? L.teams.filter(c => c !== career.club) : [];
@@ -63,6 +63,8 @@ const fallas = [];
 temporadas.forEach((t, i) => {
   if (t.ia !== 'v2') fallas.push(`T${i + 1}: no se usó el mercado v2`);
   if (!(t.movimientos > 20)) fallas.push(`T${i + 1}: muy pocos movimientos (${t.movimientos})`);
+  if ((t.tipos['préstamo'] || 0) > 150) fallas.push(`T${i + 1}: demasiados préstamos (${t.tipos['préstamo']})`);
+  if (t.tamanoKB > 1100) fallas.push(`T${i + 1}: la partida pesa demasiado (${t.tamanoKB} KB)`);
   if (t.eco.noNumericos) fallas.push(`T${i + 1}: presupuestos no numéricos`);
   if (t.arquerosMin < 1) fallas.push(`T${i + 1}: un club de la liga quedó sin arquero`);
   if (t.defMin < 4 || t.medMin < 3 || t.delMin < 2) fallas.push(`T${i + 1}: un club no puede formar un once completo`);

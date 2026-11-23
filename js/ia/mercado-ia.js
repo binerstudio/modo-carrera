@@ -72,6 +72,7 @@ function mercado(s){
  /* 0) préstamos que vuelven */
  w.loansIA=w.loansIA.filter(l=>{if(l.until>s)return true;const n=fold(l.name);const now=where.get(n);
   if(now&&now===l.to&&by.has(l.from)){const o=by.get(now).find(x=>(x._n||fold(x.name))===n);if(o)mover(o,now,l.from,0,'vuelve de préstamo')}return false});
+ const inicio=new Map();by.forEach((a,k)=>{const o={};for(const g in XI)o[g]=sigue(a,g);inicio.set(k,o)});
  /* 1) contratos que vencen esta temporada: los titulares jóvenes renuevan (el ciclo sigue solo);
        los demás pueden quedar libres (se evalúan los de mejor nivel, con tope) */
  const libres=[];
@@ -114,16 +115,18 @@ function mercado(s){
   const jov=a.filter(o=>o.age<=21&&!titular(a,o)&&o.rating<=L-8).sort((x,y)=>y.rating-x.rating).slice(0,2);
   for(const o of jov){if(sigue(a,o.pos)<=MIN[o.pos])continue;const dest=clubs.filter(x=>x!==k&&Math.abs((lvl.get(x)||0)-o.rating)<=3&&(by.get(x)||[]).filter(y=>y.pos===o.pos).length<MIN[o.pos]+2);
    if(!dest.length)continue;const to=dest[Math.floor(R()*Math.min(dest.length,10))];w.loansIA.push({name:o.name,from:k,to,until:s+1});mover(o,k,to,0,'préstamo');nPr++}}
- /* 4) emergencia: ningún club puede quedar sin el mínimo para formar un once (arquero incluido) */
+ /* 4) emergencia: si este mercado dejó a un club sin lo necesario para su once (arquero incluido), se lo repone a préstamo */
  for(const k of clubs){const a=by.get(k);if(!a)continue;
-  for(const g in XI){let falta=XI[g]-sigue(a,g);let guard=0;
+  const ini=inicio.get(k)||{};
+  for(const g in XI){let falta=Math.min(XI[g],ini[g]??XI[g])-sigue(a,g);let guard=0;   /* solo lo que este mercado dejó por debajo */
    while(falta>0&&guard++<4){const L=lvl.get(k)||60;
     const don=clubs.filter(x=>x!==k&&sigue(by.get(x)||[],g)>MIN[g]).map(x=>[x,(by.get(x)||[]).filter(o=>o.pos===g&&(+o.age||0)<36&&!titular(by.get(x),o)).sort((p,q)=>Math.abs(p.rating-L)-Math.abs(q.rating-L))[0]]).filter(x=>x[1]);
     if(!don.length)break;don.sort((p,q)=>Math.abs(p[1].rating-L)-Math.abs(q[1].rating-L));const [from,o]=don[0];
     w.loansIA.push({name:o.name,from,to:k,until:s+1});mover(o,from,k,0,'préstamo');falta--}}}
  /* registro */
  const rel=moves.slice().sort((x,y)=>(y[4]==='traspaso')-(x[4]==='traspaso')||y[3]-x[3]).slice(0,220);
- w.aiMoves=w.aiMoves||[];w.aiMoves.unshift({season:s,moves:rel,total:moves.length,ia:'v2'});if(w.aiMoves.length>4)w.aiMoves.length=4;
+ const tipos={};moves.forEach(m=>{tipos[m[4]]=(tipos[m[4]]||0)+1});
+ w.aiMoves=w.aiMoves||[];w.aiMoves.unshift({season:s,moves:rel,total:moves.length,tipos,ia:'v2'});if(w.aiMoves.length>4)w.aiMoves.length=4;
  w.mv=(w.mv||0)+1;try{if(window.mcMovePlayer&&moves.length){const m=moves.find(x=>x[2]!=='Retiro');if(m)mcMovePlayer(m[0],m[2])}}catch(e){}
  try{window.mcClearGRL&&mcClearGRL()}catch(e){}
  const cnt=t=>moves.filter(m=>m[4]===t).length,dinero=moves.reduce((x,m)=>x+m[3],0);
