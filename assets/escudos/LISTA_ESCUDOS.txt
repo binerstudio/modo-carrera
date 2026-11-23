@@ -1,0 +1,2711 @@
+MODO CARRERA 11.0 · ESCUDOS
+===========================
+Copiá cada escudo (PNG, fondo transparente, ideal 256x256) en assets/escudos/ con EXACTAMENTE este nombre de archivo.
+El juego lo detecta solo: si el archivo no existe, usa el banco de logos en línea y, si tampoco hay, las iniciales del club.
+[OK] = el archivo ya está en la carpeta · [FALTA] = escudo pendiente.
+Total: 2327 clubes en 189 ligas · presentes: 30 · pendientes: 2297.
+
+--- Albania (10 clubes) ---
+[FALTA] kf-egnatia.png   ←  KF Egnatia
+[FALTA] kf-teuta.png   ←  KF Teuta
+[FALTA] fc-dinamo-city.png   ←  FC Dinamo City
+[FALTA] kf-tirana.png   ←  KF Tirana
+[FALTA] kf-skenderbeu-korce.png   ←  KF Skënderbeu Korçë
+[FALTA] af-elbasani.png   ←  Af Elbasani
+[FALTA] vllaznia-shkoder.png   ←  Vllaznia Shkodër
+[FALTA] fk-vora.png   ←  FK Vora
+[FALTA] kf-laci.png   ←  KF Laçi
+[FALTA] fk-partizani-tirana.png   ←  FK Partizani Tirana
+
+--- Alemania (18 clubes) ---
+[FALTA] fc-augsburg.png   ←  Augsburg
+[FALTA] union-berlin.png   ←  Union Berlin
+[FALTA] werder-bremen.png   ←  Werder Bremen
+[FALTA] borussia-dortmund.png   ←  Borussia Dortmund
+[FALTA] sv-elversberg.png   ←  SV Elversberg
+[FALTA] eintracht-frankfurt.png   ←  Eintracht Frankfurt
+[FALTA] sc-freiburg.png   ←  Freiburg
+[FALTA] hamburger-sv.png   ←  Hamburger SV
+[FALTA] tsg-hoffenheim.png   ←  Hoffenheim
+[FALTA] fc-koln.png   ←  FC Köln
+[FALTA] fsv-mainz-05.png   ←  FSV Mainz 05
+[FALTA] sc-paderborn-07.png   ←  SC Paderborn 07
+[FALTA] fc-schalke-04.png   ←  FC Schalke 04
+[FALTA] borussia-monchengladbach.png   ←  Borussia Mönchengladbach
+[FALTA] bayer-leverkusen.png   ←  Bayer Leverkusen
+[FALTA] bayern-munchen.png   ←  Bayern München
+[FALTA] rb-leipzig.png   ←  RB Leipzig
+[FALTA] vfb-stuttgart.png   ←  Stuttgart
+
+--- Andorra (10 clubes) ---
+[FALTA] fc-santa-coloma.png   ←  FC Santa Coloma
+[FALTA] inter-club-d-escaldes.png   ←  Inter Club d’Escaldes
+[FALTA] atletic-club-d-escaldes.png   ←  Atlètic Club d’Escaldes
+[FALTA] cf-esperanca-d-andorra.png   ←  CF Esperança d’Andorra
+[FALTA] fc-ordino.png   ←  FC Ordino
+[FALTA] penya-encarnada-d-andorra.png   ←  Penya Encarnada d’Andorra
+[FALTA] ranger-s-fc.png   ←  Ranger’s FC
+[FALTA] ce-casa-de-portugal.png   ←  Ce Casa de Portugal
+[FALTA] sporting-club-d-escaldes.png   ←  Sporting Club d’Escaldes
+[FALTA] ce-carroi.png   ←  Ce Carroi
+
+--- Angola (16 clubes) ---
+[FALTA] academica-do-lobito.png   ←  Académica do Lobito
+[FALTA] bravos-do-maquis.png   ←  Bravos do Maquis
+[FALTA] desportivo-da-huila.png   ←  Desportivo da Huíla
+[FALTA] desportivo-da-lunda-sul.png   ←  Desportivo da Lunda-Sul
+[FALTA] estrela-1-de-maio.png   ←  Estrela 1.º de Maio
+[FALTA] fc-de-cabinda.png   ←  FC de Cabinda
+[FALTA] fc-de-luanda.png   ←  FC de Luanda
+[FALTA] interclube.png   ←  Interclube
+[FALTA] kabuscorp.png   ←  Kabuscorp
+[FALTA] primeiro-de-agosto.png   ←  Primeiro de Agosto
+[FALTA] petro-de-luanda.png   ←  Petro de Luanda
+[FALTA] recreativo-da-caala.png   ←  Recreativo da Caála
+[FALTA] recreativo-do-libolo.png   ←  Recreativo do Libolo
+[FALTA] sagrada-esperanca.png   ←  Sagrada Esperança
+[FALTA] sao-salvador-do-kongo.png   ←  São Salvador do Kongo
+[FALTA] wiliete-de-benguela.png   ←  Wiliete de Benguela
+
+--- Anguila (6 clubes) ---
+[FALTA] lymers-fc.png   ←  Lymers FC
+[FALTA] uprising-fc.png   ←  Uprising FC
+[FALTA] alhcs-spartans-international-fc.png   ←  Alhcs Spartans International FC
+[FALTA] diamond-fc.png   ←  Diamond FC
+[FALTA] east-enders-fc.png   ←  East Enders FC
+[FALTA] eagle-claw-fc.png   ←  Eagle Claw FC
+
+--- Antigua y Barbuda (9 clubes) ---
+[FALTA] green-city-fc.png   ←  Green City FC
+[FALTA] freemansville-scorpions.png   ←  Freemansville Scorpions
+[FALTA] garden-stars-fc.png   ←  Garden Stars FC
+[FALTA] old-road-fc.png   ←  Old Road FC
+[FALTA] greenbay-hoppers-fc.png   ←  Greenbay Hoppers FC
+[FALTA] grenades-fc.png   ←  Grenades FC
+[FALTA] villa-lions-fc.png   ←  Villa Lions FC
+[FALTA] pigotts-sc.png   ←  Pigotts SC
+[FALTA] potters-tigers-fc.png   ←  Potters Tigers FC
+
+--- Arabia Saudita (18 clubes) ---
+[FALTA] al-nassr.png   ←  Al-Nassr
+[FALTA] al-hilal.png   ←  Al-Hilal
+[FALTA] al-ahli-saudi.png   ←  Al-Ahli
+[FALTA] al-qadsiah.png   ←  Al-Qadsiah
+[FALTA] al-ittihad.png   ←  Al-Ittihad
+[FALTA] al-taawoun.png   ←  Al-Taawoun
+[FALTA] al-ettifaq.png   ←  Al-Ettifaq
+[FALTA] neom-sc.png   ←  NEOM
+[FALTA] al-hazem.png   ←  Al-Hazem
+[FALTA] al-fayha.png   ←  Al-Fayha
+[FALTA] al-fateh.png   ←  Al-Fateh
+[FALTA] al-khaleej.png   ←  Al-Khaleej
+[FALTA] al-shabab.png   ←  Al-Shabab
+[FALTA] al-kholood.png   ←  Al-Kholood
+[FALTA] al-riyadh.png   ←  Al-Riyadh
+[FALTA] abha-club.png   ←  Abha Club
+[FALTA] al-faisaly.png   ←  Al-Faisaly
+[FALTA] al-diraiyah.png   ←  Al-Diraiyah
+
+--- Argelia (13 clubes) ---
+[FALTA] aso-chlef.png   ←  ASO Chlef
+[FALTA] cr-belouizdad.png   ←  CR Belouizdad
+[FALTA] es-ben-aknoun.png   ←  ES Ben Aknoun
+[FALTA] es-setif.png   ←  ES Sétif
+[FALTA] js-el-biar.png   ←  JS El Biar
+[FALTA] js-kabylie.png   ←  JS Kabylie
+[FALTA] js-saoura.png   ←  JS Saoura
+[FALTA] mb-rouissat.png   ←  MB Rouissat
+[FALTA] mc-alger.png   ←  MC Alger
+[FALTA] mc-oran.png   ←  MC Oran
+[FALTA] olympique-akbou.png   ←  Olympique Akbou
+[FALTA] us-biskra.png   ←  US Biskra
+[FALTA] usm-alger.png   ←  USM Alger
+
+--- Argentina (30 clubes) ---
+[OK]    platense.png   ←  Platense
+[OK]    defensa-y-justicia.png   ←  Defensa y Justicia
+[OK]    central-cordoba-se.png   ←  Central Córdoba
+[OK]    lanus.png   ←  Lanús
+[OK]    deportivo-riestra.png   ←  Deportivo Riestra
+[OK]    talleres.png   ←  Talleres
+[OK]    boca-juniors.png   ←  Boca Juniors
+[OK]    estudiantes-de-la-plata.png   ←  Estudiantes de La Plata
+[OK]    instituto.png   ←  Instituto
+[OK]    gimnasia-y-esgrima-mendoza.png   ←  Gimnasia y Esgrima (Mendoza)
+[OK]    san-lorenzo.png   ←  San Lorenzo
+[OK]    independiente.png   ←  Independiente
+[OK]    newells-old-boys.png   ←  Newell's Old Boys
+[OK]    union.png   ←  Unión
+[OK]    velez-sarsfield.png   ←  Vélez Sarsfield
+[OK]    argentinos-juniors.png   ←  Argentinos Juniors
+[OK]    aldosivi.png   ←  Aldosivi
+[OK]    atletico-tucuman.png   ←  Atlético Tucumán
+[OK]    banfield.png   ←  Banfield
+[OK]    barracas-central.png   ←  Barracas Central
+[OK]    belgrano.png   ←  Belgrano
+[OK]    river-plate.png   ←  River Plate
+[OK]    estudiantes-de-rio-cuarto.png   ←  Estudiantes de Río Cuarto
+[OK]    independiente-rivadavia.png   ←  Independiente Rivadavia
+[OK]    huracan.png   ←  Huracán
+[OK]    racing-club.png   ←  Racing Club
+[OK]    rosario-central.png   ←  Rosario Central
+[OK]    sarmiento.png   ←  Sarmiento
+[OK]    tigre.png   ←  Tigre
+[OK]    gimnasia-y-esgrima-la-plata.png   ←  Gimnasia y Esgrima (La Plata)
+
+--- Armenia (12 clubes) ---
+[FALTA] fc-noah.png   ←  FC Noah
+[FALTA] fc-pyunik.png   ←  FC Pyunik
+[FALTA] fc-ararat-armenia.png   ←  FC Ararat-Armenia
+[FALTA] alashkert-fc.png   ←  Alashkert FC
+[FALTA] fc-sardarapat.png   ←  FC Sardarapat
+[FALTA] fc-urartu.png   ←  FC Urartu
+[FALTA] shirak-gyumri.png   ←  Shirak Gyumri
+[FALTA] bkma-yerevan.png   ←  Bkma Yerevan
+[FALTA] ararat-yerevan.png   ←  Ararat Yerevan
+[FALTA] fc-syunik.png   ←  FC Syunik
+[FALTA] fc-van.png   ←  FC van
+[FALTA] gandzasar-kapan.png   ←  Gandzasar Kapan
+
+--- Aruba (9 clubes) ---
+[FALTA] sv-sporting.png   ←  SV Sporting
+[FALTA] sv-britannia.png   ←  SV Britannia
+[FALTA] sv-la-fama.png   ←  SV La Fama
+[FALTA] sv-deportivo-nacional.png   ←  SV Deportivo Nacional
+[FALTA] sv-racing-club-aruba.png   ←  SV Racing Club Aruba
+[FALTA] sv-bubali.png   ←  SV Bubali
+[FALTA] sv-real-koyari.png   ←  SV Real Koyari
+[FALTA] sv-river-plate.png   ←  SV River Plate
+[FALTA] sv-estrella.png   ←  SV Estrella
+
+--- Australia (12 clubes) ---
+[FALTA] adelaide-united.png   ←  Adelaide United
+[FALTA] auckland-fc.png   ←  Auckland FC
+[FALTA] brisbane-roar.png   ←  Brisbane Roar
+[FALTA] central-coast-mariners.png   ←  Central Coast Mariners
+[FALTA] macarthur-fc.png   ←  Macarthur FC
+[FALTA] melbourne-city.png   ←  Melbourne City
+[FALTA] melbourne-victory.png   ←  Melbourne Victory
+[FALTA] newcastle-jets.png   ←  Newcastle Jets
+[FALTA] perth-glory.png   ←  Perth Glory
+[FALTA] sydney-fc.png   ←  Sydney FC
+[FALTA] wellington-phoenix.png   ←  Wellington Phoenix
+[FALTA] western-sydney-wanderers.png   ←  Western Sydney Wanderers
+
+--- Austria (12 clubes) ---
+[FALTA] fc-red-bull-salzburg.png   ←  FC Red Bull Salzburg
+[FALTA] sk-rapid-wien.png   ←  SK Rapid Wien
+[FALTA] lask.png   ←  LASK
+[FALTA] tsv-hartberg.png   ←  TSV Hartberg
+[FALTA] sk-sturm-graz.png   ←  SK Sturm Graz
+[FALTA] sv-ried.png   ←  SV Ried
+[FALTA] wsg-tirol.png   ←  WSG Tirol
+[FALTA] austria-lustenau.png   ←  Austria Lustenau
+[FALTA] grazer-ak-1902.png   ←  Grazer Ak 1902
+[FALTA] scr-altach.png   ←  SCR Altach
+[FALTA] fk-austria-wien.png   ←  FK Austria Wien
+[FALTA] wolfsberger-ac.png   ←  Wolfsberger AC
+
+--- Azerbaiyán (12 clubes) ---
+[FALTA] qarabag.png   ←  Qarabağ
+[FALTA] neftci.png   ←  Neftçi
+[FALTA] sabah.png   ←  Sabah
+[FALTA] turan-tovuz.png   ←  Turan Tovuz
+[FALTA] zira-fk.png   ←  Zira FK
+[FALTA] kapaz.png   ←  Kapaz
+[FALTA] shamakhi.png   ←  Shamakhi
+[FALTA] imisli-fk.png   ←  İmi̇şli̇ FK
+[FALTA] sumqayit.png   ←  Sumqayit
+[FALTA] gabala.png   ←  Gabala
+[FALTA] safa.png   ←  Şafa
+[FALTA] araz-nakhchivan.png   ←  Araz-Nakhchivan
+
+--- Bahamas (6 clubes) ---
+[FALTA] dynamos-fc-bahamas.png   ←  Dynamos FC (Bahamas)
+[FALTA] renegades-fc.png   ←  Renegades FC
+[FALTA] united-fc-bahamas.png   ←  United FC (Bahamas)
+[FALTA] im-bears-fc.png   ←  Im Bears FC
+[FALTA] baha-juniors-fc.png   ←  Baha Juniors FC
+[FALTA] future-stars-fc.png   ←  Future Stars FC
+
+--- Bangladesh (12 clubes) ---
+[FALTA] bashundhara-kings.png   ←  Bashundhara Kings
+[FALTA] abahani-limited-dhaka.png   ←  Abahani Limited Dhaka
+[FALTA] bangladesh-police-fc.png   ←  Bangladesh Police FC
+[FALTA] brothers-union.png   ←  Brothers Union
+[FALTA] fortis-fc.png   ←  Fortis FC
+[FALTA] rahmatganj-mfs.png   ←  Rahmatganj MFS
+[FALTA] pwd-sc-dhaka.png   ←  PWD SC Dhaka
+[FALTA] city-club-dhaka.png   ←  City Club Dhaka
+[FALTA] chattogram-city-fc.png   ←  Chattogram City FC
+[FALTA] arambagh-krira-sangha.png   ←  Arambagh Krira Sangha
+[FALTA] dhaka-wanderers-club.png   ←  Dhaka Wanderers Club
+[FALTA] fakirerpool-young-men-s-club.png   ←  Fakirerpool Young Men’s Club
+
+--- Barbados (7 clubes) ---
+[FALTA] kickstart-rush.png   ←  Kickstart Rush
+[FALTA] brittons-hill-united.png   ←  Brittons Hill United
+[FALTA] ellerton-fc.png   ←  Ellerton FC
+[FALTA] bagatelle-ssc.png   ←  Bagatelle SSC
+[FALTA] pride-of-gall-hill.png   ←  Pride of Gall Hill
+[FALTA] pro-shottas.png   ←  Pro-Shottas
+[FALTA] uwi-blackbirds.png   ←  Uwi Blackbirds
+
+--- Baréin (11 clubes) ---
+[FALTA] al-khaldiya-sc.png   ←  Al-Khaldiya SC
+[FALTA] al-muhahaqq-sc.png   ←  Al-Muhahaqq SC
+[FALTA] al-riffa-sc.png   ←  Al-Riffa SC
+[FALTA] manama-club.png   ←  Manama Club
+[FALTA] east-riffa-club.png   ←  East Riffa Club
+[FALTA] sitra-club.png   ←  Sitra Club
+[FALTA] al-hidd-sc.png   ←  Al-Hidd SC
+[FALTA] bahrain-sc.png   ←  Bahrain SC
+[FALTA] budaiya-club.png   ←  Budaiya Club
+[FALTA] a-ali-club.png   ←  A’ali Club
+[FALTA] malkiya-club.png   ←  Malkiya Club
+
+--- Bélgica (18 clubes) ---
+[FALTA] club-brugge.png   ←  Club Brugge
+[FALTA] anderlecht.png   ←  Anderlecht
+[FALTA] union-saint-gilloise.png   ←  Union Saint-Gilloise
+[FALTA] krc-genk.png   ←  KRC Genk
+[FALTA] kaa-gent.png   ←  KAA Gent
+[FALTA] royal-antwerp.png   ←  Royal Antwerp
+[FALTA] standard-de-liege.png   ←  Standard de Liège
+[FALTA] cercle-brugge.png   ←  Cercle Brugge
+[FALTA] kv-mechelen.png   ←  KV Mechelen
+[FALTA] royal-charleroi-sc.png   ←  Royal Charleroi SC
+[FALTA] kvc-westerlo.png   ←  KVC Westerlo
+[FALTA] sint-truidense-vv.png   ←  Sint-Truidense VV
+[FALTA] oud-heverlee-leuven.png   ←  Oud-Heverlee Leuven
+[FALTA] zulte-waregem.png   ←  Zulte Waregem
+[FALTA] raal-la-louviere.png   ←  RAAL La Louvière
+[FALTA] sk-beveren.png   ←  SK Beveren
+[FALTA] lommel-sk.png   ←  Lommel SK
+[FALTA] kv-kortrijk.png   ←  KV Kortrijk
+
+--- Belice (9 clubes) ---
+[FALTA] police-united-fc.png   ←  Police United FC
+[FALTA] belmopan-bandits-sc.png   ←  Belmopan Bandits SC
+[FALTA] benque-viejo-united-fc.png   ←  Benque Viejo United FC
+[FALTA] verdes-fc.png   ←  Verdes FC
+[FALTA] port-layola-fc.png   ←  Port Layola FC
+[FALTA] progresso-fc.png   ←  Progresso FC
+[FALTA] napoles-fc.png   ←  Napoles FC
+[FALTA] wagiya-sc.png   ←  Wagiya SC
+[FALTA] san-pedro-pirates-fc.png   ←  San Pedro Pirates FC
+
+--- Benín (14 clubes) ---
+[FALTA] aspac.png   ←  Aspac
+[FALTA] as-sobemap.png   ←  AS Sobemap
+[FALTA] as-cavaliers.png   ←  AS Cavaliers
+[FALTA] as-cotonou.png   ←  AS Cotonou
+[FALTA] asvo-fc.png   ←  Asvo FC
+[FALTA] ayema-fc.png   ←  Ayéma FC
+[FALTA] bani-ganse-fc.png   ←  Bani Gansè FC
+[FALTA] buffles-du-borgou.png   ←  Buffles du Borgou
+[FALTA] damissa-fc.png   ←  Damissa FC
+[FALTA] dragons-de-l-oueme.png   ←  Dragons de L'ouémé
+[FALTA] dynamo-fc-d-abomey.png   ←  Dynamo FC D'abomey
+[FALTA] espoir-fc.png   ←  Espoir FC
+[FALTA] hodio-fc.png   ←  Hodio FC
+[FALTA] uss-krake.png   ←  Uss Kraké
+
+--- Bermudas (10 clubes) ---
+[FALTA] phc-zebras.png   ←  PHC Zebras
+[FALTA] devonshire-colts.png   ←  Devonshire Colts
+[FALTA] north-village-rams.png   ←  North Village Rams
+[FALTA] paget-lions.png   ←  Paget Lions
+[FALTA] somerset-trojans.png   ←  Somerset Trojans
+[FALTA] x-roads-warriors.png   ←  X’roads Warriors
+[FALTA] st-george-s-colts.png   ←  St. George’s Colts
+[FALTA] club-por-identificar-1-bermudas.png   ←  Club por identificar 1 (Bermudas)
+[FALTA] club-por-identificar-2-bermudas.png   ←  Club por identificar 2 (Bermudas)
+[FALTA] club-por-identificar-3-bermudas.png   ←  Club por identificar 3 (Bermudas)
+
+--- Bielorrusia (16 clubes) ---
+[FALTA] ml-vitebsk.png   ←  ML Vitebsk
+[FALTA] dinamo-minsk.png   ←  Dinamo Minsk
+[FALTA] isloch-minsk-raion.png   ←  Isloch Minsk Raion
+[FALTA] dinamo-brest.png   ←  Dinamo Brest
+[FALTA] torpedo-belaz-zhodino.png   ←  Torpedo-Belaz Zhodino
+[FALTA] gomel.png   ←  Gomel
+[FALTA] fc-minsk.png   ←  FC Minsk
+[FALTA] baranovichi.png   ←  Baranovichi
+[FALTA] vitebsk.png   ←  Vitebsk
+[FALTA] belshina-bobruisk.png   ←  Belshina Bobruisk
+[FALTA] slavia-mozyr.png   ←  Slavia Mozyr
+[FALTA] bate-borisov.png   ←  BATE Borisov
+[FALTA] dnepr-mogilev.png   ←  Dnepr Mogilev
+[FALTA] neman-grodno.png   ←  Neman Grodno
+[FALTA] arsenal-dzerzhinsk.png   ←  Arsenal Dzerzhinsk
+[FALTA] naftan-novopolotsk.png   ←  Naftan Novopolotsk
+
+--- Bolivia (13 clubes) ---
+[FALTA] bolivar.png   ←  Bolívar
+[FALTA] the-strongest.png   ←  The Strongest
+[FALTA] san-antonio-bulo-bulo.png   ←  San Antonio Bulo Bulo
+[FALTA] blooming.png   ←  Blooming
+[FALTA] real-oruro.png   ←  Real Oruro
+[FALTA] gv-san-jose.png   ←  GV San José
+[FALTA] independiente-petrolero.png   ←  Independiente Petrolero
+[FALTA] nacional-potosi.png   ←  Nacional Potosí
+[FALTA] oriente-petrolero.png   ←  Oriente Petrolero
+[FALTA] real-tomayapo.png   ←  Real Tomayapo
+[FALTA] real-potosi.png   ←  Real Potosí
+[FALTA] universitario-de-vinto.png   ←  Universitario de Vinto
+[FALTA] aurora.png   ←  Aurora
+
+--- Bosnia y Herzegovina (10 clubes) ---
+[FALTA] hsk-zrinjski-mostar.png   ←  HŠK Zrinjski Mostar
+[FALTA] borac-banja-luka.png   ←  Borac Banja Luka
+[FALTA] fk-sarajevo.png   ←  FK Sarajevo
+[FALTA] nk-siroki-brijeg.png   ←  NK Široki Brijeg
+[FALTA] bsk-banja-luka.png   ←  BSK Banja Luka
+[FALTA] fk-zeljeznicar-sarajevo.png   ←  FK Željezničar Sarajevo
+[FALTA] fk-velez-mostar.png   ←  FK Velež Mostar
+[FALTA] nk-celik-zenica.png   ←  NK Čelik Zenica
+[FALTA] fk-radnik-bijeljina.png   ←  FK Radnik Bijeljina
+[FALTA] fk-sloga-doboj.png   ←  FK Sloga Doboj
+
+--- Botsuana (4 clubes) ---
+[FALTA] gaborone-united.png   ←  Gaborone United
+[FALTA] jwaneng-galaxy.png   ←  Jwaneng Galaxy
+[FALTA] mochudi-centre-chiefs.png   ←  Mochudi Centre Chiefs
+[FALTA] township-rollers.png   ←  Township Rollers
+
+--- Brasil (20 clubes) ---
+[FALTA] palmeiras.png   ←  Palmeiras
+[FALTA] flamengo.png   ←  Flamengo
+[FALTA] cruzeiro.png   ←  Cruzeiro
+[FALTA] corinthians.png   ←  Corinthians
+[FALTA] vasco-da-gama.png   ←  Vasco da Gama
+[FALTA] botafogo.png   ←  Botafogo
+[FALTA] fluminense.png   ←  Fluminense
+[FALTA] bahia.png   ←  Bahia
+[FALTA] santos.png   ←  Santos
+[FALTA] atletico-mineiro.png   ←  Atlético Mineiro
+[FALTA] athletico-paranaense.png   ←  Athletico Paranaense
+[FALTA] red-bull-bragantino.png   ←  Bragantino
+[FALTA] sao-paulo.png   ←  São Paulo
+[FALTA] gremio.png   ←  Grêmio
+[FALTA] internacional.png   ←  Internacional
+[FALTA] ec-vitoria.png   ←  Vitória
+[FALTA] coritiba.png   ←  Coritiba
+[FALTA] mirassol.png   ←  Mirassol
+[FALTA] remo.png   ←  Remo
+[FALTA] chapecoense.png   ←  Chapecoense
+
+--- Brunéi (12 clubes) ---
+[FALTA] indera-sc.png   ←  Indera SC
+[FALTA] kasuka-fc.png   ←  Kasuka FC
+[FALTA] kota-ranger-fc.png   ←  Kota Ranger FC
+[FALTA] ms-ppdb.png   ←  MS PPDB
+[FALTA] ms-abdb.png   ←  MS ABDB
+[FALTA] kuala-belait-fc.png   ←  Kuala Belait FC
+[FALTA] jerudong-fc.png   ←  Jerudong FC
+[FALTA] bsrc-ft.png   ←  BSRC FT
+[FALTA] wijaya-fc.png   ←  Wijaya FC
+[FALTA] lun-bawang-fc.png   ←  Lun Bawang FC
+[FALTA] hawa-ft.png   ←  Hawa FT
+[FALTA] dpmm-fc.png   ←  DPMM FC
+
+--- Bulgaria (14 clubes) ---
+[FALTA] ludogorets-razgrad.png   ←  Ludogorets Razgrad
+[FALTA] levski-sofia.png   ←  Levski Sofia
+[FALTA] cska-sofia.png   ←  CSKA Sofia
+[FALTA] cska-1948.png   ←  CSKA 1948
+[FALTA] botev-plovdiv.png   ←  Botev Plovdiv
+[FALTA] cherno-more-varna.png   ←  Cherno More Varna
+[FALTA] arda-kardzhali.png   ←  Arda Kardzhali
+[FALTA] lokomotiv-plovdiv.png   ←  Lokomotiv Plovdiv
+[FALTA] dunav-ruse.png   ←  Dunav Ruse
+[FALTA] slavia-sofia.png   ←  Slavia Sofia
+[FALTA] botev-vratsa.png   ←  Botev Vratsa
+[FALTA] spartak-varna.png   ←  Spartak Varna
+[FALTA] lokomotiv-sofia.png   ←  Lokomotiv Sofia
+[FALTA] septemvri-sofia.png   ←  Septemvri Sofia
+
+--- Burkina Faso (8 clubes) ---
+[FALTA] cffeb-ouagadougou.png   ←  Cffeb Ouagadougou
+[FALTA] majestic-sc.png   ←  Majestic SC
+[FALTA] rahimo-fc.png   ←  Rahimo FC
+[FALTA] sporting-football-des-cascades.png   ←  Sporting Football des Cascades
+[FALTA] us-forces-armees.png   ←  US Forces Armées
+[FALTA] asfa-yennenga.png   ←  Asfa Yennenga
+[FALTA] efo.png   ←  Efo
+[FALTA] etoile-filante-de-ouagadougou.png   ←  Étoile Filante de Ouagadougou
+
+--- Burundi (10 clubes) ---
+[FALTA] aigle-noir-makamba.png   ←  Aigle Noir Makamba
+[FALTA] bumamuru-fc.png   ←  Bumamuru FC
+[FALTA] flambeau-du-centre.png   ←  Flambeau du Centre
+[FALTA] inter-star.png   ←  Inter Star
+[FALTA] kayanza-united.png   ←  Kayanza United
+[FALTA] le-messager-ngozi.png   ←  Le Messager Ngozi
+[FALTA] musongati-fc.png   ←  Musongati FC
+[FALTA] olympic-star.png   ←  Olympic Star
+[FALTA] rukinzo-fc.png   ←  Rukinzo FC
+[FALTA] vital-o-fc.png   ←  Vital'o FC
+
+--- Bután (10 clubes) ---
+[FALTA] paro-fc.png   ←  Paro FC
+[FALTA] thimphu-city-fc.png   ←  Thimphu City FC
+[FALTA] royal-thimphu-college-fc.png   ←  Royal Thimphu College FC
+[FALTA] transport-united-fc.png   ←  Transport United FC
+[FALTA] bff-academy-fc.png   ←  BFF Academy FC
+[FALTA] ugyen-academy-fc.png   ←  Ugyen Academy FC
+[FALTA] tsirang-fc.png   ←  Tsirang FC
+[FALTA] tensung-fc.png   ←  Tensung FC
+[FALTA] southern-city-fc.png   ←  Southern City FC
+[FALTA] samtse-fc.png   ←  Samtse FC
+
+--- Cabo Verde (9 clubes) ---
+[FALTA] academica-do-mindelo.png   ←  Académica do Mindelo
+[FALTA] academica-do-porto-novo.png   ←  Académica do Porto Novo
+[FALTA] clube-desportivo-benfica-brava.png   ←  Clube Desportivo Benfica (Brava)
+[FALTA] clube-desportivo-onze-unidos.png   ←  Clube Desportivo Onze Unidos
+[FALTA] cutelinho-futebol-clube.png   ←  Cutelinho Futebol Clube
+[FALTA] fc-derby.png   ←  FC Derby
+[FALTA] sport-clube-africa-show.png   ←  Sport Clube África Show
+[FALTA] sporting-clube-da-praia.png   ←  Sporting Clube da Praia
+[FALTA] sport-sal-rei-club.png   ←  Sport Sal Rei Club
+
+--- Camboya (10 clubes) ---
+[FALTA] preah-khan-reach-svay-rieng-fc.png   ←  Preah Khan Reach Svay Rieng FC
+[FALTA] phnom-penh-crown-fc.png   ←  Phnom Penh Crown FC
+[FALTA] angkor-tiger-fc.png   ←  Angkor Tiger FC
+[FALTA] boeung-ket-fc.png   ←  Boeung Ket FC
+[FALTA] isi-dangkor-sengchey-fc.png   ←  ISI Dangkor Sengchey FC
+[FALTA] kirivong-sok-sen-chey-fc.png   ←  Kirivong Sok Sen Chey FC
+[FALTA] life-fc-sihanoukville.png   ←  Life FC Sihanoukville
+[FALTA] moi-kompong-dewa-fc.png   ←  Moi Kompong Dewa FC
+[FALTA] naga-world-fc.png   ←  Naga World FC
+[FALTA] royal-cambodian-armed-forces-fc.png   ←  Royal Cambodian Armed Forces FC
+
+--- Camerún (10 clubes) ---
+[FALTA] aigle-royal-du-moungo.png   ←  Aigle Royal du Moungo
+[FALTA] canon-sportif-de-yaounde.png   ←  Canon Sportif de Yaoundé
+[FALTA] colombe-sportive-du-dja-et-lobo.png   ←  Colombe Sportive du Dja Et Lobo
+[FALTA] coton-sport-fc.png   ←  Coton Sport FC
+[FALTA] dynamo-de-douala.png   ←  Dynamo de Douala
+[FALTA] gazelle-fa.png   ←  Gazelle FA
+[FALTA] pwd-bamenda.png   ←  PWD Bamenda
+[FALTA] stade-renard.png   ←  Stade Renard
+[FALTA] unisport-du-haut-nkam.png   ←  Unisport du Haut Nkam
+[FALTA] victoria-united.png   ←  Victoria United
+
+--- Canadá (8 clubes) ---
+[FALTA] cavalry-fc.png   ←  Cavalry FC
+[FALTA] forge-fc.png   ←  Forge FC
+[FALTA] atletico-ottawa.png   ←  Atlético Ottawa
+[FALTA] fc-supra-du-quebec.png   ←  FC Supra du Québec
+[FALTA] inter-toronto-fc.png   ←  Inter Toronto FC
+[FALTA] vancouver-fc.png   ←  Vancouver FC
+[FALTA] halifax-wanderers.png   ←  Halifax Wanderers
+[FALTA] pacific-fc.png   ←  Pacific FC
+
+--- Chad (11 clubes) ---
+[FALTA] aiglons-fc.png   ←  Aiglons FC
+[FALTA] as-psi.png   ←  AS Psi
+[FALTA] as-sante.png   ←  AS Santé
+[FALTA] eland-de-derby-fc.png   ←  Eland de Derby FC
+[FALTA] elephant-zakouma-du-salamat.png   ←  Éléphant Zakouma du Salamat
+[FALTA] espoir-fc-de-bongor.png   ←  Espoir FC de Bongor
+[FALTA] fc-onape.png   ←  FC Onape
+[FALTA] foullah-edifice-fc.png   ←  Foullah Edifice FC
+[FALTA] gazelle-fc.png   ←  Gazelle FC
+[FALTA] tourbillon-fc.png   ←  Tourbillon FC
+[FALTA] universite-de-moundou-fc.png   ←  Université de Moundou FC
+
+--- Chequia (16 clubes) ---
+[FALTA] sk-slavia-praha.png   ←  SK Slavia Praha
+[FALTA] ac-sparta-praha.png   ←  AC Sparta Praha
+[FALTA] fc-viktoria-plzen.png   ←  FC Viktoria Plzeň
+[FALTA] fc-slovan-liberec.png   ←  FC Slovan Liberec
+[FALTA] fk-mlada-boleslav.png   ←  FK Mladá Boleslav
+[FALTA] sk-sigma-olomouc.png   ←  SK Sigma Olomouc
+[FALTA] fk-jablonec.png   ←  FK Jablonec
+[FALTA] fc-banik-ostrava.png   ←  FC Baník Ostrava
+[FALTA] fc-hradec-kralove.png   ←  FC Hradec Králové
+[FALTA] fk-pardubice.png   ←  FK Pardubice
+[FALTA] fk-teplice.png   ←  FK Teplice
+[FALTA] bohemians-1905.png   ←  Bohemians 1905
+[FALTA] fc-slovacko.png   ←  FC Slovácko
+[FALTA] fc-zbrojovka-brno.png   ←  FC Zbrojovka Brno
+[FALTA] sk-artis-brno.png   ←  SK Artis Brno
+[FALTA] fc-zlin.png   ←  FC Zlín
+
+--- Chile (16 clubes) ---
+[FALTA] universidad-catolica.png   ←  Universidad Católica
+[FALTA] o-higgins.png   ←  O’Higgins
+[FALTA] universidad-de-chile.png   ←  Universidad de Chile
+[FALTA] audax-italiano.png   ←  Audax Italiano
+[FALTA] cobresal.png   ←  Cobresal
+[FALTA] colo-colo.png   ←  Colo-Colo
+[FALTA] huachipato.png   ←  Huachipato
+[FALTA] nublense.png   ←  Ñublense
+[FALTA] union-la-calera.png   ←  Unión La Calera
+[FALTA] deportes-la-serena.png   ←  Deportes La Serena
+[FALTA] everton-de-vina-del-mar.png   ←  Everton de Viña del Mar
+[FALTA] universidad-de-concepcion.png   ←  Universidad de Concepción
+[FALTA] palestino.png   ←  Palestino
+[FALTA] deportes-concepcion.png   ←  Deportes Concepción
+[FALTA] coquimbo-unido.png   ←  Coquimbo Unido
+[FALTA] deportes-limache.png   ←  Deportes Limache
+
+--- China (16 clubes) ---
+[FALTA] shanghai-port.png   ←  Shanghai Port
+[FALTA] shanghai-shenhua.png   ←  Shanghai Shenhua
+[FALTA] chengdu-rongcheng.png   ←  Chengdu Rongcheng
+[FALTA] beijing-guoan.png   ←  Beijing Guoan
+[FALTA] shandong-taishan.png   ←  Shandong Taishan
+[FALTA] zhejiang-professional.png   ←  Zhejiang Professional
+[FALTA] yunnan-yukun.png   ←  Yunnan Yukun
+[FALTA] qingdao-west-coast.png   ←  Qingdao West Coast
+[FALTA] henan-fc.png   ←  Henan FC
+[FALTA] shenzhen-peng-city.png   ←  Shenzhen Peng City
+[FALTA] wuhan-three-towns.png   ←  Wuhan Three Towns
+[FALTA] qingdao-hainiu.png   ←  Qingdao Hainiu
+[FALTA] liaoning-tieren.png   ←  Liaoning Tieren
+[FALTA] chongqing-tonglianglong.png   ←  Chongqing Tonglianglong
+[FALTA] dalian-yingbo.png   ←  Dalian Yingbo
+[FALTA] tianjin-jinmen-tiger.png   ←  Tianjin Jinmen Tiger
+
+--- Chipre (14 clubes) ---
+[FALTA] aek-larnaca.png   ←  AEK Larnaca
+[FALTA] omonia-nicosia.png   ←  Omonia Nicosia
+[FALTA] ael-limassol.png   ←  AEL Limassol
+[FALTA] apoel-nicosia.png   ←  Apoel Nicosia
+[FALTA] apollon-limassol.png   ←  Apollon Limassol
+[FALTA] pafos-fc.png   ←  Pafos FC
+[FALTA] aris-limassol.png   ←  Aris Limassol
+[FALTA] omonia-29m.png   ←  Omonia 29M
+[FALTA] olympiakos-nicosia.png   ←  Olympiakos Nicosia
+[FALTA] nea-salamis.png   ←  Nea Salamis
+[FALTA] anorthosis-famagusta.png   ←  Anorthosis Famagusta
+[FALTA] karmiotissa.png   ←  Karmiotissa
+[FALTA] omonia-aradippou.png   ←  Omonia Aradippou
+[FALTA] krasava-eny-ypsonas.png   ←  Krasava Eny Ypsonas
+
+--- Colombia (20 clubes) ---
+[FALTA] atletico-nacional.png   ←  Atlético Nacional
+[FALTA] america-de-cali.png   ←  América de Cali
+[FALTA] junior-fc.png   ←  Junior FC
+[FALTA] millonarios-fc.png   ←  Millonarios FC
+[FALTA] independiente-medellin.png   ←  Independiente Medellín
+[FALTA] deportes-tolima.png   ←  Deportes Tolima
+[FALTA] independiente-santa-fe.png   ←  Independiente Santa Fe
+[FALTA] internacional-de-bogota.png   ←  Internacional de Bogotá
+[FALTA] deportivo-cali.png   ←  Deportivo Cali
+[FALTA] once-caldas.png   ←  Once Caldas
+[FALTA] atletico-bucaramanga.png   ←  Atlético Bucaramanga
+[FALTA] aguilas-doradas.png   ←  Águilas Doradas
+[FALTA] deportivo-pasto.png   ←  Deportivo Pasto
+[FALTA] llaneros-fc.png   ←  Llaneros FC
+[FALTA] cucuta-deportivo.png   ←  Cúcuta Deportivo
+[FALTA] fortaleza-ceif.png   ←  Fortaleza Ceif
+[FALTA] alianza-fc-colombia.png   ←  Alianza FC (Colombia)
+[FALTA] jaguares-de-cordoba.png   ←  Jaguares de Córdoba
+[FALTA] boyaca-chico.png   ←  Boyacá Chicó
+[FALTA] deportivo-pereira.png   ←  Deportivo Pereira
+
+--- Comoras (3 clubes) ---
+[FALTA] fomboni-fc.png   ←  Fomboni FC
+[FALTA] gombessa-sport.png   ←  Gombessa Sport
+[FALTA] volcan-club.png   ←  Volcan Club
+
+--- Corea del Norte (11 clubes) ---
+[FALTA] april-25-sc.png   ←  April 25 SC
+[FALTA] ryomyong-sc.png   ←  Ryomyong SC
+[FALTA] sobaeksu-sc.png   ←  Sobaeksu SC
+[FALTA] rimyongsu-sc.png   ←  Rimyongsu SC
+[FALTA] hwaebul-sc.png   ←  Hwaebul SC
+[FALTA] amrokgang-sg.png   ←  Amrokgang SG
+[FALTA] kigwancha-sg.png   ←  Kigwancha SG
+[FALTA] wolmido-sg.png   ←  Wolmido SG
+[FALTA] pyongyang-sc.png   ←  Pyongyang SC
+[FALTA] kyonggongop-sg.png   ←  Kyonggongop SG
+[FALTA] sonbong-sc.png   ←  Sonbong SC
+
+--- Costa de Marfil (4 clubes) ---
+[FALTA] asec-mimosas.png   ←  ASEC Mimosas
+[FALTA] fc-san-pedro.png   ←  FC San-Pédro
+[FALTA] stade-d-abidjan.png   ←  Stade d’Abidjan
+[FALTA] yamoussoukro-fc.png   ←  Yamoussoukro FC
+
+--- Costa Rica (10 clubes) ---
+[FALTA] deportivo-saprissa.png   ←  Deportivo Saprissa
+[FALTA] cs-cartagines.png   ←  CS Cartaginés
+[FALTA] ld-alajuelense.png   ←  LD Alajuelense
+[FALTA] cs-herediano.png   ←  CS Herediano
+[FALTA] municipal-perez-zeledon.png   ←  Municipal Pérez Zeledón
+[FALTA] ad-san-carlos.png   ←  AD San Carlos
+[FALTA] puntarenas-fc.png   ←  Puntarenas FC
+[FALTA] sporting-fc.png   ←  Sporting FC
+[FALTA] escorpiones-fc.png   ←  Escorpiones FC
+[FALTA] inter-san-carlos.png   ←  Inter San Carlos
+
+--- Croacia (10 clubes) ---
+[FALTA] dinamo-zagreb.png   ←  Dinamo Zagreb
+[FALTA] hajduk-split.png   ←  Hajduk Split
+[FALTA] hnk-gorica.png   ←  HNK Gorica
+[FALTA] hnk-rijeka.png   ←  HNK Rijeka
+[FALTA] istra-1961.png   ←  Istra 1961
+[FALTA] lokomotiva-zagreb.png   ←  Lokomotiva Zagreb
+[FALTA] nk-osijek.png   ←  NK Osijek
+[FALTA] nk-rudes.png   ←  NK Rudeš
+[FALTA] slaven-belupo.png   ←  Slaven Belupo
+[FALTA] varazdin.png   ←  Varaždin
+
+--- Cuba (15 clubes) ---
+[FALTA] santiago-de-cuba.png   ←  Santiago de Cuba
+[FALTA] club-por-identificar-1-cuba.png   ←  Club por identificar 1 (Cuba)
+[FALTA] villa-clara.png   ←  Villa Clara
+[FALTA] guantanamo.png   ←  Guantánamo
+[FALTA] las-tunas.png   ←  Las Tunas
+[FALTA] club-por-identificar-2-cuba.png   ←  Club por identificar 2 (Cuba)
+[FALTA] ciego-de-avila.png   ←  Ciego de Ávila
+[FALTA] artemisa.png   ←  Artemisa
+[FALTA] holguin.png   ←  Holguín
+[FALTA] club-por-identificar-3-cuba.png   ←  Club por identificar 3 (Cuba)
+[FALTA] matanzas.png   ←  Matanzas
+[FALTA] pinar-del-rio.png   ←  Pinar del Río
+[FALTA] mayabeque.png   ←  Mayabeque
+[FALTA] granma.png   ←  Granma
+[FALTA] sancti-spiritus.png   ←  Sancti Spíritus
+
+--- Curazao (9 clubes) ---
+[FALTA] sv-scherpenheuvel.png   ←  SV Scherpenheuvel
+[FALTA] sv-subt.png   ←  SV Subt
+[FALTA] centro-dominguito.png   ←  Centro Dominguito
+[FALTA] jong-colombia.png   ←  Jong Colombia
+[FALTA] undeba.png   ←  Undeba
+[FALTA] victory-boys.png   ←  Victory Boys
+[FALTA] csd-barber.png   ←  CSD Barber
+[FALTA] inter-willemstad.png   ←  Inter Willemstad
+[FALTA] hubentut-fortuna.png   ←  Hubentut Fortuna
+
+--- Dinamarca (12 clubes) ---
+[FALTA] fc-k-benhavn.png   ←  FC København
+[FALTA] fc-midtjylland.png   ←  FC Midtjylland
+[FALTA] viborg-ff.png   ←  Viborg FF
+[FALTA] fc-nordsj-lland.png   ←  FC Nordsjælland
+[FALTA] br-ndby-if.png   ←  Brøndby IF
+[FALTA] ob-odense.png   ←  Ob Odense
+[FALTA] ac-horsens.png   ←  AC Horsens
+[FALTA] agf-aarhus.png   ←  Agf Aarhus
+[FALTA] silkeborg-if.png   ←  Silkeborg IF
+[FALTA] lyngby-bk.png   ←  Lyngby BK
+[FALTA] randers-fc.png   ←  Randers FC
+[FALTA] s-nderjyske.png   ←  Sønderjyske
+
+--- Dominica (9 clubes) ---
+[FALTA] we-united-fc.png   ←  We United FC
+[FALTA] mahaut-soca-strikers.png   ←  Mahaut Soca Strikers
+[FALTA] bombers-fc.png   ←  Bombers FC
+[FALTA] middleham-united-fc.png   ←  Middleham United FC
+[FALTA] south-east-fc.png   ←  South East FC
+[FALTA] harlem-united.png   ←  Harlem United
+[FALTA] ds-fc.png   ←  DS FC
+[FALTA] pointe-michel-fc.png   ←  Pointe Michel FC
+[FALTA] east-central-fc.png   ←  East Central FC
+
+--- Ecuador (16 clubes) ---
+[FALTA] macara.png   ←  Macará
+[FALTA] universidad-catolica-ecuador.png   ←  Universidad Católica (Ecuador)
+[FALTA] ldu-quito.png   ←  LDU Quito
+[FALTA] aucas.png   ←  Aucas
+[FALTA] libertad-fc.png   ←  Libertad FC
+[FALTA] guayaquil-city.png   ←  Guayaquil City
+[FALTA] leones-fc.png   ←  Leones FC
+[FALTA] emelec.png   ←  Emelec
+[FALTA] deportivo-cuenca.png   ←  Deportivo Cuenca
+[FALTA] orense-sc.png   ←  Orense SC
+[FALTA] tecnico-universitario.png   ←  Técnico Universitario
+[FALTA] delfin-sc.png   ←  Delfín SC
+[FALTA] independiente-del-valle.png   ←  Independiente del Valle
+[FALTA] barcelona-sc.png   ←  Barcelona SC
+[FALTA] mushuc-runa.png   ←  Mushuc Runa
+[FALTA] manta-fc.png   ←  Manta FC
+
+--- Egipto (16 clubes) ---
+[FALTA] abo-qir-fertilizers.png   ←  Abo Qir Fertilizers
+[FALTA] al-ahly.png   ←  Al Ahly
+[FALTA] al-mokawloon-al-arab.png   ←  Al Mokawloon al Arab
+[FALTA] asyut-petroleum.png   ←  Asyut Petroleum
+[FALTA] ceramica-cleopatra.png   ←  Ceramica Cleopatra
+[FALTA] enppi.png   ←  ENPPI
+[FALTA] el-gouna-fc.png   ←  El Gouna FC
+[FALTA] ghazl-el-mahalla.png   ←  Ghazl el Mahalla
+[FALTA] ittihad-alexandria.png   ←  Ittihad Alexandria
+[FALTA] modern-sport-fc.png   ←  Modern Sport FC
+[FALTA] national-bank-of-egypt.png   ←  National Bank of Egypt
+[FALTA] olympic-el-qanah-fc.png   ←  Olympic el Qanah FC
+[FALTA] pyramids-fc.png   ←  Pyramids FC
+[FALTA] wadi-degla.png   ←  Wadi Degla
+[FALTA] zamalek-sc.png   ←  Zamalek SC
+[FALTA] zed-fc.png   ←  Zed FC
+
+--- El Salvador (12 clubes) ---
+[FALTA] cd-fas.png   ←  CD FAS
+[FALTA] alianza-fc.png   ←  Alianza FC
+[FALTA] cd-aguila.png   ←  CD Águila
+[FALTA] luis-angel-firpo.png   ←  Luis Ángel Firpo
+[FALTA] isidro-metapan.png   ←  Isidro Metapán
+[FALTA] municipal-limeno.png   ←  Municipal Limeño
+[FALTA] platense-zacatecoluca.png   ←  Platense Zacatecoluca
+[FALTA] fuerte-san-francisco.png   ←  Fuerte San Francisco
+[FALTA] cd-cacahuatique.png   ←  CD Cacahuatique
+[FALTA] atletico-balboa.png   ←  Atlético Balboa
+[FALTA] inca-aruba.png   ←  Inca Aruba
+[FALTA] internacional-santa-tecla.png   ←  Internacional Santa Tecla
+
+--- Emiratos Árabes Unidos (14 clubes) ---
+[FALTA] shabab-al-ahli.png   ←  Shabab al Ahli
+[FALTA] al-wasl.png   ←  Al Wasl
+[FALTA] al-ain.png   ←  Al Ain
+[FALTA] al-jazira.png   ←  Al Jazira
+[FALTA] sharjah-fc.png   ←  Sharjah FC
+[FALTA] al-wahda.png   ←  Al Wahda
+[FALTA] al-nasr.png   ←  Al Nasr
+[FALTA] kalba-fc.png   ←  Kalba FC
+[FALTA] khor-fakkan.png   ←  Khor Fakkan
+[FALTA] ajman-club.png   ←  Ajman Club
+[FALTA] baniyas.png   ←  Baniyas
+[FALTA] al-dhafra.png   ←  Al Dhafra
+[FALTA] hatta-club.png   ←  Hatta Club
+[FALTA] united-fc.png   ←  United FC
+
+--- Eritrea (9 clubes) ---
+[FALTA] anseba-fc.png   ←  Anseba FC
+[FALTA] denden-fc.png   ←  Denden FC
+[FALTA] red-sea-fc.png   ←  Red Sea FC
+[FALTA] agordat-fc.png   ←  Agordat FC
+[FALTA] amarat-united.png   ←  Amarat United
+[FALTA] cemento-fc.png   ←  Cemento FC
+[FALTA] dankalia-fc.png   ←  Dankalia FC
+[FALTA] malakia-fc.png   ←  Malakia FC
+[FALTA] senafe-fc.png   ←  Senafe FC
+
+--- Escocia (12 clubes) ---
+[FALTA] celtic.png   ←  Celtic
+[FALTA] rangers.png   ←  Rangers
+[FALTA] aberdeen.png   ←  Aberdeen
+[FALTA] heart-of-midlothian.png   ←  Heart of Midlothian
+[FALTA] falkirk.png   ←  Falkirk
+[FALTA] st-johnstone.png   ←  St. Johnstone
+[FALTA] dundee-united.png   ←  Dundee United
+[FALTA] motherwell.png   ←  Motherwell
+[FALTA] hibernian.png   ←  Hibernian
+[FALTA] st-mirren.png   ←  St. Mirren
+[FALTA] kilmarnock.png   ←  Kilmarnock
+[FALTA] dundee-fc.png   ←  Dundee FC
+
+--- Eslovaquia (12 clubes) ---
+[FALTA] fc-dac-1904-dunajska-streda.png   ←  FC Dac 1904 Dunajská Streda
+[FALTA] sk-slovan-bratislava.png   ←  ŠK Slovan Bratislava
+[FALTA] msk-zilina.png   ←  MŠK Žilina
+[FALTA] fc-spartak-trnava.png   ←  FC Spartak Trnava
+[FALTA] fk-zeleziarne-podbrezova.png   ←  FK Železiarne Podbrezová
+[FALTA] fc-kosice.png   ←  FC Košice
+[FALTA] mfk-dukla-banska-bystrica.png   ←  MFK Dukla Banská Bystrica
+[FALTA] mfk-zemplin-michalovce.png   ←  MFK Zemplín Michalovce
+[FALTA] kfc-komarno.png   ←  KFC Komárno
+[FALTA] mfk-ruzomberok.png   ←  MFK Ružomberok
+[FALTA] mfk-skalica.png   ←  MFK Skalica
+[FALTA] as-trencin.png   ←  AS Trenčín
+
+--- Eslovenia (10 clubes) ---
+[FALTA] nk-celje.png   ←  NK Celje
+[FALTA] fc-koper.png   ←  FC Koper
+[FALTA] nk-bravo.png   ←  NK Bravo
+[FALTA] olimpija-ljubljana.png   ←  Olimpija Ljubljana
+[FALTA] nk-maribor.png   ←  NK Maribor
+[FALTA] nk-radomlje.png   ←  NK Radomlje
+[FALTA] nk-aluminij.png   ←  NK Aluminij
+[FALTA] ns-mura.png   ←  NŠ Mura
+[FALTA] nk-brinje-grosuplje.png   ←  NK Brinje Grosuplje
+[FALTA] nafta-1903.png   ←  Nafta 1903
+
+--- España (20 clubes) ---
+[FALTA] real-madrid.png   ←  Real Madrid
+[FALTA] barcelona.png   ←  Barcelona
+[FALTA] atletico-madrid.png   ←  Atlético de Madrid
+[FALTA] villarreal.png   ←  Villarreal
+[FALTA] real-sociedad.png   ←  Real Sociedad
+[FALTA] real-betis.png   ←  Betis
+[FALTA] athletic-club.png   ←  Athletic Club
+[FALTA] celta-vigo.png   ←  Celta
+[FALTA] sevilla.png   ←  Sevilla
+[FALTA] valencia.png   ←  Valencia
+[FALTA] espanyol.png   ←  Espanyol
+[FALTA] deportivo-la-coruna.png   ←  Deportivo La Coruña
+[FALTA] racing-de-santander.png   ←  Racing de Santander
+[FALTA] rayo-vallecano.png   ←  Rayo Vallecano
+[FALTA] getafe.png   ←  Getafe
+[FALTA] levante.png   ←  Levante
+[FALTA] osasuna.png   ←  Osasuna
+[FALTA] elche.png   ←  Elche
+[FALTA] alaves.png   ←  Alavés
+[FALTA] malaga.png   ←  Málaga
+
+--- Estados Unidos (30 clubes) ---
+[FALTA] atlanta-united.png   ←  Atlanta United
+[FALTA] austin-fc.png   ←  Austin FC
+[FALTA] charlotte-fc.png   ←  Charlotte FC
+[FALTA] chicago-fire.png   ←  Chicago Fire
+[FALTA] fc-cincinnati.png   ←  FC Cincinnati
+[FALTA] colorado-rapids.png   ←  Colorado Rapids
+[FALTA] columbus-crew.png   ←  Columbus Crew
+[FALTA] dc-united.png   ←  DC United
+[FALTA] fc-dallas.png   ←  FC Dallas
+[FALTA] houston-dynamo.png   ←  Houston Dynamo
+[FALTA] la-galaxy.png   ←  LA Galaxy
+[FALTA] los-angeles-fc.png   ←  LAFC
+[FALTA] cf-montreal.png   ←  CF Montréal
+[FALTA] minnesota-united.png   ←  Minnesota United
+[FALTA] nashville-sc.png   ←  Nashville SC
+[FALTA] new-england-revolution.png   ←  New England Revolution
+[FALTA] new-york-city-fc.png   ←  New York City FC
+[FALTA] new-york-red-bulls.png   ←  New York Red Bulls
+[FALTA] orlando-city.png   ←  Orlando City
+[FALTA] philadelphia-union.png   ←  Philadelphia Union
+[FALTA] inter-miami.png   ←  Inter Miami
+[FALTA] portland-timbers.png   ←  Portland Timbers
+[FALTA] real-salt-lake.png   ←  Real Salt Lake
+[FALTA] seattle-sounders.png   ←  Seattle Sounders
+[FALTA] sporting-kc.png   ←  Sporting KC
+[FALTA] toronto-fc.png   ←  Toronto FC
+[FALTA] vancouver-whitecaps.png   ←  Vancouver Whitecaps
+[FALTA] st-louis-city.png   ←  St. Louis City
+[FALTA] san-jose-earthquakes.png   ←  San Jose Earthquakes
+[FALTA] san-diego-fc.png   ←  San Diego FC
+
+--- Esuatini (9 clubes) ---
+[FALTA] green-mamba-fc.png   ←  Green Mamba FC
+[FALTA] manzini-sea-birds.png   ←  Manzini Sea Birds
+[FALTA] matsapha-united.png   ←  Matsapha United
+[FALTA] mbabane-highlanders.png   ←  Mbabane Highlanders
+[FALTA] mbabane-swallows.png   ←  Mbabane Swallows
+[FALTA] moneni-pirates.png   ←  Moneni Pirates
+[FALTA] nsingizini-hotspurs.png   ←  Nsingizini Hotspurs
+[FALTA] royal-leopard.png   ←  Royal Leopard
+[FALTA] young-buffaloes.png   ←  Young Buffaloes
+
+--- Etiopía (4 clubes) ---
+[FALTA] bahir-dar-kenema.png   ←  Bahir Dar Kenema
+[FALTA] ethiopia-bunna-ethiopian-coffee.png   ←  Ethiopia Bunna (Ethiopian Coffee)
+[FALTA] ethiopia-medin.png   ←  Ethiopia Medin
+[FALTA] negele-arsi.png   ←  Negele Arsi
+
+--- Filipinas (10 clubes) ---
+[FALTA] kaya-fc-iloilo.png   ←  Kaya Fc–iloilo
+[FALTA] aguilas-umak-fc.png   ←  Aguilas–umak FC
+[FALTA] manila-digger-fc.png   ←  Manila Digger FC
+[FALTA] dynamic-herb-cebu-fc.png   ←  Dynamic Herb Cebu FC
+[FALTA] maharlika-fc.png   ←  Maharlika FC
+[FALTA] azkals-development-club.png   ←  Azkals Development Club
+[FALTA] stallion-laguna-fc.png   ←  Stallion Laguna FC
+[FALTA] tuloy-fc.png   ←  Tuloy FC
+[FALTA] mendiola-1991-fc.png   ←  Mendiola 1991 FC
+[FALTA] philippine-army-fc.png   ←  Philippine Army FC
+
+--- Finlandia (12 clubes) ---
+[FALTA] fc-inter-turku.png   ←  FC Inter Turku
+[FALTA] hjk-helsinki.png   ←  HJK Helsinki
+[FALTA] kups-kuopio.png   ←  KuPS KUOPIO
+[FALTA] ac-oulu.png   ←  AC Oulu
+[FALTA] if-gnistan.png   ←  IF Gnistan
+[FALTA] vps-vaasa.png   ←  VPS Vaasa
+[FALTA] fc-lahti.png   ←  FC Lahti
+[FALTA] ilves-tampere.png   ←  Ilves Tampere
+[FALTA] tps-turku.png   ←  TPS Turku
+[FALTA] sjk-seinajoki.png   ←  SJK Seinäjoki
+[FALTA] ff-jaro.png   ←  FF Jaro
+[FALTA] ifk-mariehamn.png   ←  IFK Mariehamn
+
+--- Fiyi (10 clubes) ---
+[FALTA] ba-fc.png   ←  Ba FC
+[FALTA] labasa-fc.png   ←  Labasa FC
+[FALTA] rewa-fc.png   ←  Rewa FC
+[FALTA] lautoka-fc.png   ←  Lautoka FC
+[FALTA] navua-fc.png   ←  Navua FC
+[FALTA] suva-fc.png   ←  Suva FC
+[FALTA] nadi-fc.png   ←  Nadi FC
+[FALTA] nasinu-fc.png   ←  Nasinu FC
+[FALTA] nadroga-fc.png   ←  Nadroga FC
+[FALTA] tailevu-naitasiri-fc.png   ←  Tailevu Naitasiri FC
+
+--- Francia (18 clubes) ---
+[FALTA] angers.png   ←  Angers
+[FALTA] auxerre.png   ←  Auxerre
+[FALTA] brest.png   ←  Brest
+[FALTA] le-havre.png   ←  Le Havre
+[FALTA] le-mans-fc.png   ←  Le Mans FC
+[FALTA] lens.png   ←  Lens
+[FALTA] lille.png   ←  Lille
+[FALTA] lorient.png   ←  Lorient
+[FALTA] lyon.png   ←  Lyon
+[FALTA] marseille.png   ←  Marseille
+[FALTA] monaco.png   ←  Monaco
+[FALTA] nice.png   ←  Nice
+[FALTA] paris-fc.png   ←  Paris FC
+[FALTA] paris-saint-germain.png   ←  Paris Saint-Germain
+[FALTA] rennes.png   ←  Rennes
+[FALTA] strasbourg.png   ←  Strasbourg
+[FALTA] toulouse.png   ←  Toulouse
+[FALTA] estac-troyes.png   ←  ESTAC Troyes
+
+--- Gabón (10 clubes) ---
+[FALTA] ao-cercle-mberi-sportif.png   ←  Ao Cercle Mbéri Sportif
+[FALTA] as-mangasport.png   ←  AS Mangasport
+[FALTA] as-stade-mandji.png   ←  AS Stade Mandji
+[FALTA] bouenguidi-sports.png   ←  Bouenguidi Sports
+[FALTA] cf-mounana.png   ←  CF Mounana
+[FALTA] lozo-sport.png   ←  Lozo Sport
+[FALTA] ogooue-fc.png   ←  Ogooué FC
+[FALTA] oyem-ac.png   ←  Oyem AC
+[FALTA] us-bitam.png   ←  US Bitam
+[FALTA] vautour-club.png   ←  Vautour Club
+
+--- Gales (16 clubes) ---
+[FALTA] the-new-saints-tns.png   ←  The New Saints (TNS)
+[FALTA] connah-s-quay-nomads.png   ←  Connah’s Quay Nomads
+[FALTA] penybont-fc.png   ←  Penybont FC
+[FALTA] colwyn-bay-fc.png   ←  Colwyn Bay FC
+[FALTA] airbus-uk-broughton.png   ←  Airbus UK Broughton
+[FALTA] caernarfon-town.png   ←  Caernarfon Town
+[FALTA] barry-town-united.png   ←  Barry Town United
+[FALTA] cardiff-metropolitan.png   ←  Cardiff Metropolitan
+[FALTA] cambrian-united.png   ←  Cambrian United
+[FALTA] llandudno-fc.png   ←  Llandudno FC
+[FALTA] haverfordwest-county.png   ←  Haverfordwest County
+[FALTA] briton-ferry-llansawel.png   ←  Briton Ferry Llansawel
+[FALTA] flint-town-united.png   ←  Flint Town United
+[FALTA] ammanford-afc.png   ←  Ammanford AFC
+[FALTA] trefelin-bgc.png   ←  Trefelin BGC
+[FALTA] holywell-town.png   ←  Holywell Town
+
+--- Gambia (10 clubes) ---
+[FALTA] bombada-fc.png   ←  Bombada FC
+[FALTA] brikama-united.png   ←  Brikama United
+[FALTA] fortune-fc.png   ←  Fortune FC
+[FALTA] gambia-ports-authority.png   ←  Gambia Ports Authority
+[FALTA] hawks-fc.png   ←  Hawks FC
+[FALTA] medina-united-football-academy.png   ←  Medina United Football Academy
+[FALTA] real-de-banjul.png   ←  Real de Banjul
+[FALTA] samger-fc.png   ←  Samger FC
+[FALTA] team-rhino-fc.png   ←  Team Rhino FC
+[FALTA] waa-banjul-fc.png   ←  Waa Banjul FC
+
+--- Georgia (10 clubes) ---
+[FALTA] dinamo-batumi.png   ←  Dinamo Batumi
+[FALTA] dinamo-tbilisi.png   ←  Dinamo Tbilisi
+[FALTA] iberia-1999-tbilisi.png   ←  Iberia 1999 Tbilisi
+[FALTA] fc-rustavi.png   ←  FC Rustavi
+[FALTA] torpedo-kutaisi.png   ←  Torpedo Kutaisi
+[FALTA] dila-gori.png   ←  Dila Gori
+[FALTA] samgurali-tskaltubo.png   ←  Samgurali Tskaltubo
+[FALTA] spaeri-fc.png   ←  Spaeri FC
+[FALTA] fc-gagra.png   ←  FC Gagra
+[FALTA] meshakhte-tkibuli.png   ←  Meshakhte Tkibuli
+
+--- Ghana (18 clubes) ---
+[FALTA] aduana-stars.png   ←  Aduana Stars
+[FALTA] asante-kotoko.png   ←  Asante Kotoko
+[FALTA] basake-holy-stars.png   ←  Basake Holy Stars
+[FALTA] bechem-united.png   ←  Bechem United
+[FALTA] berekum-chelsea.png   ←  Berekum Chelsea
+[FALTA] bibiani-gold-stars.png   ←  Bibiani Gold Stars
+[FALTA] debibi-united.png   ←  Debibi United
+[FALTA] dreams-fc.png   ←  Dreams FC
+[FALTA] fc-ashantigold.png   ←  FC Ashantigold
+[FALTA] fc-samartex.png   ←  FC Samartex
+[FALTA] heart-of-lions.png   ←  Heart of Lions
+[FALTA] hearts-of-oak.png   ←  Hearts of Oak
+[FALTA] karela-united.png   ←  Karela United
+[FALTA] medeama-sc.png   ←  Medeama SC
+[FALTA] port-city-fc.png   ←  Port City FC
+[FALTA] swedru-all-blacks.png   ←  Swedru All Blacks
+[FALTA] vision-fc.png   ←  Vision FC
+[FALTA] young-apostles.png   ←  Young Apostles
+
+--- Gibraltar (11 clubes) ---
+[FALTA] lincoln-red-imps.png   ←  Lincoln Red Imps
+[FALTA] st-joseph-s-fc.png   ←  St Joseph’s FC
+[FALTA] fc-bruno-s-magpies.png   ←  FC Bruno’s Magpies
+[FALTA] mons-calpe-sc.png   ←  Mons Calpe SC
+[FALTA] glacis-united.png   ←  Glacis United
+[FALTA] lions-gibraltar-fc.png   ←  Lions Gibraltar FC
+[FALTA] europa-fc.png   ←  Europa FC
+[FALTA] europa-point-fc.png   ←  Europa Point FC
+[FALTA] lynx-fc.png   ←  Lynx FC
+[FALTA] fc-college-1975.png   ←  FC College 1975
+[FALTA] fc-hound-dogs.png   ←  FC Hound Dogs
+
+--- Granada (9 clubes) ---
+[FALTA] st-david-s-united-fc.png   ←  St. David's United FC
+[FALTA] paradise-fc-international.png   ←  Paradise FC International
+[FALTA] hurricanes-sc.png   ←  Hurricanes SC
+[FALTA] queens-park-rangers-fc-1969.png   ←  Queens Park Rangers FC 1969
+[FALTA] fc-camerhogne.png   ←  FC Camerhogne
+[FALTA] hard-rock-fc.png   ←  Hard Rock FC
+[FALTA] shamrock.png   ←  Shamrock
+[FALTA] sab-spartans-sc.png   ←  SAB Spartans SC
+[FALTA] north-stars.png   ←  North Stars
+
+--- Grecia (14 clubes) ---
+[FALTA] panathinaikos.png   ←  Panathinaikos
+[FALTA] panetolikos.png   ←  Panetolikos
+[FALTA] paok-salonica.png   ←  PAOK Salónica
+[FALTA] volos.png   ←  Volos
+[FALTA] kalamata.png   ←  Kalamata
+[FALTA] kifisia.png   ←  Kifisia
+[FALTA] levadiakos.png   ←  Levadiakos
+[FALTA] ofi-creta.png   ←  OFI Creta
+[FALTA] olympiacos.png   ←  Olympiacos
+[FALTA] aek-atenas.png   ←  AEK Atenas
+[FALTA] aris-salonica.png   ←  Aris Salónica
+[FALTA] asteras-tripolis.png   ←  Asteras Tripolis
+[FALTA] atromitos.png   ←  Atromitos
+[FALTA] iraklis.png   ←  Iraklis
+
+--- Guatemala (9 clubes) ---
+[FALTA] antigua-gfc.png   ←  Antigua GFC
+[FALTA] municipal.png   ←  Municipal
+[FALTA] xelaju-mc.png   ←  Xelajú MC
+[FALTA] deportivo-mixco.png   ←  Deportivo Mixco
+[FALTA] guastatoya.png   ←  Guastatoya
+[FALTA] aurora-fc.png   ←  Aurora FC
+[FALTA] coban-imperial.png   ←  Cobán Imperial
+[FALTA] malacateco.png   ←  Malacateco
+[FALTA] comunicaciones.png   ←  Comunicaciones
+
+--- Guinea (10 clubes) ---
+[FALTA] asfag.png   ←  Asfag
+[FALTA] as-kaloum.png   ←  AS Kaloum
+[FALTA] as-mineurs-de-sangaredi.png   ←  AS Mineurs de Sangarédi
+[FALTA] ci-kamsar.png   ←  Ci Kamsar
+[FALTA] hafia-fc.png   ←  Hafia FC
+[FALTA] horoya-ac.png   ←  Horoya AC
+[FALTA] milo-fc.png   ←  Milo FC
+[FALTA] renaissance-fc.png   ←  Renaissance FC
+[FALTA] soar-academie.png   ←  Soar Académie
+[FALTA] wakriya-ac.png   ←  Wakriya AC
+
+--- Guinea Ecuatorial (9 clubes) ---
+[FALTA] 15-de-agosto.png   ←  15 de Agosto
+[FALTA] akonnangui-fc.png   ←  Akonnangui FC
+[FALTA] atletico-semu.png   ←  Atlético Semu
+[FALTA] deportivo-unidad.png   ←  Deportivo Unidad
+[FALTA] dragon-fc.png   ←  Dragón FC
+[FALTA] dvo-mongomo.png   ←  Dvo Mongomo
+[FALTA] leones-vegetarianos.png   ←  Leones Vegetarianos
+[FALTA] sony-de-ela-nguema.png   ←  Sony de Elá Nguema
+[FALTA] the-panthers-fc.png   ←  The Panthers FC
+
+--- Guinea-Bisáu (8 clubes) ---
+[FALTA] desportivo-de-gabu.png   ←  Desportivo de Gabú
+[FALTA] fc-cuntum.png   ←  FC Cuntum
+[FALTA] flamengo-de-pefine.png   ←  Flamengo de Pefine
+[FALTA] nuno-tristao-fc.png   ←  Nuno Tristão FC
+[FALTA] portos-de-bissau.png   ←  Portos de Bissau
+[FALTA] sport-bissau-e-benfica.png   ←  Sport Bissau e Benfica
+[FALTA] sporting-clube-de-bafata.png   ←  Sporting Clube de Bafatá
+[FALTA] uniao-desportiva-internacional-de-bissau.png   ←  União Desportiva Internacional de Bissau
+
+--- Guyana (10 clubes) ---
+[FALTA] guyana-defence-force-fc.png   ←  Guyana Defence Force FC
+[FALTA] club-por-identificar-1-guyana.png   ←  Club por identificar 1 (Guyana)
+[FALTA] guyana-police-force-fc.png   ←  Guyana Police Force FC
+[FALTA] western-tigers-fc.png   ←  Western Tigers FC
+[FALTA] monedderlust-fc.png   ←  Monedderlust FC
+[FALTA] club-por-identificar-2-guyana.png   ←  Club por identificar 2 (Guyana)
+[FALTA] ann-s-grove-united.png   ←  Ann’s Grove United
+[FALTA] fruta-conquerors-fc.png   ←  Fruta Conquerors FC
+[FALTA] camptown-fc.png   ←  Camptown FC
+[FALTA] club-por-identificar-3-guyana.png   ←  Club por identificar 3 (Guyana)
+
+--- Haití (13 clubes) ---
+[FALTA] club-por-identificar-1-haiti.png   ←  Club por identificar 1 (Haití)
+[FALTA] real-hope-fa.png   ←  Real Hope FA
+[FALTA] racing-fc-des-gonaives.png   ←  Racing FC des Gonaïves
+[FALTA] as-capoise.png   ←  AS Capoise
+[FALTA] tempete-fc.png   ←  Tempête FC
+[FALTA] ouanaminthe-fc.png   ←  Ouanaminthe FC
+[FALTA] violette-ac.png   ←  Violette AC
+[FALTA] don-bosco-fc.png   ←  Don Bosco FC
+[FALTA] cavaly-as.png   ←  Cavaly AS
+[FALTA] club-por-identificar-2-haiti.png   ←  Club por identificar 2 (Haití)
+[FALTA] fc-juventus-des-cayes.png   ←  FC Juventus des Cayes
+[FALTA] racing-club-haitien.png   ←  Racing Club Haïtien
+[FALTA] america-des-cayes.png   ←  América des Cayes
+
+--- Honduras (12 clubes) ---
+[FALTA] cd-olimpia.png   ←  CD Olimpia
+[FALTA] real-espana.png   ←  Real España
+[FALTA] cd-marathon.png   ←  CD Marathón
+[FALTA] motagua.png   ←  Motagua
+[FALTA] cd-platense.png   ←  CD Platense
+[FALTA] olancho-fc.png   ←  Olancho FC
+[FALTA] lobos-upnfm.png   ←  Lobos Upnfm
+[FALTA] genesis-fc.png   ←  Génesis FC
+[FALTA] juticalpa-fc.png   ←  Juticalpa FC
+[FALTA] cd-choloma.png   ←  CD Choloma
+[FALTA] estrella-roja-fc.png   ←  Estrella Roja FC
+[FALTA] atletico-independiente.png   ←  Atlético Independiente
+
+--- Hong Kong (11 clubes) ---
+[FALTA] kitchee-sc.png   ←  Kitchee SC
+[FALTA] lee-man-fc.png   ←  Lee Man FC
+[FALTA] tai-po-fc.png   ←  Tai Po FC
+[FALTA] golik-north-district-fc.png   ←  Golik North District FC
+[FALTA] eastern-sc.png   ←  Eastern SC
+[FALTA] eastern-district-sa.png   ←  Eastern District SA
+[FALTA] bc-rangers.png   ←  BC Rangers
+[FALTA] woofoo-kowloon-city.png   ←  Woofoo Kowloon City
+[FALTA] kwoon-chung-southern-district.png   ←  Kwoon Chung Southern District
+[FALTA] hong-kong-football-club.png   ←  Hong Kong Football Club
+[FALTA] supreme-shatin.png   ←  Supreme Shatin
+
+--- Hungría (12 clubes) ---
+[FALTA] vasas-fc.png   ←  Vasas FC
+[FALTA] budapest-honved.png   ←  Budapest Honvéd
+[FALTA] zalaegerszegi-te.png   ←  Zalaegerszegi Te
+[FALTA] mtk-budapest.png   ←  MTK Budapest
+[FALTA] nyiregyhaza-spartacus.png   ←  Nyíregyháza Spartacus
+[FALTA] kisvarda-fc.png   ←  Kisvárda FC
+[FALTA] puskas-akademia.png   ←  Puskás Akadémia
+[FALTA] ferencvarosi-tc.png   ←  Ferencvárosi TC
+[FALTA] eto-fc-gyor.png   ←  Eto FC Győr
+[FALTA] debreceni-vsc.png   ←  Debreceni VSC
+[FALTA] paksi-fc.png   ←  Paksi FC
+[FALTA] ujpest-fc.png   ←  Újpest FC
+
+--- India (13 clubes) ---
+[FALTA] bengaluru-fc.png   ←  Bengaluru FC
+[FALTA] chennaiyin-fc.png   ←  Chennaiyin FC
+[FALTA] churchill-brothers.png   ←  Churchill Brothers
+[FALTA] east-bengal-fc.png   ←  East Bengal FC
+[FALTA] fc-goa.png   ←  FC Goa
+[FALTA] inter-kashi.png   ←  Inter Kashi
+[FALTA] kerala-blasters.png   ←  Kerala Blasters
+[FALTA] mohun-bagan-super-giant.png   ←  Mohun Bagan Super Giant
+[FALTA] mumbai-city-fc.png   ←  Mumbai City FC
+[FALTA] northeast-united-fc.png   ←  Northeast United FC
+[FALTA] odisha-fc.png   ←  Odisha FC
+[FALTA] punjab-fc.png   ←  Punjab FC
+[FALTA] sporting-club-delhi.png   ←  Sporting Club Delhi
+
+--- Indonesia (18 clubes) ---
+[FALTA] persija-jakarta.png   ←  Persija Jakarta
+[FALTA] dewa-united-banten-fc.png   ←  Dewa United Banten FC
+[FALTA] bali-united-fc.png   ←  Bali United FC
+[FALTA] madura-united-fc.png   ←  Madura United FC
+[FALTA] persib-bandung.png   ←  Persib Bandung
+[FALTA] persita-tangerang.png   ←  Persita Tangerang
+[FALTA] java-united-fc.png   ←  Java United FC
+[FALTA] persebaya-surabaya.png   ←  Persebaya Surabaya
+[FALTA] bhayangkara-presisi-lampung-fc.png   ←  Bhayangkara Presisi Lampung FC
+[FALTA] garudayaksa-fc.png   ←  Garudayaksa FC
+[FALTA] borneo-fc-samarinda.png   ←  Borneo FC Samarinda
+[FALTA] psm-makassar.png   ←  PSM Makassar
+[FALTA] arema-fc.png   ←  Arema FC
+[FALTA] isenmulang-kalteng-fc.png   ←  Isenmulang Kalteng FC
+[FALTA] persijap-jepara.png   ←  Persijap Jepara
+[FALTA] persik-kediri.png   ←  Persik Kediri
+[FALTA] psim-yogyakarta.png   ←  PSIM Yogyakarta
+[FALTA] pss-sleman.png   ←  PSS Sleman
+
+--- Inglaterra (20 clubes) ---
+[FALTA] manchester-city.png   ←  Manchester City
+[FALTA] arsenal.png   ←  Arsenal
+[FALTA] manchester-united.png   ←  Manchester United
+[FALTA] chelsea.png   ←  Chelsea
+[FALTA] liverpool.png   ←  Liverpool
+[FALTA] tottenham-hotspur.png   ←  Tottenham
+[FALTA] newcastle-united.png   ←  Newcastle
+[FALTA] brighton-hove-albion.png   ←  Brighton
+[FALTA] brentford.png   ←  Brentford
+[FALTA] aston-villa.png   ←  Aston Villa
+[FALTA] bournemouth.png   ←  Bournemouth
+[FALTA] crystal-palace.png   ←  Crystal Palace
+[FALTA] nottingham-forest.png   ←  Nottingham Forest
+[FALTA] sunderland.png   ←  Sunderland
+[FALTA] leeds-united.png   ←  Leeds United
+[FALTA] everton.png   ←  Everton
+[FALTA] fulham.png   ←  Fulham
+[FALTA] coventry-city.png   ←  Coventry City
+[FALTA] hull-city.png   ←  Hull City
+[FALTA] ipswich-town.png   ←  Ipswich Town
+
+--- Irak (22 clubes) ---
+[FALTA] al-quwa-al-jawiya.png   ←  Al-Quwa Al-Jawiya
+[FALTA] duhok-sc.png   ←  Duhok SC
+[FALTA] al-talaba.png   ←  Al-Talaba
+[FALTA] newroz-sc.png   ←  Newroz SC
+[FALTA] mosul-fc.png   ←  Mosul FC
+[FALTA] al-gharraf.png   ←  Al-Gharraf
+[FALTA] al-minaa.png   ←  Al-Minaa
+[FALTA] diyala.png   ←  Diyala
+[FALTA] al-karkh.png   ←  Al-Karkh
+[FALTA] al-naft.png   ←  Al-Naft
+[FALTA] naft-maysan.png   ←  Naft Maysan
+[FALTA] al-jolan.png   ←  Al-Jolan
+[FALTA] al-kahrabaa.png   ←  Al-Kahrabaa
+[FALTA] karbala.png   ←  Karbala
+[FALTA] ghaz-al-shamal.png   ←  Ghaz Al-Shamal
+[FALTA] mes-shahr-e-babak.png   ←  Mes Shahr-E Babak
+[FALTA] sanat-naft-abadan.png   ←  Sanat Naft Abadan
+[FALTA] al-shorta.png   ←  Al-Shorta
+[FALTA] al-zawraa.png   ←  Al-Zawraa
+[FALTA] erbil-sc.png   ←  Erbil SC
+[FALTA] zakho-sc.png   ←  Zakho SC
+[FALTA] al-karma-sc.png   ←  Al-Karma SC
+
+--- Irán (16 clubes) ---
+[FALTA] persepolis-fc.png   ←  Persepolis FC
+[FALTA] esteghlal-fc.png   ←  Esteghlal FC
+[FALTA] sepahan-fc.png   ←  Sepahan FC
+[FALTA] tractor-fc.png   ←  Tractor FC
+[FALTA] foolad-fc.png   ←  Foolad FC
+[FALTA] gol-gohar-sirjan.png   ←  Gol Gohar Sirjan
+[FALTA] aluminium-arak.png   ←  Aluminium Arak
+[FALTA] zob-ahan.png   ←  Zob Ahan
+[FALTA] kheybar-khorramabad.png   ←  Kheybar Khorramabad
+[FALTA] chadormalu-sc.png   ←  Chadormalu SC
+[FALTA] malavan-bandar-anzali.png   ←  Malavan Bandar Anzali
+[FALTA] paykan-fc.png   ←  Paykan FC
+[FALTA] fajr-sepasi-shiraz.png   ←  Fajr Sepasi Shiraz
+[FALTA] shams-azar-qazvin.png   ←  Shams Azar Qazvin
+[FALTA] esteghlal-khuzestan.png   ←  Esteghlal Khuzestan
+[FALTA] nassaji-mazandaran.png   ←  Nassaji Mazandaran
+
+--- Irlanda (12 clubes) ---
+[FALTA] shamrock-rovers.png   ←  Shamrock Rovers
+[FALTA] st-patrick-s-athletic.png   ←  St. Patrick’s Athletic
+[FALTA] bohemians.png   ←  Bohemians
+[FALTA] shelbourne.png   ←  Shelbourne
+[FALTA] derry-city.png   ←  Derry City
+[FALTA] dundalk-fc.png   ←  Dundalk FC
+[FALTA] waterford-fc.png   ←  Waterford FC
+[FALTA] galway-united.png   ←  Galway United
+[FALTA] drogheda-united.png   ←  Drogheda United
+[FALTA] sligo-rovers.png   ←  Sligo Rovers
+[FALTA] cork-city.png   ←  Cork City
+[FALTA] ucd-afc.png   ←  UCD AFC
+
+--- Irlanda del Norte (12 clubes) ---
+[FALTA] linfield-fc.png   ←  Linfield FC
+[FALTA] coleraine-fc.png   ←  Coleraine FC
+[FALTA] larne-fc.png   ←  Larne FC
+[FALTA] glentoran-fc.png   ←  Glentoran FC
+[FALTA] cliftonville-fc.png   ←  Cliftonville FC
+[FALTA] carrick-rangers-fc.png   ←  Carrick Rangers FC
+[FALTA] dungannon-swifts.png   ←  Dungannon Swifts
+[FALTA] crusaders-fc.png   ←  Crusaders FC
+[FALTA] ballymena-united.png   ←  Ballymena United
+[FALTA] limavady-united.png   ←  Limavady United
+[FALTA] bangor-fc.png   ←  Bangor FC
+[FALTA] portadown-fc.png   ←  Portadown FC
+
+--- Islandia (12 clubes) ---
+[FALTA] vikingur-reykjavik.png   ←  Víkingur Reykjavík
+[FALTA] fram-reykjavik.png   ←  Fram Reykjavík
+[FALTA] kr-reykjavik.png   ←  KR Reykjavík
+[FALTA] brei-ablik.png   ←  Breiðablik
+[FALTA] ia-akranes.png   ←  ÍA Akranes
+[FALTA] keflavik.png   ←  Keflavík
+[FALTA] stjarnan-gar-ab-r.png   ←  Stjarnan Garðabær
+[FALTA] valur-reykjavik.png   ←  Valur Reykjavík
+[FALTA] fh-hafnarfjor-ur.png   ←  FH Hafnarfjörður
+[FALTA] or-akureyri.png   ←  Þór Akureyri
+[FALTA] ka-akureyri.png   ←  KA Akureyri
+[FALTA] ibv-vestmannaeyjar.png   ←  ÍBV Vestmannaeyjar
+
+--- Islas Caimán (11 clubes) ---
+[FALTA] cayman-athletic-sc.png   ←  Cayman Athletic SC
+[FALTA] academy-sc.png   ←  Academy SC
+[FALTA] bodden-town-fc.png   ←  Bodden Town FC
+[FALTA] elite-sc.png   ←  Elite SC
+[FALTA] cayman-brac-fc.png   ←  Cayman Brac FC
+[FALTA] east-end-united-fc.png   ←  East End United FC
+[FALTA] savannah-tigers-fc.png   ←  Savannah Tigers FC
+[FALTA] future-sc.png   ←  Future SC
+[FALTA] latinos-fc.png   ←  Latinos FC
+[FALTA] sunset-fc.png   ←  Sunset FC
+[FALTA] scholars-international-fc.png   ←  Scholars International FC
+
+--- Islas Cook (6 clubes) ---
+[FALTA] lion-heart.png   ←  Lion Heart
+[FALTA] tupapa-maraerenga.png   ←  Tupapa Maraerenga
+[FALTA] nikao-sokattak.png   ←  Nikao Sokattak
+[FALTA] matavera-ngatangiia.png   ←  Matavera-Ngatangiia
+[FALTA] avatiu.png   ←  Avatiu
+[FALTA] titikaveka.png   ←  Titikaveka
+
+--- Islas Feroe (10 clubes) ---
+[FALTA] ki-klaksvik.png   ←  KÍ Klaksvík
+[FALTA] nsi-runavik.png   ←  NSÍ Runavík
+[FALTA] hb-torshavn.png   ←  HB Tórshavn
+[FALTA] b36-torshavn.png   ←  B36 Tórshavn
+[FALTA] vikingur-g-ta.png   ←  Víkingur Gøta
+[FALTA] b68-toftir.png   ←  B68 Toftir
+[FALTA] 07-vestur.png   ←  07 Vestur
+[FALTA] ab-argir.png   ←  AB Argir
+[FALTA] eb-streymur.png   ←  Eb/Streymur
+[FALTA] skala-if.png   ←  Skála IF
+
+--- Islas Salomón (10 clubes) ---
+[FALTA] usp-fc.png   ←  USP FC
+[FALTA] central-coast-fc.png   ←  Central Coast FC
+[FALTA] malaita-kingz-fc.png   ←  Malaita Kingz FC
+[FALTA] green-shield-fc.png   ←  Green Shield FC
+[FALTA] honiara-city-fc.png   ←  Honiara City FC
+[FALTA] kossa-fc.png   ←  KOSSA FC
+[FALTA] marist-fc.png   ←  Marist FC
+[FALTA] sosa-fc.png   ←  SOSA FC
+[FALTA] southern-united-fc.png   ←  Southern United FC
+[FALTA] ghupo-wantoks-fc.png   ←  Ghupo Wantoks FC
+
+--- Islas Turcas y Caicos (7 clubes) ---
+[FALTA] cheshire-hall-fc.png   ←  Cheshire Hall FC
+[FALTA] academy-eagles-fc.png   ←  Academy Eagles FC
+[FALTA] teachers-fc.png   ←  Teachers FC
+[FALTA] beaches-fc.png   ←  Beaches FC
+[FALTA] flamingo-fc.png   ←  Flamingo FC
+[FALTA] teachers-young-strikers.png   ←  Teachers Young Strikers
+[FALTA] provo-united-sc.png   ←  Provo United SC
+
+--- Islas Vírgenes Británicas (9 clubes) ---
+[FALTA] panthers-fc.png   ←  Panthers FC
+[FALTA] old-madrid-fc.png   ←  Old Madrid FC
+[FALTA] positive-fc.png   ←  Positive FC
+[FALTA] lion-heart-fc.png   ←  Lion Heart FC
+[FALTA] sugar-boys-fc.png   ←  Sugar Boys FC
+[FALTA] one-love-fc.png   ←  One Love FC
+[FALTA] vg-united.png   ←  VG United
+[FALTA] wolues-fc.png   ←  Wolues FC
+[FALTA] avengers-fc.png   ←  Avengers FC
+
+--- Islas Vírgenes Estadounidenses (6 clubes) ---
+[FALTA] rovers-fc.png   ←  Rovers FC
+[FALTA] prankton-united-sc.png   ←  Prankton United SC
+[FALTA] raymix-sc.png   ←  Raymix SC
+[FALTA] lrvi-fc.png   ←  Lrvi FC
+[FALTA] new-vibes-sc.png   ←  New Vibes SC
+[FALTA] massey-sa.png   ←  Massey SA
+
+--- Israel (14 clubes) ---
+[FALTA] maccabi-tel-aviv.png   ←  Maccabi Tel Aviv
+[FALTA] maccabi-haifa.png   ←  Maccabi Haifa
+[FALTA] hapoel-tel-aviv.png   ←  Hapoel Tel Aviv
+[FALTA] hapoel-be-er-sheva.png   ←  Hapoel Be’er Sheva
+[FALTA] beitar-jerusalem.png   ←  Beitar Jerusalem
+[FALTA] hapoel-jerusalem.png   ←  Hapoel Jerusalem
+[FALTA] hapoel-haifa.png   ←  Hapoel Haifa
+[FALTA] maccabi-petah-tikva.png   ←  Maccabi Petah Tikva
+[FALTA] maccabi-netanya.png   ←  Maccabi Netanya
+[FALTA] bnei-sakhnin.png   ←  Bnei Sakhnin
+[FALTA] hapoel-ramat-gan.png   ←  Hapoel Ramat Gan
+[FALTA] hapoel-kiryat-shmona.png   ←  Hapoel Kiryat Shmona
+[FALTA] hapoel-petah-tikva.png   ←  Hapoel Petah Tikva
+[FALTA] ironi-tiberias.png   ←  Ironi Tiberias
+
+--- Italia (20 clubes) ---
+[FALTA] inter-milan.png   ←  Inter
+[FALTA] ac-milan.png   ←  AC Milan
+[FALTA] juventus.png   ←  Juventus
+[FALTA] napoli.png   ←  Napoli
+[FALTA] roma.png   ←  Roma
+[FALTA] atalanta.png   ←  Atalanta
+[FALTA] bologna.png   ←  Bologna
+[FALTA] cagliari.png   ←  Cagliari
+[FALTA] como.png   ←  Como
+[FALTA] fiorentina.png   ←  Fiorentina
+[FALTA] frosinone.png   ←  Frosinone
+[FALTA] genoa.png   ←  Genoa
+[FALTA] lazio.png   ←  Lazio
+[FALTA] lecce.png   ←  Lecce
+[FALTA] monza.png   ←  Monza
+[FALTA] parma.png   ←  Parma
+[FALTA] torino.png   ←  Torino
+[FALTA] udinese.png   ←  Udinese
+[FALTA] sassuolo.png   ←  Sassuolo
+[FALTA] venezia.png   ←  Venezia
+
+--- Jamaica (13 clubes) ---
+[FALTA] arnett-gardens.png   ←  Arnett Gardens
+[FALTA] cavalier-fc.png   ←  Cavalier FC
+[FALTA] chapelton-maroons.png   ←  Chapelton Maroons
+[FALTA] dunbeholden-fc.png   ←  Dunbeholden FC
+[FALTA] molynes-united.png   ←  Molynes United
+[FALTA] montego-bay-united.png   ←  Montego Bay United
+[FALTA] mount-pleasant-fa.png   ←  Mount Pleasant FA
+[FALTA] portmore-united.png   ←  Portmore United
+[FALTA] racing-united.png   ←  Racing United
+[FALTA] tivoli-gardens.png   ←  Tivoli Gardens
+[FALTA] treasure-beach-fc.png   ←  Treasure Beach FC
+[FALTA] tru-juice-fc.png   ←  Tru-Juice FC
+[FALTA] waterhouse-fc.png   ←  Waterhouse FC
+
+--- Japón (20 clubes) ---
+[FALTA] fc-tokyo.png   ←  FC Tokyo
+[FALTA] kashiwa-reysol.png   ←  Kashiwa Reysol
+[FALTA] sanfrecce-hiroshima.png   ←  Sanfrecce Hiroshima
+[FALTA] fc-machida-zelvia.png   ←  FC Machida Zelvia
+[FALTA] vissel-kobe.png   ←  Vissel Kobe
+[FALTA] kashima-antlers.png   ←  Kashima Antlers
+[FALTA] yokohama-f-marinos.png   ←  Yokohama F. Marinos
+[FALTA] kawasaki-frontale.png   ←  Kawasaki Frontale
+[FALTA] urawa-reds.png   ←  Urawa Reds
+[FALTA] fagiano-okayama.png   ←  Fagiano Okayama
+[FALTA] cerezo-osaka.png   ←  Cerezo Osaka
+[FALTA] kyoto-sanga.png   ←  Kyoto Sanga
+[FALTA] nagoya-grampus.png   ←  Nagoya Grampus
+[FALTA] tokyo-verdy.png   ←  Tokyo Verdy
+[FALTA] shimizu-s-pulse.png   ←  Shimizu S-Pulse
+[FALTA] v-varen-nagasaki.png   ←  V-Varen Nagasaki
+[FALTA] jef-united-chiba.png   ←  Jef United Chiba
+[FALTA] gamba-osaka.png   ←  Gamba Osaka
+[FALTA] mito-hollyhock.png   ←  Mito Hollyhock
+[FALTA] avispa-fukuoka.png   ←  Avispa Fukuoka
+
+--- Kazajistán (16 clubes) ---
+[FALTA] ordabasy.png   ←  Ordabasy
+[FALTA] kairat-almaty.png   ←  Kairat Almaty
+[FALTA] astana.png   ←  Astana
+[FALTA] okzhetpes.png   ←  Okzhetpes
+[FALTA] aktobe.png   ←  Aktobe
+[FALTA] elimai-semey.png   ←  Elimai Semey
+[FALTA] tobol.png   ←  Tobol
+[FALTA] zhenis.png   ←  Zhenis
+[FALTA] ulytau.png   ←  Ulytau
+[FALTA] kyzylzhar.png   ←  Kyzylzhar
+[FALTA] caspiy.png   ←  Caspiy
+[FALTA] irtysh-pavlodar.png   ←  Irtysh Pavlodar
+[FALTA] atyrau.png   ←  Atyrau
+[FALTA] zhetysu.png   ←  Zhetysu
+[FALTA] altai-oskemen.png   ←  Altai Oskemen
+[FALTA] kaisar-kyzylorda.png   ←  Kaisar Kyzylorda
+
+--- Kenia (18 clubes) ---
+[FALTA] 3k-fc.png   ←  3K FC
+[FALTA] afc-leopards.png   ←  AFC Leopards
+[FALTA] aps-bomet-fc.png   ←  Aps Bomet FC
+[FALTA] bandari-fc.png   ←  Bandari FC
+[FALTA] gor-mahia-fc.png   ←  Gor Mahia FC
+[FALTA] kakamega-homeboyz.png   ←  Kakamega Homeboyz
+[FALTA] kcb-fc.png   ←  KCB FC
+[FALTA] kenya-police-fc.png   ←  Kenya Police FC
+[FALTA] mara-sugar-fc.png   ←  Mara Sugar FC
+[FALTA] mathare-united.png   ←  Mathare United
+[FALTA] migori-youth-fc.png   ←  Migori Youth FC
+[FALTA] mombasa-united-fc.png   ←  Mombasa United FC
+[FALTA] murang-a-seal.png   ←  Murang’a Seal
+[FALTA] nairobi-united.png   ←  Nairobi United
+[FALTA] posta-rangers.png   ←  Posta Rangers
+[FALTA] shabana-fc.png   ←  Shabana FC
+[FALTA] tusker-fc.png   ←  Tusker FC
+[FALTA] ulinzi-stars-fc.png   ←  Ulinzi Stars FC
+
+--- Kirguistán (16 clubes) ---
+[FALTA] abdysh-ata-kant.png   ←  Abdysh-Ata Kant
+[FALTA] bars-issyk-kul.png   ←  Bars Issyk-Kul
+[FALTA] asia-talas.png   ←  Asia Talas
+[FALTA] ozgon-fc.png   ←  Ozgon FC
+[FALTA] talant-fc.png   ←  Talant FC
+[FALTA] alga-bishkek.png   ←  Alga Bishkek
+[FALTA] asiagoal-bishkek.png   ←  Asiagoal Bishkek
+[FALTA] bishkek-city.png   ←  Bishkek City
+[FALTA] dordoi-bishkek.png   ←  Dordoi Bishkek
+[FALTA] fk-toktogul.png   ←  FK Toktogul
+[FALTA] ilbirs-bishkek.png   ←  Ilbirs Bishkek
+[FALTA] kyrgyzaltyn-kara-balta.png   ←  Kyrgyzaltyn Kara-Balta
+[FALTA] muras-united.png   ←  Muras United
+[FALTA] neftchi-kochkor-ata.png   ←  Neftchi Kochkor-Ata
+[FALTA] oshmu-aldier.png   ←  Oshmu-Aldier
+[FALTA] fk-alay-osh.png   ←  FK Alay Osh
+
+--- Kosovo (10 clubes) ---
+[FALTA] fc-drita.png   ←  FC Drita
+[FALTA] fc-ballkani.png   ←  FC Ballkani
+[FALTA] fc-prishtina.png   ←  FC Prishtina
+[FALTA] fc-malisheva.png   ←  FC Malisheva
+[FALTA] kf-llapi.png   ←  KF Llapi
+[FALTA] sc-gjilani.png   ←  SC Gjilani
+[FALTA] kf-dukagjini.png   ←  KF Dukagjini
+[FALTA] kf-drenica.png   ←  KF Drenica
+[FALTA] kf-feronikeli-74.png   ←  KF Feronikeli 74
+[FALTA] fc-vushtrria.png   ←  FC Vushtrria
+
+--- Kuwait (12 clubes) ---
+[FALTA] kuwait-sc.png   ←  Kuwait SC
+[FALTA] al-qadsia-sc.png   ←  Al-Qadsia SC
+[FALTA] al-arabi-sc.png   ←  Al-Arabi SC
+[FALTA] kazma-sc.png   ←  Kazma SC
+[FALTA] al-salmiya-sc.png   ←  Al-Salmiya SC
+[FALTA] al-fahaheel-sc.png   ←  Al-Fahaheel SC
+[FALTA] al-nasr-sc.png   ←  Al-Nasr SC
+[FALTA] al-tadamon-sc.png   ←  Al-Tadamon SC
+[FALTA] al-jahra-sc.png   ←  Al-Jahra SC
+[FALTA] al-shabab-sc.png   ←  Al-Shabab SC
+[FALTA] al-sahel-sc.png   ←  Al-Sahel SC
+[FALTA] al-sulaibikhat-sc.png   ←  Al-Sulaibikhat SC
+
+--- Laos (13 clubes) ---
+[FALTA] ezra-fc.png   ←  Ezra FC
+[FALTA] young-elephants-fc.png   ←  Young Elephants FC
+[FALTA] mazda-laos-gb-fc.png   ←  Mazda Laos GB FC
+[FALTA] champasak-avenir-fc.png   ←  Champasak Avenir FC
+[FALTA] lao-army-fc.png   ←  Lao Army FC
+[FALTA] salavan-united.png   ←  Salavan United
+[FALTA] luangprabang-fc.png   ←  Luangprabang FC
+[FALTA] namtha-united.png   ←  Namtha United
+[FALTA] bis-master-fc.png   ←  BIS Master FC
+[FALTA] savannakhet-fc.png   ←  Savannakhet FC
+[FALTA] bis-football-club.png   ←  BIS Football Club
+[FALTA] oudomxay-entremets.png   ←  Oudomxay Entremets
+[FALTA] pinkeo-2010-chanthabouly-pakse.png   ←  Pinkeo 2010 Chanthabouly Pakse
+
+--- Lesoto (10 clubes) ---
+[FALTA] bantu-fc.png   ←  Bantu FC
+[FALTA] kick4life-fc.png   ←  Kick4life FC
+[FALTA] lcs-fc.png   ←  LCS FC
+[FALTA] lesotho-defence-force.png   ←  Lesotho Defence Force
+[FALTA] lifofane.png   ←  Lifofane
+[FALTA] lijabatho.png   ←  Lijabatho
+[FALTA] lioli-fc.png   ←  Lioli FC
+[FALTA] lmps-fc.png   ←  Lmps FC
+[FALTA] majantja-fc.png   ←  Majantja FC
+[FALTA] matlama-fc.png   ←  Matlama FC
+
+--- Letonia (10 clubes) ---
+[FALTA] riga-fc.png   ←  Riga FC
+[FALTA] fc-rfs.png   ←  FC RFS
+[FALTA] fk-auda.png   ←  FK Auda
+[FALTA] fk-liepaja.png   ←  FK Liepāja
+[FALTA] fs-jelgava.png   ←  FS Jelgava
+[FALTA] ogre-united.png   ←  Ogre United
+[FALTA] fk-tukums-2000.png   ←  FK Tukums 2000
+[FALTA] sk-super-nova.png   ←  SK Super Nova
+[FALTA] bfc-daugavpils.png   ←  BFC Daugavpils
+[FALTA] fk-grobina.png   ←  FK Grobiņa
+
+--- Lituania (9 clubes) ---
+[FALTA] fk-kauno-zalgiris.png   ←  FK Kauno Žalgiris
+[FALTA] fk-suduva.png   ←  FK Sūduva
+[FALTA] fk-zalgiris-vilnius.png   ←  FK Žalgiris Vilnius
+[FALTA] fk-transinvest.png   ←  FK Transinvest
+[FALTA] fk-banga-gargzdai.png   ←  FK Banga Gargždai
+[FALTA] fc-hegelmann.png   ←  FC Hegelmann
+[FALTA] fa-siauliai.png   ←  FA Šiauliai
+[FALTA] fk-panevezys.png   ←  FK Panevėžys
+[FALTA] fc-dziugas-telsiai.png   ←  FC Džiugas Telšiai
+
+--- Luxemburgo (16 clubes) ---
+[FALTA] fc-una-strassen.png   ←  FC Una Strassen
+[FALTA] fc-atert-bissen.png   ←  FC Atert Bissen
+[FALTA] fc-differdange-03.png   ←  FC Differdange 03
+[FALTA] us-mondorf-les-bains.png   ←  US Mondorf-Les-Bains
+[FALTA] un-kaerjeng-97.png   ←  Un Käerjeng 97
+[FALTA] f91-dudelange.png   ←  F91 Dudelange
+[FALTA] fc-victoria-rosport.png   ←  FC Victoria Rosport
+[FALTA] fc-progres-niederkorn.png   ←  FC Progrès Niederkorn
+[FALTA] jeunesse-esch.png   ←  Jeunesse Esch
+[FALTA] racing-fc-union-luxembourg.png   ←  Racing FC Union Luxembourg
+[FALTA] us-hostert.png   ←  US Hostert
+[FALTA] fc-wiltz-71.png   ←  FC Wiltz 71
+[FALTA] us-rumelange.png   ←  US Rumelange
+[FALTA] fc-residence-walferdange.png   ←  FC Résidence Walferdange
+[FALTA] fc-etzella-ettelbruck.png   ←  FC Etzella Ettelbruck
+[FALTA] swift-hesperange.png   ←  Swift Hesperange
+
+--- Macao (11 clubes) ---
+[FALTA] gala-fc.png   ←  Gala FC
+[FALTA] cheng-fung.png   ←  Cheng Fung
+[FALTA] chiba-fc.png   ←  Chiba FC
+[FALTA] must-ipo.png   ←  Must IPO
+[FALTA] shao-jiang.png   ←  Shao Jiang
+[FALTA] universidade-de-macau.png   ←  Universidade de Macau
+[FALTA] hang-sai.png   ←  Hang Sai
+[FALTA] fc-os-artilheiros.png   ←  FC Os Artilheiros
+[FALTA] gorilla-of-the-universe.png   ←  Gorilla of the Universe
+[FALTA] sunco-g-universe.png   ←  Sunco G. Universe
+[FALTA] artilheiros.png   ←  Artilheiros
+
+--- Madagascar (10 clubes) ---
+[FALTA] ajesaia-bongolava.png   ←  Ajesaia Bongolava
+[FALTA] as-fanalamanga.png   ←  AS Fanalamanga
+[FALTA] as-saint-michel-elgeco-plus.png   ←  AS Saint-Michel Elgeco Plus
+[FALTA] cff-andoharanofotsy.png   ←  CFF Andoharanofotsy
+[FALTA] cosfa-analamanga.png   ←  Cosfa Analamanga
+[FALTA] disciples-fc-antsirabe.png   ←  Disciples FC Antsirabé
+[FALTA] fosa-juniors-boeny.png   ←  Fosa Juniors Boeny
+[FALTA] inate-fc-rouge.png   ←  Inate FC Rouge
+[FALTA] mama-fca.png   ←  Mama Fca
+[FALTA] usca-foot-antananarivo.png   ←  Usca Foot Antananarivo
+
+--- Malasia (12 clubes) ---
+[FALTA] johor-darul-ta-zim.png   ←  Johor Darul Ta’zim
+[FALTA] selangor-fc.png   ←  Selangor FC
+[FALTA] kuching-city-fc.png   ←  Kuching City FC
+[FALTA] kuala-lumpur-city-fc.png   ←  Kuala Lumpur City FC
+[FALTA] terengganu-fc.png   ←  Terengganu FC
+[FALTA] star-city-fc.png   ←  Star City FC
+[FALTA] negeri-sembilan-fc.png   ←  Negeri Sembilan FC
+[FALTA] penang-fc.png   ←  Penang FC
+[FALTA] sabah-fc.png   ←  Sabah FC
+[FALTA] brunei-dpmm-fc.png   ←  Brunei DPMM FC
+[FALTA] melaka-fc.png   ←  Melaka FC
+[FALTA] kelantan-red-warrior-fc.png   ←  Kelantan Red Warrior FC
+
+--- Malaui (10 clubes) ---
+[FALTA] blue-eagles.png   ←  Blue Eagles
+[FALTA] chitipa-united.png   ←  Chitipa United
+[FALTA] civil-service-united.png   ←  Civil Service United
+[FALTA] karonga-united.png   ←  Karonga United
+[FALTA] mafco-fc.png   ←  Mafco FC
+[FALTA] masters-security.png   ←  Masters Security
+[FALTA] mighty-wanderers.png   ←  Mighty Wanderers
+[FALTA] moyale-barracks.png   ←  Moyale Barracks
+[FALTA] nyasa-big-bullets-fc.png   ←  Nyasa Big Bullets FC
+[FALTA] silver-strikers.png   ←  Silver Strikers
+
+--- Maldivas (10 clubes) ---
+[FALTA] odi-sports-club.png   ←  Odi Sports Club
+[FALTA] maziya-s-rc.png   ←  Maziya S&RC;
+[FALTA] new-radiant-sc.png   ←  New Radiant SC
+[FALTA] buru-sports-club.png   ←  Buru Sports Club
+[FALTA] club-eagles.png   ←  Club Eagles
+[FALTA] victory-sports-club.png   ←  Victory Sports Club
+[FALTA] tc-sports-club.png   ←  TC Sports Club
+[FALTA] club-green-streets.png   ←  Club Green Streets
+[FALTA] dhidhdhoo-sports-club.png   ←  Dhidhdhoo Sports Club
+[FALTA] club-valencia.png   ←  Club Valencia
+
+--- Malí (12 clubes) ---
+[FALTA] as-bakaridjan.png   ←  AS Bakaridjan
+[FALTA] as-kayes.png   ←  AS Kayes
+[FALTA] as-real-bamako.png   ←  AS Réal Bamako
+[FALTA] binga-fc.png   ←  Binga FC
+[FALTA] centre-sportif-de-bamako.png   ←  Centre Sportif de Bamako
+[FALTA] derby-academie.png   ←  Derby Académie
+[FALTA] djoliba-ac.png   ←  Djoliba AC
+[FALTA] fc-diarra.png   ←  FC Diarra
+[FALTA] onze-createurs.png   ←  Onze Créateurs
+[FALTA] stade-malien.png   ←  Stade Malien
+[FALTA] us-bougouba.png   ←  US Bougouba
+[FALTA] usfas-bamako.png   ←  Usfas Bamako
+
+--- Malta (12 clubes) ---
+[FALTA] amrun-spartans.png   ←  ħamrun Spartans
+[FALTA] valletta-fc.png   ←  Valletta FC
+[FALTA] floriana.png   ←  Floriana
+[FALTA] sliema-wanderers.png   ←  Sliema Wanderers
+[FALTA] marsaxlokk.png   ←  Marsaxlokk
+[FALTA] hibernians.png   ←  Hibernians
+[FALTA] birkirkara.png   ←  Birkirkara
+[FALTA] gzira-united.png   ←  Gżira United
+[FALTA] balzan.png   ←  Balzan
+[FALTA] mosta.png   ←  Mosta
+[FALTA] zabbar-st-patrick.png   ←  żabbar St. Patrick
+[FALTA] birzebbuga-st-peter-s.png   ←  Birżebbuġa St. Peter’s
+
+--- Marruecos (13 clubes) ---
+[FALTA] as-far-rabat.png   ←  AS FAR Rabat
+[FALTA] codm-meknes.png   ←  Codm Meknès
+[FALTA] difaa-hassani-el-jadidi.png   ←  Difaa Hassani el Jadidi
+[FALTA] hassania-agadir.png   ←  Hassania Agadir
+[FALTA] ittihad-tanger.png   ←  Ittihad Tanger
+[FALTA] moghreb-athletic-tetouan.png   ←  Moghreb Athletic Tétouan
+[FALTA] raja-casablanca.png   ←  Raja Casablanca
+[FALTA] renaissance-zemamra.png   ←  Renaissance Zemamra
+[FALTA] rs-berkane.png   ←  RS Berkane
+[FALTA] union-touarga-sport-uts.png   ←  Union Touarga Sport (Uts)
+[FALTA] us-amal-tiznit.png   ←  US Amal Tiznit
+[FALTA] widad-temara.png   ←  Widad Témara
+[FALTA] wydad-casablanca.png   ←  Wydad Casablanca
+
+--- Mauricio (8 clubes) ---
+[FALTA] la-cure-waves.png   ←  La Cure Waves
+[FALTA] bolton-city-fc.png   ←  Bolton City FC
+[FALTA] cercle-de-joachim.png   ←  Cercle de Joachim
+[FALTA] entente-boulet-rouge.png   ←  Entente Boulet Rouge
+[FALTA] grse-wanderers.png   ←  Grse Wanderers
+[FALTA] pamplemousses-sc.png   ←  Pamplemousses SC
+[FALTA] petite-riviere-noire-fc.png   ←  Petite Rivière Noire FC
+[FALTA] savanne-sc.png   ←  Savanne SC
+
+--- Mauritania (9 clubes) ---
+[FALTA] as-douanes.png   ←  AS Douanes
+[FALTA] as-pompiers.png   ←  AS Pompiers
+[FALTA] chemal-fc.png   ←  Chemal FC
+[FALTA] fc-nouadhibou.png   ←  FC Nouadhibou
+[FALTA] fc-nzidane.png   ←  FC Nzidane
+[FALTA] nouakchott-academie.png   ←  Nouakchott Académie
+[FALTA] asc-gendrim.png   ←  Asc Gendrim
+[FALTA] asc-snim.png   ←  Asc Snim
+[FALTA] kaedi-fc.png   ←  Kaédi FC
+
+--- México (18 clubes) ---
+[FALTA] club-america.png   ←  América
+[FALTA] atlante.png   ←  Atlante
+[FALTA] atlas.png   ←  Atlas
+[FALTA] san-luis.png   ←  San Luis
+[FALTA] juarez.png   ←  Juárez
+[FALTA] chivas-guadalajara.png   ←  Guadalajara
+[FALTA] cruz-azul.png   ←  Cruz Azul
+[FALTA] leon.png   ←  León
+[FALTA] necaxa.png   ←  Necaxa
+[FALTA] pachuca.png   ←  Pachuca
+[FALTA] puebla.png   ←  Puebla
+[FALTA] pumas-unam.png   ←  Pumas UNAM
+[FALTA] monterrey.png   ←  Monterrey
+[FALTA] santos-laguna.png   ←  Santos Laguna
+[FALTA] tigres-uanl.png   ←  Tigres UANL
+[FALTA] toluca.png   ←  Toluca
+[FALTA] tijuana.png   ←  Tijuana
+[FALTA] queretaro.png   ←  Querétaro
+
+--- Mongolia (9 clubes) ---
+[FALTA] fc-ulaanbaatar.png   ←  FC Ulaanbaatar
+[FALTA] central-stallions-fc.png   ←  Central Stallions FC
+[FALTA] deren-fc.png   ←  Deren FC
+[FALTA] hunters-fc.png   ←  Hunters FC
+[FALTA] amtat-fc.png   ←  Amtat FC
+[FALTA] khovd-western-fc.png   ←  Khovd Western FC
+[FALTA] erchim-fc.png   ←  Erchim FC
+[FALTA] khovd-club.png   ←  Khovd Club
+[FALTA] ulaangom-city-fc.png   ←  Ulaangom City FC
+
+--- Montenegro (10 clubes) ---
+[FALTA] otrant.png   ←  Otrant
+[FALTA] sutjeska-niksic.png   ←  Sutjeska Nikšić
+[FALTA] mornar.png   ←  Mornar
+[FALTA] buducnost-podgorica.png   ←  Budućnost Podgorica
+[FALTA] mladost-donja-gorica.png   ←  Mladost Donja Gorica
+[FALTA] decic.png   ←  Dečić
+[FALTA] arsenal-tivat.png   ←  Arsenal Tivat
+[FALTA] petrovac.png   ←  Petrovac
+[FALTA] bokelj.png   ←  Bokelj
+[FALTA] jezero.png   ←  Jezero
+
+--- Mozambique (13 clubes) ---
+[FALTA] ad-pemba.png   ←  Ad Pemba
+[FALTA] ad-vilankulo-enh-vilankulo.png   ←  Ad Vilankulo (Enh Vilankulo)
+[FALTA] associacao-black-bulls.png   ←  Associação Black Bulls
+[FALTA] baia-de-pemba.png   ←  Baía de Pemba
+[FALTA] chingale-de-tete.png   ←  Chingale de Tete
+[FALTA] costa-do-sol.png   ←  Costa do Sol
+[FALTA] ferroviario-da-beira.png   ←  Ferroviário da Beira
+[FALTA] ferroviario-de-lichinga.png   ←  Ferroviário de Lichinga
+[FALTA] ferroviario-de-maputo.png   ←  Ferroviário de Maputo
+[FALTA] ferroviario-de-nacala.png   ←  Ferroviário de Nacala
+[FALTA] ferroviario-de-nampula.png   ←  Ferroviário de Nampula
+[FALTA] maxaquene.png   ←  Maxaquene
+[FALTA] uniao-desportiva-do-songo.png   ←  União Desportiva do Songo
+
+--- Myanmar (11 clubes) ---
+[FALTA] shan-united.png   ←  Shan United
+[FALTA] yangon-united.png   ←  Yangon United
+[FALTA] dagon-star-united.png   ←  Dagon Star United
+[FALTA] ispe-fc.png   ←  Ispe FC
+[FALTA] yadanarbon-fc.png   ←  Yadanarbon FC
+[FALTA] thitsar-arman-fc.png   ←  Thitsar Arman FC
+[FALTA] ayeyawady-united.png   ←  Ayeyawady United
+[FALTA] mahar-united.png   ←  Mahar United
+[FALTA] hantharwady-united.png   ←  Hantharwady United
+[FALTA] myawady-fc.png   ←  Myawady FC
+[FALTA] chinland-fc.png   ←  Chinland FC
+
+--- Namibia (10 clubes) ---
+[FALTA] african-stars.png   ←  African Stars
+[FALTA] blue-waters.png   ←  Blue Waters
+[FALTA] eeshoke-chula-chula-fc.png   ←  Eeshoke Chula Chula FC
+[FALTA] fc-ongos.png   ←  FC Ongos
+[FALTA] julinho-sporting.png   ←  Julinho Sporting
+[FALTA] life-fighters.png   ←  Life Fighters
+[FALTA] mighty-gunners.png   ←  Mighty Gunners
+[FALTA] okahandja-united.png   ←  Okahandja United
+[FALTA] tigers-fc.png   ←  Tigers FC
+[FALTA] young-african.png   ←  Young African
+
+--- Nepal (14 clubes) ---
+[FALTA] church-boys-united.png   ←  Church Boys United
+[FALTA] machhindra-fc.png   ←  Machhindra FC
+[FALTA] nepal-police-club.png   ←  Nepal Police Club
+[FALTA] jawalakhel-youth-club.png   ←  Jawalakhel Youth Club
+[FALTA] satdobato-youth-club.png   ←  Satdobato Youth Club
+[FALTA] new-road-team.png   ←  New Road Team
+[FALTA] tribhuvan-army-fc.png   ←  Tribhuvan Army FC
+[FALTA] manang-marshyangdi-club.png   ←  Manang Marshyangdi Club
+[FALTA] shree-bhagawati-club.png   ←  Shree Bhagawati Club
+[FALTA] sankata-fc.png   ←  Sankata FC
+[FALTA] himalayan-sherpa-club.png   ←  Himalayan Sherpa Club
+[FALTA] friends-club.png   ←  Friends Club
+[FALTA] apf-fc.png   ←  APF FC
+[FALTA] planning-boys-united.png   ←  Planning Boys United
+
+--- Nicaragua (10 clubes) ---
+[FALTA] real-esteli-fc.png   ←  Real Estelí FC
+[FALTA] diriangen-fc.png   ←  Diriangén FC
+[FALTA] managua-fc.png   ←  Managua FC
+[FALTA] matagalpa-fc.png   ←  Matagalpa FC
+[FALTA] club-sport-sebaco.png   ←  Club Sport Sébaco
+[FALTA] deportivo-walter-ferretti.png   ←  Deportivo Walter Ferretti
+[FALTA] art-municipal-jalapa.png   ←  Art Municipal Jalapa
+[FALTA] san-marcos-fc.png   ←  San Marcos FC
+[FALTA] rancho-santana-fc.png   ←  Rancho Santana FC
+[FALTA] unan-managua.png   ←  UNAN Managua
+
+--- Nigeria (20 clubes) ---
+[FALTA] abia-warriors.png   ←  Abia Warriors
+[FALTA] barau-fc.png   ←  Barau FC
+[FALTA] bendel-insurance.png   ←  Bendel Insurance
+[FALTA] doma-united.png   ←  Doma United
+[FALTA] enugu-rangers.png   ←  Enugu Rangers
+[FALTA] enyimba-fc.png   ←  Enyimba FC
+[FALTA] ikorodu-city.png   ←  Ikorodu City
+[FALTA] inter-lagos.png   ←  Inter Lagos
+[FALTA] kano-pillars.png   ←  Kano Pillars
+[FALTA] katsina-united.png   ←  Katsina United
+[FALTA] kun-khalifat-fc.png   ←  Kun Khalifat FC
+[FALTA] kwara-united.png   ←  Kwara United
+[FALTA] nasarawa-united.png   ←  Nasarawa United
+[FALTA] niger-tornadoes.png   ←  Niger Tornadoes
+[FALTA] plateau-united.png   ←  Plateau United
+[FALTA] ranchers-bees.png   ←  Ranchers Bees
+[FALTA] rivers-united.png   ←  Rivers United
+[FALTA] shooting-stars.png   ←  Shooting Stars
+[FALTA] sporting-lagos.png   ←  Sporting Lagos
+[FALTA] warri-wolves.png   ←  Warri Wolves
+
+--- Noruega (16 clubes) ---
+[FALTA] viking-fk.png   ←  Viking FK
+[FALTA] fk-bod-glimt.png   ←  FK Bodø/Glimt
+[FALTA] rosenborg-bk.png   ←  Rosenborg BK
+[FALTA] molde-fk.png   ←  Molde FK
+[FALTA] lillestr-m-sk.png   ←  Lillestrøm SK
+[FALTA] troms-il.png   ←  Tromsø Il
+[FALTA] sk-brann.png   ←  SK Brann
+[FALTA] valerenga.png   ←  Vålerenga
+[FALTA] sarpsborg-08.png   ←  Sarpsborg 08
+[FALTA] kfum-oslo.png   ←  Kfum Oslo
+[FALTA] hamkam.png   ←  Hamkam
+[FALTA] fredrikstad-fk.png   ←  Fredrikstad FK
+[FALTA] sandefjord.png   ←  Sandefjord
+[FALTA] aalesunds-fk.png   ←  Aalesunds FK
+[FALTA] kristiansund-bk.png   ←  Kristiansund BK
+[FALTA] ik-start.png   ←  IK Start
+
+--- Nueva Caledonia (10 clubes) ---
+[FALTA] puaikura.png   ←  Puaikura
+[FALTA] tiga-sport.png   ←  Tiga Sport
+[FALTA] asc-gaica.png   ←  ASC Gaïca
+[FALTA] hienghene-sport.png   ←  Hienghène Sport
+[FALTA] ca-saint-louis.png   ←  CA Saint-Louis
+[FALTA] as-magenta.png   ←  AS Magenta
+[FALTA] as-lossi.png   ←  AS Lössi
+[FALTA] as-kunie.png   ←  AS Kunié
+[FALTA] horizon-patho.png   ←  Horizon Patho
+[FALTA] sc-ne-drehu.png   ←  SC Ne Drehu
+
+--- Nueva Zelanda (10 clubes) ---
+[FALTA] auckland-city.png   ←  Auckland City
+[FALTA] auckland-united.png   ←  Auckland United
+[FALTA] birkenhead-united.png   ←  Birkenhead United
+[FALTA] cashmere-technical.png   ←  Cashmere Technical
+[FALTA] coastal-spirit.png   ←  Coastal Spirit
+[FALTA] miramar-rangers.png   ←  Miramar Rangers
+[FALTA] napier-city-rovers.png   ←  Napier City Rovers
+[FALTA] wellington-olympic.png   ←  Wellington Olympic
+[FALTA] wellington-phoenix-reserves.png   ←  Wellington Phoenix Reserves
+[FALTA] western-springs.png   ←  Western Springs
+
+--- Omán (14 clubes) ---
+[FALTA] al-seeb-club.png   ←  Al-Seeb Club
+[FALTA] al-nahda-club.png   ←  Al-Nahda Club
+[FALTA] al-shabab-oman.png   ←  Al-Shabab (Omán)
+[FALTA] al-nasr-oman.png   ←  Al-Nasr (Omán)
+[FALTA] bahla-club.png   ←  Bahla Club
+[FALTA] oman-club.png   ←  Oman Club
+[FALTA] sohar-sc.png   ←  Sohar SC
+[FALTA] sur-sc.png   ←  Sur SC
+[FALTA] dhofar-club.png   ←  Dhofar Club
+[FALTA] saham-club.png   ←  Saham Club
+[FALTA] samail-sc.png   ←  Samail SC
+[FALTA] ibri-club.png   ←  Ibri Club
+[FALTA] fanja-sc.png   ←  Fanja SC
+[FALTA] al-musannah-club.png   ←  Al-Musannah Club
+
+--- Países Bajos (18 clubes) ---
+[FALTA] psv-eindhoven.png   ←  PSV
+[FALTA] feyenoord.png   ←  Feyenoord
+[FALTA] ajax.png   ←  Ajax
+[FALTA] az-alkmaar.png   ←  AZ
+[FALTA] fc-twente.png   ←  Twente
+[FALTA] fc-utrecht.png   ←  Utrecht
+[FALTA] nec.png   ←  NEC
+[FALTA] sc-heerenveen.png   ←  Heerenveen
+[FALTA] groningen.png   ←  Groningen
+[FALTA] sparta-rotterdam.png   ←  Sparta Rotterdam
+[FALTA] go-ahead-eagles.png   ←  Go Ahead Eagles
+[FALTA] pec-zwolle.png   ←  PEC Zwolle
+[FALTA] excelsior.png   ←  Excelsior
+[FALTA] fortuna-sittard.png   ←  Fortuna Sittard
+[FALTA] sc-cambuur.png   ←  SC Cambuur
+[FALTA] ado-den-haag.png   ←  ADO den Haag
+[FALTA] willem-ii.png   ←  Willem II
+[FALTA] telstar.png   ←  Telstar
+
+--- Panamá (12 clubes) ---
+[FALTA] cd-plaza-amador.png   ←  CD Plaza Amador
+[FALTA] deportivo-arabe-unido.png   ←  Deportivo Árabe Unido
+[FALTA] tauro-fc.png   ←  Tauro FC
+[FALTA] alianza-fc-panama.png   ←  Alianza FC (Panamá)
+[FALTA] sporting-san-miguelito.png   ←  Sporting San Miguelito
+[FALTA] cai-la-chorrera.png   ←  CAI La Chorrera
+[FALTA] san-francisco-fc.png   ←  San Francisco FC
+[FALTA] umecit-fc.png   ←  UMECIT FC
+[FALTA] veraguas-united.png   ←  Veraguas United
+[FALTA] herrera-fc.png   ←  Herrera FC
+[FALTA] cd-universitario.png   ←  CD Universitario
+[FALTA] union-cocle-fc.png   ←  Unión Coclé FC
+
+--- Papúa Nueva Guinea (11 clubes) ---
+[FALTA] as-mont-dore.png   ←  AS Mont-Dore
+[FALTA] lae-city-fc.png   ←  Lae City FC
+[FALTA] gulf-komara-fc.png   ←  Gulf Komara FC
+[FALTA] hekari-united-fc.png   ←  Hekari United FC
+[FALTA] fc-morobe-wawens.png   ←  FC Morobe Wawens
+[FALTA] port-moresby-strikers.png   ←  Port Moresby Strikers
+[FALTA] admiralty-island-fc.png   ←  Admiralty Island FC
+[FALTA] united-highlands-fc.png   ←  United Highlands FC
+[FALTA] kula-fc.png   ←  Kula FC
+[FALTA] lae-city-dwellers-fc.png   ←  Lae City Dwellers FC
+[FALTA] star-mountain-fc.png   ←  Star Mountain FC
+
+--- Paraguay (12 clubes) ---
+[FALTA] cerro-porteno.png   ←  Cerro Porteño
+[FALTA] club-libertad.png   ←  Club Libertad
+[FALTA] club-guarani.png   ←  Club Guaraní
+[FALTA] club-nacional.png   ←  Club Nacional
+[FALTA] sportivo-trinidense.png   ←  Sportivo Trinidense
+[FALTA] sportivo-ameliano.png   ←  Sportivo Ameliano
+[FALTA] sportivo-luqueno.png   ←  Sportivo Luqueño
+[FALTA] recoleta-fc.png   ←  Recoleta FC
+[FALTA] rubio-nu.png   ←  Rubio Ñu
+[FALTA] sportivo-san-lorenzo.png   ←  Sportivo San Lorenzo
+[FALTA] olimpia.png   ←  Olimpia
+[FALTA] 2-de-mayo.png   ←  2 de Mayo
+
+--- Perú (16 clubes) ---
+[FALTA] cusco-fc.png   ←  Cusco FC
+[FALTA] alianza-lima.png   ←  Alianza Lima
+[FALTA] sporting-cristal.png   ←  Sporting Cristal
+[FALTA] alianza-atletico.png   ←  Alianza Atlético
+[FALTA] deportivo-garcilaso.png   ←  Deportivo Garcilaso
+[FALTA] cienciano.png   ←  Cienciano
+[FALTA] los-chankas.png   ←  Los Chankas
+[FALTA] adt-tarma.png   ←  ADT Tarma
+[FALTA] atletico-grau.png   ←  Atlético Grau
+[FALTA] comerciantes-unidos.png   ←  Comerciantes Unidos
+[FALTA] sport-boys.png   ←  Sport Boys
+[FALTA] juan-pablo-ii-college.png   ←  Juan Pablo II College
+[FALTA] fc-cajamarca.png   ←  FC Cajamarca
+[FALTA] deportivo-moquegua.png   ←  Deportivo Moquegua
+[FALTA] melgar.png   ←  Melgar
+[FALTA] universitario.png   ←  Universitario
+
+--- Polonia (18 clubes) ---
+[FALTA] cracovia.png   ←  Cracovia
+[FALTA] gks-katowice.png   ←  GKS Katowice
+[FALTA] gornik-zabrze.png   ←  Górnik Zabrze
+[FALTA] jagiellonia-bia-ystok.png   ←  Jagiellonia Białystok
+[FALTA] korona-kielce.png   ←  Korona Kielce
+[FALTA] lech-poznan.png   ←  Lech Poznań
+[FALTA] legia-warszawa.png   ←  Legia Warszawa
+[FALTA] motor-lublin.png   ←  Motor Lublin
+[FALTA] piast-gliwice.png   ←  Piast Gliwice
+[FALTA] pogon-szczecin.png   ←  Pogoń Szczecin
+[FALTA] radomiak-radom.png   ←  Radomiak Radom
+[FALTA] rakow-czestochowa.png   ←  Raków Częstochowa
+[FALTA] slask-wroc-aw.png   ←  śląsk Wrocław
+[FALTA] widzew-odz.png   ←  Widzew Łódź
+[FALTA] wieczysta-krakow.png   ←  Wieczysta Kraków
+[FALTA] wis-a-krakow.png   ←  Wisła Kraków
+[FALTA] wis-a-p-ock.png   ←  Wisła Płock
+[FALTA] zag-ebie-lubin.png   ←  Zagłębie Lubin
+
+--- Portugal (18 clubes) ---
+[FALTA] academico-de-viseu.png   ←  Académico de Viseu
+[FALTA] alverca.png   ←  Alverca
+[FALTA] arouca.png   ←  Arouca
+[FALTA] benfica.png   ←  Benfica
+[FALTA] sc-braga.png   ←  Braga
+[FALTA] casa-pia.png   ←  Casa Pia
+[FALTA] estoril.png   ←  Estoril
+[FALTA] estrela-da-amadora.png   ←  Estrela da Amadora
+[FALTA] famalicao.png   ←  Famalicão
+[FALTA] gil-vicente.png   ←  Gil Vicente
+[FALTA] maritimo.png   ←  Marítimo
+[FALTA] moreirense.png   ←  Moreirense
+[FALTA] cd-nacional.png   ←  CD Nacional
+[FALTA] porto.png   ←  Porto
+[FALTA] rio-ave.png   ←  Rio Ave
+[FALTA] santa-clara.png   ←  Santa Clara
+[FALTA] sporting-cp.png   ←  Sporting CP
+[FALTA] vitoria-guimaraes.png   ←  Vitória SC
+
+--- Puerto Rico (9 clubes) ---
+[FALTA] san-juan-fc.png   ←  San Juan FC
+[FALTA] academia-quintana.png   ←  Academia Quintana
+[FALTA] puerto-rico-surf.png   ←  Puerto Rico Surf
+[FALTA] taurinos-de-cayey.png   ←  Taurinos de Cayey
+[FALTA] ds-edusoccer.png   ←  DS Edusoccer
+[FALTA] ponce-fc.png   ←  Ponce FC
+[FALTA] caribe-soccer.png   ←  Caribe Soccer
+[FALTA] caguas-sporting-fc.png   ←  Caguas Sporting FC
+[FALTA] mayaguez-fc.png   ←  Mayagüez FC
+
+--- Qatar (12 clubes) ---
+[FALTA] al-sadd.png   ←  Al Sadd
+[FALTA] al-duhail.png   ←  Al Duhail
+[FALTA] al-rayyan.png   ←  Al Rayyan
+[FALTA] al-gharafa.png   ←  Al Gharafa
+[FALTA] al-arabi.png   ←  Al Arabi
+[FALTA] al-wakrah.png   ←  Al Wakrah
+[FALTA] qatar-sc.png   ←  Qatar SC
+[FALTA] al-ahli.png   ←  Al Ahli
+[FALTA] al-shamal.png   ←  Al Shamal
+[FALTA] al-sailiya.png   ←  Al Sailiya
+[FALTA] al-shahaniya.png   ←  Al Shahaniya
+[FALTA] lusail-sc.png   ←  Lusail SC
+
+--- RD Congo (23 clubes) ---
+[FALTA] ac-rangers.png   ←  AC Rangers
+[FALTA] af-anges-verts.png   ←  Af Anges Verts
+[FALTA] as-butras.png   ←  AS Butras
+[FALTA] as-dauphin-noir.png   ←  AS Dauphin Noir
+[FALTA] as-malole.png   ←  AS Malole
+[FALTA] as-maniema-union.png   ←  AS Maniema Union
+[FALTA] as-new-soger.png   ←  AS New Soger
+[FALTA] as-saint-luc.png   ←  AS Saint-Luc
+[FALTA] as-simba.png   ←  AS Simba
+[FALTA] as-vita-club.png   ←  AS Vita Club
+[FALTA] celeste-fc.png   ←  Céleste FC
+[FALTA] cs-don-bosco.png   ←  CS Don Bosco
+[FALTA] cs-manika.png   ←  CS Manika
+[FALTA] etoile-du-congo.png   ←  Étoile du Congo
+[FALTA] fc-blessing.png   ←  FC Blessing
+[FALTA] fc-etoile-du-kivu.png   ←  FC Étoile du Kivu
+[FALTA] fc-lubumbashi-sport.png   ←  FC Lubumbashi Sport
+[FALTA] fc-mk-etancheite.png   ←  FC MK Étanchéité
+[FALTA] fc-saint-eloi-lupopo.png   ←  FC Saint-Éloi Lupopo
+[FALTA] fc-tanganyika.png   ←  FC Tanganyika
+[FALTA] new-jak-fc.png   ←  New Jak FC
+[FALTA] novakin-fc.png   ←  Novakin FC
+[FALTA] sm-sanga-balende.png   ←  SM Sanga Balende
+
+--- República Centroafricana (8 clubes) ---
+[FALTA] anges-de-fatima.png   ←  Anges de Fatima
+[FALTA] asopt.png   ←  Asopt
+[FALTA] as-tempete-mocaf.png   ←  AS Tempête Mocaf
+[FALTA] dfc-8eme-arrondissement.png   ←  DFC 8ème Arrondissement
+[FALTA] olympic-real-de-bangui.png   ←  Olympic Real de Bangui
+[FALTA] red-star-fc.png   ←  Red Star FC
+[FALTA] scaf-fc.png   ←  Scaf FC
+[FALTA] usca-bangui.png   ←  Usca Bangui
+
+--- República Dominicana (8 clubes) ---
+[FALTA] cibao-fc.png   ←  Cibao FC
+[FALTA] salcedo-fc.png   ←  Salcedo FC
+[FALTA] delfines-del-este.png   ←  Delfines del Este
+[FALTA] moca-fc.png   ←  Moca FC
+[FALTA] universidad-o-m-fc.png   ←  Universidad O&m FC
+[FALTA] atlantico-fc.png   ←  Atlántico FC
+[FALTA] atletico-vega-real.png   ←  Atlético Vega Real
+[FALTA] jarabacoa-fc.png   ←  Jarabacoa FC
+
+--- Ruanda (16 clubes) ---
+[FALTA] al-hilal-sc.png   ←  Al Hilal SC
+[FALTA] al-merrikh-sc.png   ←  Al Merrikh SC
+[FALTA] amagaju-fc.png   ←  Amagaju FC
+[FALTA] apr-fc.png   ←  Apr FC
+[FALTA] bugesera-fc.png   ←  Bugesera FC
+[FALTA] etincelles-fc.png   ←  Etincelles FC
+[FALTA] etoile-de-l-est.png   ←  Etoile de L’est
+[FALTA] gasogi-united.png   ←  Gasogi United
+[FALTA] gicumbi-fc.png   ←  Gicumbi FC
+[FALTA] kigali-fc.png   ←  Kigali FC
+[FALTA] kiyovu-sports.png   ←  Kiyovu Sports
+[FALTA] marines-fc.png   ←  Marines FC
+[FALTA] mukura-victory-sports.png   ←  Mukura Victory Sports
+[FALTA] musanze-fc.png   ←  Musanze FC
+[FALTA] rayon-sports.png   ←  Rayon Sports
+[FALTA] sunrise-fc.png   ←  Sunrise FC
+
+--- Rumanía (16 clubes) ---
+[FALTA] universitatea-craiova.png   ←  Universitatea Craiova
+[FALTA] dinamo-bucuresti.png   ←  Dinamo București
+[FALTA] rapid-bucuresti.png   ←  Rapid București
+[FALTA] petrolul-ploiesti.png   ←  Petrolul Ploiești
+[FALTA] universitatea-cluj.png   ←  Universitatea Cluj
+[FALTA] farul-constanta.png   ←  Farul Constanța
+[FALTA] corvinul-hunedoara.png   ←  Corvinul Hunedoara
+[FALTA] fcsb.png   ←  FCSB
+[FALTA] cfr-cluj.png   ←  CFR Cluj
+[FALTA] fc-arges.png   ←  FC Argeș
+[FALTA] fc-botosani.png   ←  FC Botoșani
+[FALTA] sepsi-osk.png   ←  Sepsi Osk
+[FALTA] uta-arad.png   ←  UTA Arad
+[FALTA] otelul-galati.png   ←  Oțelul Galați
+[FALTA] fk-csikszereda.png   ←  FK Csíkszereda
+[FALTA] fc-voluntari.png   ←  FC Voluntari
+
+--- Rusia (16 clubes) ---
+[FALTA] zenit.png   ←  Zenit
+[FALTA] spartak-moscu.png   ←  Spartak Moscú
+[FALTA] cska-moscu.png   ←  CSKA Moscú
+[FALTA] dinamo-moscu.png   ←  Dinamo Moscú
+[FALTA] krasnodar.png   ←  Krasnodar
+[FALTA] lokomotiv-moscu.png   ←  Lokomotiv Moscú
+[FALTA] rubin-kazan.png   ←  Rubin Kazán
+[FALTA] baltika-kaliningrado.png   ←  Baltika Kaliningrado
+[FALTA] rostov.png   ←  Rostov
+[FALTA] akhmat-grozny.png   ←  Akhmat Grozny
+[FALTA] akron-tolyatti.png   ←  Akron Tolyatti
+[FALTA] rodina-moscu.png   ←  Rodina Moscú
+[FALTA] krylia-sovetov-samara.png   ←  Krylia Sovetov Samara
+[FALTA] orenburg.png   ←  Orenburg
+[FALTA] dinamo-majachkala.png   ←  Dinamo Majachkalá
+[FALTA] fakel-voronezh.png   ←  Fakel Voronezh
+
+--- Samoa (12 clubes) ---
+[FALTA] blue-kumuls-united-fc.png   ←  Blue Kumuls United FC
+[FALTA] vaipuna-sc.png   ←  Vaipuna SC
+[FALTA] lupe-ole-soaga.png   ←  Lupe ole Soaga
+[FALTA] vaivase-tai-fc.png   ←  Vaivase-tai FC
+[FALTA] vaitele-uta-sc.png   ←  Vaitele-uta SC
+[FALTA] lepea-fc.png   ←  Lepea FC
+[FALTA] kiwi-fc.png   ←  Kiwi FC
+[FALTA] sogi-sc.png   ←  Sogi SC
+[FALTA] fa-atoia-united-fc.png   ←  Fa'atoia United FC
+[FALTA] moaula-fc.png   ←  Moaula FC
+[FALTA] brothers-united-fc.png   ←  Brothers United FC
+[FALTA] moata-a-fc.png   ←  Moata'a FC
+
+--- Samoa Americana (10 clubes) ---
+[FALTA] royal-puma.png   ←  Royal Puma
+[FALTA] pago-youth.png   ←  Pago Youth
+[FALTA] pansa-east.png   ←  PanSa East
+[FALTA] ilaoa-to-omata.png   ←  Ilaoa & To'omata
+[FALTA] black-roses.png   ←  Black Roses
+[FALTA] tafuna-jets.png   ←  Tafuna Jets
+[FALTA] vaiala-tongan.png   ←  Vaiala Tongan
+[FALTA] utulei-youth.png   ←  Utulei Youth
+[FALTA] green-bay-faga-alu.png   ←  Green Bay Faga'alu
+[FALTA] tupulaga-fagasa.png   ←  Tupulaga Fagasa
+
+--- San Cristóbal y Nieves (9 clubes) ---
+[FALTA] slh-horsfords-st-paul-s-united.png   ←  SLH Horsfords St. Paul's United
+[FALTA] honda-newtown-united.png   ←  Honda Newtown United
+[FALTA] azul-cayon-rockets.png   ←  Azul Cayon Rockets
+[FALTA] sol-island-auto-conaree.png   ←  Sol Island Auto Conaree
+[FALTA] development-bank-st-peters.png   ←  Development Bank St. Peters
+[FALTA] rams-village-superstars.png   ←  Rams Village Superstars
+[FALTA] tropical-blossom-hotspring-bath-united.png   ←  Tropical Blossom Hotspring Bath United
+[FALTA] t-g-e-dieppe-bay-eagles.png   ←  T.G.E. Dieppe Bay Eagles
+[FALTA] st-kitts-concrete-masters-sandy-point.png   ←  St. Kitts Concrete Masters Sandy Point
+
+--- San Marino (16 clubes) ---
+[FALTA] sp-cailungo.png   ←  SP Cailungo
+[FALTA] ss-cosmos.png   ←  SS Cosmos
+[FALTA] fc-domagnano.png   ←  FC Domagnano
+[FALTA] sc-faetano.png   ←  SC Faetano
+[FALTA] fc-fiorentino.png   ←  FC Fiorentino
+[FALTA] ss-folgore-falciano.png   ←  SS Folgore/Falciano
+[FALTA] ac-juvenes-dogana.png   ←  AC Juvenes/Dogana
+[FALTA] la-fiorita.png   ←  La Fiorita
+[FALTA] ac-libertas.png   ←  AC Libertas
+[FALTA] ss-murata.png   ←  SS Murata
+[FALTA] ss-pennarossa.png   ←  SS Pennarossa
+[FALTA] as-san-giovanni.png   ←  AS San Giovanni
+[FALTA] san-marino-academy.png   ←  San Marino Academy
+[FALTA] tre-fiori-fc.png   ←  Tre Fiori FC
+[FALTA] sp-tre-penne.png   ←  SP Tre Penne
+[FALTA] ss-virtus.png   ←  SS Virtus
+
+--- San Vicente y las Granadinas (8 clubes) ---
+[FALTA] jebelle-fc.png   ←  Jebelle FC
+[FALTA] layou-fc.png   ←  Layou FC
+[FALTA] hope-international.png   ←  Hope International
+[FALTA] awesome-fc.png   ←  Awesome FC
+[FALTA] camdonia-chelsea.png   ←  Camdonia Chelsea
+[FALTA] sion-hill-fc.png   ←  Sion Hill FC
+[FALTA] besco-pastures.png   ←  Besco Pastures
+[FALTA] avenues-united.png   ←  Avenues United
+
+--- Santa Lucía (9 clubes) ---
+[FALTA] la-clery-fc.png   ←  La Clery FC
+[FALTA] northern-united.png   ←  Northern United
+[FALTA] platinum-fc.png   ←  Platinum FC
+[FALTA] central-castries-fc.png   ←  Central Castries FC
+[FALTA] roots-alley-ballers.png   ←  Roots Alley Ballers
+[FALTA] uptown-rebels.png   ←  Uptown Rebels
+[FALTA] gros-islet-fc.png   ←  Gros Islet FC
+[FALTA] marchand-fc.png   ←  Marchand FC
+[FALTA] south-castries-fc.png   ←  South Castries FC
+
+--- Santo Tomé y Príncipe (8 clubes) ---
+[FALTA] agrosport-de-monte-cafe.png   ←  Agrosport de Monte Café
+[FALTA] alianca-nacional.png   ←  Aliança Nacional
+[FALTA] gd-os-operarios.png   ←  GD Os Operários
+[FALTA] sporting-clube-praia-cruz.png   ←  Sporting Clube Praia Cruz
+[FALTA] sporting-de-sao-tome.png   ←  Sporting de São Tomé
+[FALTA] udra-de-angolares.png   ←  Udra de Angolares
+[FALTA] trindade-fc.png   ←  Trindade FC
+[FALTA] vitoria-do-riboque.png   ←  Vitória do Riboque
+
+--- Serbia (14 clubes) ---
+[FALTA] crvena-zvezda.png   ←  Crvena Zvezda
+[FALTA] vojvodina.png   ←  Vojvodina
+[FALTA] partizan.png   ←  Partizan
+[FALTA] zeleznicar-pancevo.png   ←  Železničar Pančevo
+[FALTA] novi-pazar.png   ←  Novi Pazar
+[FALTA] ofk-beograd.png   ←  OFK Beograd
+[FALTA] radnik-surdulica.png   ←  Radnik Surdulica
+[FALTA] cukaricki.png   ←  Čukarički
+[FALTA] imt-novi-beograd.png   ←  IMT Novi Beograd
+[FALTA] radnicki-nis.png   ←  Radnički Niš
+[FALTA] mladost-lucani.png   ←  Mladost Lučani
+[FALTA] radnicki-1923.png   ←  Radnički 1923
+[FALTA] zemun.png   ←  Zemun
+[FALTA] macva-sabac.png   ←  Mačva Šabac
+
+--- Seychelles (9 clubes) ---
+[FALTA] anse-reunion-fc.png   ←  Anse Réunion FC
+[FALTA] cote-d-or-fc.png   ←  Côte D'or FC
+[FALTA] foresters-fc.png   ←  Foresters FC
+[FALTA] la-passe-fc.png   ←  La Passe FC
+[FALTA] lightstars-fc.png   ←  Lightstars FC
+[FALTA] northern-dynamo.png   ←  Northern Dynamo
+[FALTA] red-star-defence-forces.png   ←  Red Star Defence Forces
+[FALTA] saint-louis-suns-united.png   ←  Saint Louis Suns United
+[FALTA] st-michel-united.png   ←  St Michel United
+
+--- Sierra Leona (10 clubes) ---
+[FALTA] bai-bureh-warriors.png   ←  Bai Bureh Warriors
+[FALTA] bo-rangers.png   ←  Bo Rangers
+[FALTA] east-end-lions.png   ←  East End Lions
+[FALTA] fc-johansen.png   ←  FC Johansen
+[FALTA] kamboi-eagles.png   ←  Kamboi Eagles
+[FALTA] mighty-blackpool.png   ←  Mighty Blackpool
+[FALTA] old-edwardians.png   ←  Old Edwardians
+[FALTA] ports-authority.png   ←  Ports Authority
+[FALTA] star-sport-academy.png   ←  Star Sport Academy
+[FALTA] wilberforce-strikers.png   ←  Wilberforce Strikers
+
+--- Singapur (8 clubes) ---
+[FALTA] geylang-international-fc.png   ←  Geylang International FC
+[FALTA] lion-city-sailors-fc.png   ←  Lion City Sailors FC
+[FALTA] tampines-rovers-fc.png   ←  Tampines Rovers FC
+[FALTA] fc-jurong.png   ←  FC Jurong
+[FALTA] balestier-khalsa-fc.png   ←  Balestier Khalsa FC
+[FALTA] tanjong-pagar-united-fc.png   ←  Tanjong Pagar United FC
+[FALTA] young-lions.png   ←  Young Lions
+[FALTA] hougang-united-fc.png   ←  Hougang United FC
+
+--- Somalia (10 clubes) ---
+[FALTA] badbaado-fc.png   ←  Badbaado FC
+[FALTA] dekedda-sc.png   ←  Dekedda SC
+[FALTA] elman-fc.png   ←  Elman FC
+[FALTA] gaadiidka-fc.png   ←  Gaadiidka FC
+[FALTA] heegan-fc.png   ←  Heegan FC
+[FALTA] horseed-sc.png   ←  Horseed SC
+[FALTA] jazeera-sc.png   ←  Jazeera SC
+[FALTA] jeenyo-fc.png   ←  Jeenyo FC
+[FALTA] midnimo-fc.png   ←  Midnimo FC
+[FALTA] mogadishu-city-club.png   ←  Mogadishu City Club
+
+--- Sudáfrica (15 clubes) ---
+[FALTA] amazulu-fc.png   ←  Amazulu FC
+[FALTA] chippa-united.png   ←  Chippa United
+[FALTA] durban-city-fc.png   ←  Durban City FC
+[FALTA] golden-arrows.png   ←  Golden Arrows
+[FALTA] kaizer-chiefs.png   ←  Kaizer Chiefs
+[FALTA] kruger-united.png   ←  Kruger United
+[FALTA] mamelodi-sundowns.png   ←  Mamelodi Sundowns
+[FALTA] marumo-gallants.png   ←  Marumo Gallants
+[FALTA] milford-fc.png   ←  Milford FC
+[FALTA] orlando-pirates.png   ←  Orlando Pirates
+[FALTA] polokwane-city.png   ←  Polokwane City
+[FALTA] richards-bay-fc.png   ←  Richards Bay FC
+[FALTA] sekhukhune-united.png   ←  Sekhukhune United
+[FALTA] siwelele-fc.png   ←  Siwelele FC
+[FALTA] ts-galaxy.png   ←  TS Galaxy
+
+--- Sudán (2 clubes) ---
+[FALTA] alamal-atbara.png   ←  Alamal Atbara
+[FALTA] haidob-en-nahud.png   ←  Haidob En Nahud
+
+--- Sudán del Sur (7 clubes) ---
+[FALTA] atlabara-fc.png   ←  Atlabara FC
+[FALTA] holy-family-fc.png   ←  Holy Family FC
+[FALTA] jamus-sc.png   ←  Jamus SC
+[FALTA] kator-fc.png   ←  Kator FC
+[FALTA] munuki-sc.png   ←  Munuki SC
+[FALTA] olympic-fc.png   ←  Olympic FC
+[FALTA] salam-fc.png   ←  Salam FC
+
+--- Suecia (16 clubes) ---
+[FALTA] hammarby-if.png   ←  Hammarby IF
+[FALTA] ik-sirius.png   ←  IK Sirius
+[FALTA] djurgardens-if.png   ←  Djurgårdens IF
+[FALTA] bk-hacken.png   ←  BK Häcken
+[FALTA] if-elfsborg.png   ←  IF Elfsborg
+[FALTA] vasteras-sk.png   ←  Västerås SK
+[FALTA] malmo-ff.png   ←  Malmö FF
+[FALTA] aik.png   ←  AIK
+[FALTA] ifk-goteborg.png   ←  IFK Göteborg
+[FALTA] gais.png   ←  GAIS
+[FALTA] if-brommapojkarna.png   ←  IF Brommapojkarna
+[FALTA] mjallby-aif.png   ←  Mjällby Aif
+[FALTA] kalmar-ff.png   ←  Kalmar FF
+[FALTA] degerfors-if.png   ←  Degerfors IF
+[FALTA] orgryte-is.png   ←  Örgryte Is
+[FALTA] halmstads-bk.png   ←  Halmstads BK
+
+--- Suiza (12 clubes) ---
+[FALTA] fc-basel.png   ←  FC Basel
+[FALTA] grasshopper-zurich.png   ←  Grasshopper Zürich
+[FALTA] lausanne-sport.png   ←  Lausanne-Sport
+[FALTA] fc-lugano.png   ←  FC Lugano
+[FALTA] fc-luzern.png   ←  FC Luzern
+[FALTA] fc-sion.png   ←  FC Sion
+[FALTA] fc-st-gallen.png   ←  FC St. Gallen
+[FALTA] fc-thun.png   ←  FC Thun
+[FALTA] fc-vaduz.png   ←  FC Vaduz
+[FALTA] fc-zurich.png   ←  FC Zürich
+[FALTA] bsc-young-boys.png   ←  BSC Young Boys
+[FALTA] servette-fc.png   ←  Servette FC
+
+--- Surinam (10 clubes) ---
+[FALTA] sv-notch.png   ←  SV Notch
+[FALTA] transvaal.png   ←  Transvaal
+[FALTA] voorwaarts.png   ←  Voorwaarts
+[FALTA] leo-victor.png   ←  Leo Victor
+[FALTA] pvv.png   ←  PVV
+[FALTA] inter-moengotapoe.png   ←  Inter Moengotapoe
+[FALTA] sv-broki.png   ←  SV Broki
+[FALTA] inter-wanica.png   ←  Inter Wanica
+[FALTA] sv-flora.png   ←  SV Flora
+[FALTA] coronie-boys.png   ←  Coronie Boys
+
+--- Tahití (7 clubes) ---
+[FALTA] as-pirae.png   ←  AS Pirae
+[FALTA] as-dragon.png   ←  AS Dragon
+[FALTA] as-tefana.png   ←  AS Tefana
+[FALTA] as-venus.png   ←  AS Vénus
+[FALTA] central-sport.png   ←  Central Sport
+[FALTA] as-pueu.png   ←  AS Pueu
+[FALTA] taiarapu-fc.png   ←  Taiarapu FC
+
+--- Tailandia (14 clubes) ---
+[FALTA] buriram-united.png   ←  Buriram United
+[FALTA] port-fc.png   ←  Port FC
+[FALTA] true-bangkok-united.png   ←  True Bangkok United
+[FALTA] bg-pathum-united.png   ←  BG Pathum United
+[FALTA] ratchaburi-fc.png   ←  Ratchaburi FC
+[FALTA] chonburi-fc.png   ←  Chonburi FC
+[FALTA] singha-chiangrai-united.png   ←  Singha Chiangrai United
+[FALTA] uthai-thani-fc.png   ←  Uthai Thani FC
+[FALTA] lamphun-warriors.png   ←  Lamphun Warriors
+[FALTA] ayutthaya-united.png   ←  Ayutthaya United
+[FALTA] sukhothai-fc.png   ←  Sukhothai FC
+[FALTA] rayong-fc.png   ←  Rayong FC
+[FALTA] pattani-fc.png   ←  Pattani FC
+[FALTA] rasisalai-united.png   ←  Rasisalai United
+
+--- Taiwán (8 clubes) ---
+[FALTA] hang-yuen-fc.png   ←  Hang Yuen FC
+[FALTA] taiwan-steel.png   ←  Taiwan Steel
+[FALTA] ac-taipei.png   ←  AC Taipei
+[FALTA] taichung-futuro.png   ←  Taichung Futuro
+[FALTA] tatung-fc.png   ←  Tatung FC
+[FALTA] taipower-kaohsiung.png   ←  Taipower Kaohsiung
+[FALTA] ming-chuan-university.png   ←  Ming Chuan University
+[FALTA] tatung-fc-taipei.png   ←  Tatung FC Taipei
+
+--- Tanzania (16 clubes) ---
+[FALTA] azam-fc.png   ←  Azam FC
+[FALTA] coastal-union.png   ←  Coastal Union
+[FALTA] dodoma-jiji-fc.png   ←  Dodoma Jiji FC
+[FALTA] fountain-gate-fc.png   ←  Fountain Gate FC
+[FALTA] geita-gold.png   ←  Geita Gold
+[FALTA] jkt-tanzania.png   ←  JKT Tanzania
+[FALTA] kagera-sugar.png   ←  Kagera Sugar
+[FALTA] mashujaa-fc.png   ←  Mashujaa FC
+[FALTA] mbeya-city.png   ←  Mbeya City
+[FALTA] namungo-fc.png   ←  Namungo FC
+[FALTA] pamba-jiji.png   ←  Pamba Jiji
+[FALTA] polisi-tanzania.png   ←  Polisi Tanzania
+[FALTA] simba-sc.png   ←  Simba SC
+[FALTA] singida-black-stars.png   ←  Singida Black Stars
+[FALTA] tra-united.png   ←  Tra United
+[FALTA] young-africans-sc.png   ←  Young Africans SC
+
+--- Tayikistán (21 clubes) ---
+[FALTA] yangon-city-fc.png   ←  Yangon City FC
+[FALTA] barqchi-hisor.png   ←  Barqchi Hisor
+[FALTA] cska-pomir-dushanbe.png   ←  CSKA-Pomir Dushanbe
+[FALTA] eskhata-khujand.png   ←  Eskhata Khujand
+[FALTA] hosilot-farkhor.png   ←  Hosilot Farkhor
+[FALTA] istiqlol-dushanbe.png   ←  Istiqlol Dushanbe
+[FALTA] kf-istaravshan.png   ←  KF Istaravshan
+[FALTA] kf-khujand.png   ←  KF Khujand
+[FALTA] parvoz-bobojon-ghafurov.png   ←  Parvoz Bobojon Ghafurov
+[FALTA] ravshan-kulob.png   ←  Ravshan Kulob
+[FALTA] regar-tadaz.png   ←  Regar-TadAZ
+[FALTA] sardor-tursunzoda.png   ←  Sardor Tursunzoda
+[FALTA] vakhsh-bokhtar.png   ←  Vakhsh Bokhtar
+[FALTA] barki-tajik.png   ←  Barki Tajik
+[FALTA] cska-pomir.png   ←  CSKA Pomir
+[FALTA] eskhata.png   ←  Eskhata
+[FALTA] istaravshan.png   ←  Istaravshan
+[FALTA] istiqlol.png   ←  Istiqlol
+[FALTA] khatlon.png   ←  Khatlon
+[FALTA] parvoz.png   ←  Parvoz
+[FALTA] ravshan.png   ←  Ravshan
+
+--- Timor Oriental (10 clubes) ---
+[FALTA] assalam-fc.png   ←  Assalam FC
+[FALTA] academica.png   ←  Académica
+[FALTA] as-ponta-leste.png   ←  AS Ponta Leste
+[FALTA] as-marca-fc.png   ←  AS Marca FC
+[FALTA] coracao-fc.png   ←  Coração FC
+[FALTA] dit-fc.png   ←  DIT FC
+[FALTA] emmanuel-fc.png   ←  Emmanuel FC
+[FALTA] porto-taibesse.png   ←  Porto Taibesse
+[FALTA] sport-laulara-e-benfica.png   ←  Sport Laulara e Benfica
+[FALTA] karketu-dili.png   ←  Karketu Dili
+
+--- Togo (10 clubes) ---
+[FALTA] ac-barracuda.png   ←  AC Barracuda
+[FALTA] asc-kara.png   ←  Asc Kara
+[FALTA] asko-de-kara.png   ←  Asko de Kara
+[FALTA] dynamic-togolais-fc.png   ←  Dynamic Togolais FC
+[FALTA] entente-ii.png   ←  Entente II
+[FALTA] etoile-filante-de-lome.png   ←  Étoile Filante de Lomé
+[FALTA] gomido-fc.png   ←  Gomido FC
+[FALTA] kakadl-fc.png   ←  Kakadl FC
+[FALTA] semassi-fc.png   ←  Semassi FC
+[FALTA] unisport-de-sokode.png   ←  Unisport de Sokodé
+
+--- Tonga (7 clubes) ---
+[FALTA] laugu-united-fc.png   ←  Laugu United FC
+[FALTA] fasi-moe-afi-fc.png   ←  Fasi moe Afi FC
+[FALTA] folaha-marist-kauvai-fc.png   ←  Folaha Marist Kauvai FC
+[FALTA] lavengatonga-fc.png   ←  Lavengatonga FC
+[FALTA] lotoha-apai-united.png   ←  Lotoha'apai United
+[FALTA] marist-nuku-alofa.png   ←  Marist Nuku'alofa
+[FALTA] navutoka-fc.png   ←  Navutoka FC
+
+--- Trinidad y Tobago (12 clubes) ---
+[FALTA] defence-force-fc.png   ←  Defence Force FC
+[FALTA] club-sando.png   ←  Club Sando
+[FALTA] prison-service-fc.png   ←  Prison Service FC
+[FALTA] police-fc-trinidad-y-tobago.png   ←  Police FC (Trinidad y Tobago)
+[FALTA] ac-port-of-spain.png   ←  AC Port of Spain
+[FALTA] san-juan-jabloteh.png   ←  San Juan Jabloteh
+[FALTA] central-fc.png   ←  Central FC
+[FALTA] la-horquetta-rangers.png   ←  La Horquetta Rangers
+[FALTA] cunupia-fc.png   ←  Cunupia FC
+[FALTA] point-fortin-civic.png   ←  Point Fortin Civic
+[FALTA] fc-phoenix-1976.png   ←  FC Phoenix 1976
+[FALTA] morvant-caledonia-united.png   ←  Morvant Caledonia United
+
+--- Turkmenistán (8 clubes) ---
+[FALTA] fc-arkadag.png   ←  FC Arkadag
+[FALTA] altyn-asyr.png   ←  Altyn Asyr
+[FALTA] ahal.png   ←  Ahal
+[FALTA] sagadam.png   ←  Şagadam
+[FALTA] nebitci-balkanabat.png   ←  Nebitçi Balkanabat
+[FALTA] merw-mary.png   ←  Merw Mary
+[FALTA] asgabat.png   ←  Aşgabat
+[FALTA] kopetdag-asgabat.png   ←  Köpetdag Aşgabat
+
+--- Turquía (18 clubes) ---
+[FALTA] galatasaray.png   ←  Galatasaray
+[FALTA] fenerbahce.png   ←  Fenerbahçe
+[FALTA] besiktas.png   ←  Beşi̇ktaş
+[FALTA] trabzonspor.png   ←  Trabzonspor
+[FALTA] istanbul-basaksehir.png   ←  İstanbul Başakşehi̇r
+[FALTA] samsunspor.png   ←  Samsunspor
+[FALTA] goztepe.png   ←  Göztepe
+[FALTA] kocaelispor.png   ←  Kocaeli̇spor
+[FALTA] konyaspor.png   ←  Konyaspor
+[FALTA] caykur-rizespor.png   ←  Çaykur Ri̇zespor
+[FALTA] gaziantep-fk.png   ←  Gazi̇antep FK
+[FALTA] kasimpasa.png   ←  Kasimpaşa
+[FALTA] alanyaspor.png   ←  Alanyaspor
+[FALTA] eyupspor.png   ←  Eyüpspor
+[FALTA] genclerbirligi.png   ←  Gençlerbi̇rli̇ği̇
+[FALTA] amedspor.png   ←  Amedspor
+[FALTA] erzurumspor-fk.png   ←  Erzurumspor FK
+[FALTA] corum-fk.png   ←  Çorum FK
+
+--- Ucrania (16 clubes) ---
+[FALTA] shakhtar-donetsk.png   ←  Shakhtar Donetsk
+[FALTA] dynamo-kyiv.png   ←  Dynamo Kyiv
+[FALTA] kryvbas-kryvyi-rih.png   ←  Kryvbas Kryvyi Rih
+[FALTA] polissya-zhytomyr.png   ←  Polissya Zhytomyr
+[FALTA] lnz-cherkasy.png   ←  LNZ Cherkasy
+[FALTA] karpaty-lviv.png   ←  Karpaty Lviv
+[FALTA] obolon-kyiv.png   ←  Obolon Kyiv
+[FALTA] kolos-kovalivka.png   ←  Kolos Kovalivka
+[FALTA] veres-rivne.png   ←  Veres Rivne
+[FALTA] zorya-luhansk.png   ←  Zorya Luhansk
+[FALTA] metalist-1925-kharkiv.png   ←  Metalist 1925 Kharkiv
+[FALTA] livyi-bereh-kyiv.png   ←  Livyi Bereh Kyiv
+[FALTA] epicentr-kamianets-podilskyi.png   ←  Epicentr Kamianets-Podilskyi
+[FALTA] bukovyna-chernivtsi.png   ←  Bukovyna Chernivtsi
+[FALTA] chornomorets-odesa.png   ←  Chornomorets Odesa
+[FALTA] kudrivka.png   ←  Kudrivka
+
+--- Uganda (17 clubes) ---
+[FALTA] bul-fc.png   ←  Bul FC
+[FALTA] entebbe-uppc-fc.png   ←  Entebbe Uppc FC
+[FALTA] express-fc.png   ←  Express FC
+[FALTA] kataka-fc.png   ←  Kataka FC
+[FALTA] kcca-fc.png   ←  Kcca FC
+[FALTA] kigezi-homeboyz-fc.png   ←  Kigezi Homeboyz FC
+[FALTA] kitara-fc.png   ←  Kitara FC
+[FALTA] lugazi-fc.png   ←  Lugazi FC
+[FALTA] maroons-fc.png   ←  Maroons FC
+[FALTA] mbarara-city-fc.png   ←  Mbarara City FC
+[FALTA] nec-fc.png   ←  NEC FC
+[FALTA] ntugasaze-fc.png   ←  Ntugasaze FC
+[FALTA] police-fc.png   ←  Police FC
+[FALTA] sc-villa.png   ←  SC Villa
+[FALTA] updf-fc.png   ←  Updf FC
+[FALTA] ura-fc.png   ←  Ura FC
+[FALTA] vipers-sc.png   ←  Vipers SC
+
+--- Uruguay (16 clubes) ---
+[FALTA] penarol.png   ←  Peñarol
+[FALTA] deportivo-maldonado.png   ←  Deportivo Maldonado
+[FALTA] montevideo-city-torque.png   ←  Montevideo City Torque
+[FALTA] nacional.png   ←  Nacional
+[FALTA] racing-de-montevideo.png   ←  Racing de Montevideo
+[FALTA] liverpool-montevideo.png   ←  Liverpool Montevideo
+[FALTA] montevideo-wanderers.png   ←  Montevideo Wanderers
+[FALTA] albion-fc.png   ←  Albion FC
+[FALTA] juventud-de-las-piedras.png   ←  Juventud de las Piedras
+[FALTA] central-espanol.png   ←  Central Español
+[FALTA] defensor-sporting.png   ←  Defensor Sporting
+[FALTA] cerro-largo.png   ←  Cerro Largo
+[FALTA] boston-river.png   ←  Boston River
+[FALTA] cerro.png   ←  Cerro
+[FALTA] progreso.png   ←  Progreso
+[FALTA] danubio.png   ←  Danubio
+
+--- Uzbekistán (10 clubes) ---
+[FALTA] neftchi-fergana.png   ←  Neftchi Fergana
+[FALTA] pakhtakor-tashkent.png   ←  Pakhtakor Tashkent
+[FALTA] navbahor-namangan.png   ←  Navbahor Namangan
+[FALTA] nasaf-qarshi.png   ←  Nasaf Qarshi
+[FALTA] fc-okmk-olmaliq.png   ←  FC Okmk Olmaliq
+[FALTA] lokomotiv-tashkent.png   ←  Lokomotiv Tashkent
+[FALTA] sogdiana-jizzakh.png   ←  Sogdiana Jizzakh
+[FALTA] bunyodkor.png   ←  Bunyodkor
+[FALTA] kokand-1912.png   ←  Kokand 1912
+[FALTA] mashal-muborak.png   ←  Mashal Muborak
+
+--- Vanuatu (11 clubes) ---
+[FALTA] veitongo-fc.png   ←  Veitongo FC
+[FALTA] ifira-black-bird-fc.png   ←  Ifira Black Bird FC
+[FALTA] galaxy-fc.png   ←  Galaxy FC
+[FALTA] erakor-golden-star-fc.png   ←  Erakor Golden Star FC
+[FALTA] tafea-fc.png   ←  Tafea FC
+[FALTA] shepherds-united-fc.png   ←  Shepherds United FC
+[FALTA] malampa-revivors-fc.png   ←  Malampa Revivors FC
+[FALTA] nalkutan-fc.png   ←  Nalkutan FC
+[FALTA] tupuji-imere-fc.png   ←  Tupuji Imere FC
+[FALTA] sia-raga-fc.png   ←  Sia-Raga FC
+[FALTA] santo-united-fc.png   ←  Santo United FC
+
+--- Venezuela (14 clubes) ---
+[FALTA] deportivo-tachira.png   ←  Deportivo Táchira
+[FALTA] deportivo-la-guaira.png   ←  Deportivo La Guaira
+[FALTA] carabobo-fc.png   ←  Carabobo FC
+[FALTA] academia-puerto-cabello.png   ←  Academia Puerto Cabello
+[FALTA] ucv-fc.png   ←  UCV FC
+[FALTA] estudiantes-de-merida.png   ←  Estudiantes de Mérida
+[FALTA] caracas-fc.png   ←  Caracas FC
+[FALTA] monagas-sc.png   ←  Monagas SC
+[FALTA] deportivo-rayo-zuliano.png   ←  Deportivo Rayo Zuliano
+[FALTA] anzoategui-fc.png   ←  Anzoátegui FC
+[FALTA] metropolitanos.png   ←  Metropolitanos
+[FALTA] portuguesa.png   ←  Portuguesa
+[FALTA] trujillanos.png   ←  Trujillanos
+[FALTA] zamora.png   ←  Zamora
+
+--- Vietnam (14 clubes) ---
+[FALTA] bac-ninh-fc.png   ←  BẮC Ninh FC
+[FALTA] cong-an-ha-noi-fc.png   ←  Công An HÀ Nội FC
+[FALTA] cong-an-tp-ho-chi-minh.png   ←  Công An TP. HỒ Chí Minh
+[FALTA] thanh-hoa-fc.png   ←  Thanh Hóa FC
+[FALTA] ha-noi-fc.png   ←  HÀ Nội FC
+[FALTA] hai-phong-fc.png   ←  Hải Phòng FC
+[FALTA] hoang-anh-gia-lai.png   ←  Hoàng Anh Gia Lai
+[FALTA] hong-linh-ha-tinh.png   ←  Hồng Lĩnh HÀ Tĩnh
+[FALTA] ninh-binh-fc.png   ←  Ninh Bình FC
+[FALTA] shb-a-nang.png   ←  SHB ÐÀ Nẵng
+[FALTA] song-lam-nghe-an.png   ←  Sông Lam Nghệ An
+[FALTA] thep-xanh-nam-inh.png   ←  Thép Xanh Nam Ðịnh
+[FALTA] the-cong-viettel-fc.png   ←  THỂ Công–viettel FC
+[FALTA] truong-tuoi-ong-nai.png   ←  Trường Tươi Ðồng Nai
+
+--- Zambia (19 clubes) ---
+[FALTA] chirundu-united.png   ←  Chirundu United
+[FALTA] fc-muza.png   ←  FC Muza
+[FALTA] green-buffaloes.png   ←  Green Buffaloes
+[FALTA] green-eagles.png   ←  Green Eagles
+[FALTA] kabwe-warriors.png   ←  Kabwe Warriors
+[FALTA] kanshanshi-dynamos.png   ←  Kanshanshi Dynamos
+[FALTA] konkola-blades.png   ←  Konkola Blades
+[FALTA] mufulira-wanderers.png   ←  Mufulira Wanderers
+[FALTA] mutondo-stars.png   ←  Mutondo Stars
+[FALTA] napsa-stars.png   ←  Napsa Stars
+[FALTA] nchanga-rangers.png   ←  Nchanga Rangers
+[FALTA] nkana-fc.png   ←  Nkana FC
+[FALTA] nkwazi-fc.png   ←  Nkwazi FC
+[FALTA] power-dynamos.png   ←  Power Dynamos
+[FALTA] red-arrows.png   ←  Red Arrows
+[FALTA] roan-united.png   ←  Roan United
+[FALTA] trident-fc.png   ←  Trident FC
+[FALTA] zanaco-fc.png   ←  Zanaco FC
+[FALTA] zesco-united.png   ←  Zesco United
+
+--- Zimbabue (18 clubes) ---
+[FALTA] agama-fc.png   ←  Agama FC
+[FALTA] bulawayo-chiefs-fc.png   ←  Bulawayo Chiefs FC
+[FALTA] caps-united.png   ←  Caps United
+[FALTA] chicken-inn-fc.png   ←  Chicken Inn FC
+[FALTA] dynamos-fc.png   ←  Dynamos FC
+[FALTA] fc-hunters.png   ←  FC Hunters
+[FALTA] fc-platinum.png   ←  FC Platinum
+[FALTA] hardrock-fc.png   ←  Hardrock FC
+[FALTA] herentals-college-fc.png   ←  Herentals College FC
+[FALTA] highlanders-fc.png   ←  Highlanders FC
+[FALTA] manica-diamonds-fc.png   ←  Manica Diamonds FC
+[FALTA] mwos-fc.png   ←  Mwos FC
+[FALTA] ngezi-platinum-stars.png   ←  Ngezi Platinum Stars
+[FALTA] scottland-fc.png   ←  Scottland FC
+[FALTA] simba-bhora-fc.png   ←  Simba Bhora FC
+[FALTA] telone-fc.png   ←  Telone FC
+[FALTA] triangle-united.png   ←  Triangle United
+[FALTA] zpc-kariba.png   ←  ZPC Kariba

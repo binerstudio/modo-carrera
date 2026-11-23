@@ -1,0 +1,174 @@
+MODO CARRERA 12.0 · REDISEÑO VISUAL (todo lo anterior se conserva)
+=================================================================
+Detalle: INFORME_MODO_CARRERA_12.0.md
+- Versión solo de diseño: nueva identidad visual en todas las pantallas (azul oscuro, negro y dorado, fondos de estadio, paneles con profundidad), menú lateral en pantallas grandes y navegación inferior en iPhone.
+- Pantallas nuevas o rehechas: Inicio, Noticiero (noticias generadas con lo que pasa en la partida), ficha del jugador con gráfico de atributos, calendario mensual, cuadros eliminatorios de las copas, finanzas e infraestructura, y pestaña Contratos en el mercado.
+- NO se tocaron las plantillas: data/jugadores.js y data/mundo.js son idénticos byte por byte a la 11.2 (51.893 jugadores, 2.327 clubes, 189 ligas). Tampoco el motor (js/mc10-*.js, js/mc11-nombres.js) ni los escudos.
+- Archivos nuevos: css/mc12-diseno.css, js/mc12-diseno.js y assets/jugadores/fotos.js (opcional, para sumar fotos de jugadores). En index.html solo cambian el título, el número de versión y las líneas que cargan esos archivos.
+- Las partidas guardadas con versiones anteriores se abren igual. Al abrir la 12.0 por primera vez se hace sola una copia automática.
+- Para publicar: igual que siempre, subí el contenido del ZIP al mismo proyecto de Cloudflare Pages.
+
+MODO CARRERA 11.2 (todo lo anterior se conserva)
+================================================
+Detalle: INFORME_MODO_CARRERA_11.2.md
+- Equipos grandes: se agregaron jugadores importantes que faltaban (Bayern: Boey, Pavlović, Saibari, N. Brown; PSG: Vitinha; Leipzig: plantel actualizado; Juventus, Milan, Napoli, Benfica, Galatasaray, Fiorentina, Lazio, Como, etc.).
+- Equipos con sobrepoblación recortados o repartidos a su club real: Aucas y el resto de Ecuador, Modern Sport, Ittihad Alexandria, Wydad, Berkane, Chonburi, Ayutthaya, Lyon, Puerto Cabello, Monagas, Juan Pablo II, Alianza Atlético.
+- Equipos con pocos jugadores completados: Utrecht, Orlando City, Chicago Fire, NY Red Bulls, Minnesota, Fortuna Sittard.
+- Copias repetidas de jugadores ya transferidos (verano 2026) borradas.
+- Jugadores agregados: GRL y valor estimados (marcados como estimados).
+- Versión 11.2: copia automática "Antes de actualizar a la versión 11.2" al abrir.
+
+MODO CARRERA 11.1 (todo lo anterior se conserva)
+================================================
+Detalle: INFORME_MODO_CARRERA_11.1.md
+- Jugadores con el mismo nombre: en pantalla ya no aparece "(Club)" (archivo nuevo js/mc11-nombres.js).
+- 47 copias de jugadores repetidos entre ligas borradas y 5 jugadores movidos a su club real (verificado en la web, 11/2026).
+- "Manuel Luis Da Silva Cafumana (Show)" ahora se llama "Show".
+- Archivos cambiados: index.html, data/mundo.js, data/jugadores.js, js/mc11-nombres.js (nuevo).
+- Versión 11.1: copia automática "Antes de actualizar a la versión 11.1" al abrir.
+
+MODO CARRERA 11.0 (todo lo anterior se conserva)
+================================================
+Detalle: INFORME_MODO_CARRERA_11.0.md (cambios, pruebas, pendientes y tabla por país).
+- Chile completa (16): Coquimbo Unido y Deportes Limache; Palestino recuperado (estaba mezclado en Audax Italiano).
+- Perú: Universitario y Melgar; "2 de Mayo" pasó a Paraguay (12, completa). Bolivia: Real Potosí recuperado.
+- Serbia y Bulgaria: confirmadas con 14 clubes en 2026/27 y formato real de grupos.
+- Liga Argentina: los 6 homónimos ahora aparecen los dos (el segundo lleva el club en el nombre). Nada más cambió.
+- Partidas guardadas: una temporada en curso conserva su calendario aunque la base agregue clubes.
+- Versión 11.0: copia automática "Antes de actualizar a la versión 11.0" al abrir.
+
+MODO CARRERA 10.0.1 — REPARACIÓN DE LA BASE MUNDIAL (todo lo anterior se conserva)
+====================================================================================
+Detalle completo: INFORME_AUDITORIA_10.0.1.md (incluye tabla por país y estado de cada liga).
+ARCHIVOS CAMBIADOS (subir la carpeta completa):
+- data/mundo.js ........ Portugal 2026/27 reconstruida (18 clubes, 526 jugadores), Argelia separada de Angola,
+                         clubes identificados (Tianjin Jinmen Tiger, Dalian Yingbo, Cobán Imperial, ENPPI),
+                         homónimos entre países separados, nombres corregidos, jugadores generados marcados.
+- js/mc10-datos.js ..... Portugal sale de la base mundial; nacionalidades unificadas; marcas de datos separadas.
+- js/mc10-ui.js ........ en el mercado: EST. = dato estimado · GEN. = jugador generado (no real).
+- index.html ........... versión 10.0.1 y migración de carrera v2 (solo renombra clubes; no borra nada).
+- assets/escudos/LISTA_ESCUDOS.txt ... lista regenerada (2.323 clubes, [OK]/[FALTA]).
+SIN CAMBIOS: Liga Argentina, simulador, tácticas, mercado, guardado, idioma, diseño, claves de almacenamiento.
+Al abrir la 10.0.1 se crea la copia automática "Antes de actualizar a la versión 10.0.1".
+
+MODO CARRERA 10.0 — EXPANSIÓN MUNDIAL (todo lo anterior se conserva)
+=====================================================================
+ARCHIVOS NUEVOS (subirlos junto con el resto de la carpeta):
+- data/mundo.js ........ base mundial extraída de los PDF (188 ligas, ~51.700 jugadores, datos estimados marcados).
+- js/mc10-datos.js ..... integra la base mundial en las estructuras del juego (CLUBS, LEAGUES, MC_PLAYERS) y los escudos.
+- js/mc10-liga.js ...... motor de competiciones: formatos reales por liga, Apertura/Clausura, grupos, playoffs, eventos de copa.
+- js/mc10-mundo.js ..... copas, torneos continentales, selecciones, entrenadores, coeficientes, estadísticas, historial, paso del tiempo.
+- js/mc10-ui.js ........ buscador mundial, sección Mundo, pestaña Copa, goleadores y mercado mundial (préstamos, ofertas con clubes reales).
+- assets/escudos/LISTA_ESCUDOS.txt ... nombre exacto de archivo para el escudo de cada club.
+- INFORME_MODO_CARRERA_10.0.md ....... informe completo (países, ligas, clubes, copas, torneos, auditoría y pendientes).
+
+COMPATIBILIDAD
+- Las carreras guardadas de la 6.x se abren con sus resultados, rivales y planteles intactos (probado con River, Girona y América).
+- Al abrir la 10.0 por primera vez se crea la copia automática "Antes de actualizar a la versión 10.0".
+- Liga Argentina: sin cambios de clubes, planteles, fixture ni formato; solo se corrigieron 32 nacionalidades de extranjeros.
+- Claves de almacenamiento: no se renombró ninguna. Lo nuevo de cada carrera se guarda dentro de la carrera (career.world).
+
+ESCUDOS
+- Copiar los PNG en assets/escudos/ con el nombre que indica LISTA_ESCUDOS.txt. Si un archivo no existe, el juego usa el banco
+  de logos en línea y, si tampoco hay, las iniciales del club.
+
+MODO CARRERA 6.5 — nuevo diseño de la cancha del simulador (solo visual)
+=========================================================================
+- Estadio con tribunas llenas de público, techo con luces, torres de iluminación con haces de luz,
+  carteles LED azules y dorados, arcos con red, césped con franjas de corte y cancha en perspectiva 3D.
+- Jugadores propios con camiseta azul con borde dorado (el arquero, verde); rivales como monedas doradas.
+  Todos quedan de pie sobre el césped y tienen sombra.
+- Se adapta a cualquier ancho de pantalla (celular y tablet).
+- No cambia la lógica del simulador, las posiciones, los controles ni los datos guardados.
+- Archivo nuevo: assets/estadio/tribuna.jpg (subirlo junto con el resto de la carpeta).
+
+MODO CARRERA 6.4.1 — corrección de resultados irreales
+=======================================================
+- Las tácticas (mentalidad, presión, línea, ritmo, estilo) ahora influyen con un tope. Antes se multiplicaban
+  sin límite: con todo al máximo el promedio era 5,6 goles por partido y salían 7-1, 9-4 o más.
+- El equipo que gana por 2 goles o más baja el ritmo (como en el fútbol real), así se cortan las goleadas en cadena.
+- El GRL pesa un poco más: el equipo mejor gana más seguido.
+- Medido en 1.500 partidos por caso: táctica normal 2,7 goles por partido; táctica ofensiva al máximo 3,6 (antes 5,6);
+  diferencias de 5+ goles 0,5% de los partidos (antes hasta 6%).
+- No cambia ningún dato guardado: partidas, resultados ya jugados y jugadores quedan igual.
+
+MODO CARRERA 6.4 — cambios sobre la 6.3 (todo lo anterior se conserva)
+=======================================================================
+1) ADMINISTRADOR DE JUGADORES (Inicio > Administrar jugadores, o Más > Guardado / Cuenta):
+   agregar, editar y eliminar futbolistas sin tocar el código. Búsqueda, filtros por club y posición, y vistas
+   "agregados por mí", "editados" y "eliminados" (para restaurarlos). Los cambios se guardan al instante en el
+   navegador, APARTE de data/jugadores.js, así que publicar un ZIP nuevo (aunque traiga otro jugadores.js) no los borra.
+   Se aplican al mercado, a la fuerza de los rivales y a los planteles de las carreras nuevas.
+   Las carreras ya guardadas NO se modifican: conservan su plantel tal cual.
+2) ALMACENAMIENTO CON MIGRACIONES: versión de datos (mc_schema_version). Las migraciones solo agregan o transforman,
+   nunca borran; si una falla, todo vuelve exactamente a como estaba. Cada carrera también tiene su versión
+   (campo "schema") y se actualiza sola al abrirla.
+3) COPIAS AUTOMÁTICAS (IndexedDB, últimas 15): antes de cada actualización de la app, antes de migrar, antes de
+   importar, antes de eliminar una carrera y una vez por día. Se pueden restaurar o descargar.
+4) EXPORTAR / IMPORTAR (Inicio > Copias de seguridad): archivo .json con TODO (carreras, fichajes, resultados,
+   temporadas, ajustes y jugadores editados). Al importar: "Combinar" (suma y conserva lo tuyo) o "Restaurar exactamente".
+5) Al iniciar, la app pide al navegador almacenamiento persistente (que no lo borre por falta de espacio).
+
+PARA NO PERDER DATOS AL PUBLICAR UN ZIP NUEVO
+- Abrí siempre la app desde la MISMA dirección (la principal de Cloudflare Pages, ej. tu-proyecto.pages.dev).
+  Las direcciones de vista previa (abc123.tu-proyecto.pages.dev) tienen su propio almacenamiento, vacío.
+- Otro navegador u otro dispositivo = otro almacenamiento: exportá una copia y la importás ahí.
+- Borrar los "datos del sitio" o el historial del navegador borra todo: exportá una copia antes.
+- Exportá una copia de vez en cuando (la pantalla avisa si pasaron más de 7 días).
+
+PARA QUIEN PROGRAME VERSIONES FUTURAS (script id="mc9-datos" en index.html)
+- No renombrar ni borrar claves: mc_career_v7_<id>, mc_index_v7, mc_active_v7, mc_players_v1, mc_settings*, modo_carrera_41.
+- Si cambia el formato, agregar una migración NUEVA al final de GLOBAL_MIGRATIONS o CAREER_MIGRATIONS (no editar las viejas)
+  y actualizar APP_VERSION.
+
+MODO CARRERA 6.3 — cambios sobre la 6.2 (todo lo anterior se conserva)
+=======================================================================
+1) LIGA Y CALENDARIO: fixture real todos contra todos. Ligas de 20 equipos: 38 fechas (ida y vuelta);
+   Liga Argentina (30 equipos): 29 fechas a una rueda; 18 equipos: 34; MLS 34; Liga MX 17. Localía equilibrada.
+   Torneos y Copas > Calendario: todas las fechas con todos los partidos de todos los equipos (tu club resaltado),
+   con selector para saltar a una fecha. La Clasificación (PJ, G, E, P, GF, GC, DG, PTS y forma) se calcula
+   únicamente con los resultados jugados; al terminar tu partido se simulan los demás de esa fecha según el GRL
+   de cada club. Al completar todas las fechas aparece el cierre de temporada y se puede iniciar la siguiente.
+   Las partidas guardadas se migran solas: se respetan los resultados que ya habías jugado.
+2) SIMULACIÓN: el GRL del equipo (promedio de los 11 titulares, visible en Plantel) es el factor principal.
+   Formación, estilo, mentalidad, anchura, profundidad, presión y ritmo modifican llegadas, calidad de las
+   ocasiones, posesión, córners, offsides, faltas y cansancio. Goles y asistencias repartidos entre todos los que
+   están en cancha según su puesto y calidad. Relato detallado de goles, ocasiones, tarjetas, expulsiones y lesiones.
+   Lesionados y suspendidos salen del once tras el partido y no pueden volver a alinearse (aparece una advertencia).
+   Roja directa: 2 fechas; doble amarilla o 4 amarillas: 1 fecha.
+3) INTERFAZ: las ventanas emergentes (carteles) aparecen arriba y por encima de la barra inferior.
+
+MODO CARRERA 6.2 — listo para Cloudflare Pages
+================================================
+Contenido: index.html + carpeta data/ (jugadores.js). Subir las dos cosas juntas (carpeta completa).
+
+NOVEDADES DE ESTA VERSIÓN
+1) SIMULADOR: orden cancha → eventos → estadísticas → controles. Botones X1 y X2 (se quitaron X4/X8):
+   avanzan minuto a minuto hasta el descanso y se detienen. "CONTINUAR 2º TIEMPO" simula hasta el 90 + descuento.
+   "SIMULAR HASTA EL FINAL" ejecuta todos los minutos restantes (remates, goles, tarjetas, lesiones, cambios)
+   y muestra resultado, estadísticas, eventos y calificaciones.
+2) MERCADO: base de ~1.500 jugadores reales (ver "Alcance de la base"), búsqueda por nombre y apellido
+   (cualquier orden, sin tildes) y filtros combinados: posición, liga, club, nacionalidad, edad mín/máx,
+   valoración mínima, valor máximo, "solo los que puedo pagar" y orden. Paginado de a 40 para que sea rápido.
+3) PLANTEL: titulares (11), suplentes (7) y reservas. Tocar un jugador -> menú para mandarlo al banco,
+   pasarlo a titular eligiendo el lugar, intercambiar con cualquiera o enviarlo a reservas. Advertencia si
+   queda fuera de posición (y se descuenta valoración). Cambiar de formación reacomoda el once sin perder a nadie.
+   Todo se guarda al instante.
+4) CARGAR PARTIDA: administrador con carreras ilimitadas (nombre, club, temporada, fechas, presupuesto,
+   continuar, eliminar con confirmación y renombrar). Cada carrera tiene su propio guardado e identificador.
+   Tu partida anterior se importó sola y la copia original quedó intacta.
+
+ALCANCE DE LA BASE DE JUGADORES (importante)
+- Transfermarkt NO estuvo accesible (bloqueado desde la herramienta de trabajo). Por eso la base fue compilada
+  a mano: nombres, edades, posiciones, clubes y nacionalidades reales de ~1.500 futbolistas de las 12 ligas
+  más algunas otras ligas, pero VALORACIONES y VALORES DE MERCADO ESTIMADOS (no son datos oficiales ni en vivo)
+  y las plantillas pueden estar desactualizadas por fichajes recientes.
+- Hay clubes con pocos jugadores cargados; las plantillas se completan con jugadores genéricos
+  ("Defensor suplente 3", etc.) que NO aparecen en el mercado.
+- Para ampliarla: editar data/jugadores.js (filas [nombre,pos,valoración,edad,idxNacionalidad,valor,idxClub]) o
+  llamar a MC_ADD_PLAYERS([[nombre,pos,valoración,edad,'Nacionalidad',valor,'Club'],...]) desde un archivo nuevo
+  cargado después con <script src="data/otro.js"></script>. El mercado se adapta solo.
+
+LIMITACIONES CONOCIDAS
+- Un partido a medio jugar no se guarda si se cierra la app (se guarda el resultado al terminar).
+- Los resultados de los demás equipos de la liga siguen siendo los del sistema anterior.
