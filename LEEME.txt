@@ -1,3 +1,10 @@
+MODO CARRERA 12.6.0 · SIMULADOR 2D ANIMADO (todo lo anterior se conserva)
+=======================================================================
+Detalle: INFORME_SIMULADOR_2D.md
+- Cada evento del motor se ve como una jugada animada con los jugadores reales que intervinieron.
+- 22 jugadores de cuerpo entero, camisetas por club, árbitro, 4 cámaras (TV, Cenital, Seguimiento, Táctica), x1/x2/x4.
+- El reloj espera a la animación: el marcador nunca se adelanta a lo que se ve.
+
 MODO CARRERA 12.5.0 · ETAPA 3: IA DE LOS CLUBES Y MERCADO (todo lo anterior se conserva)
 ====================================================================================
 Detalle: INFORME_ETAPA_3.md
