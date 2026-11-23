@@ -94,6 +94,7 @@ async function playCase(browser, cs) {
   }
 
   // Guardar, recargar y comprobar que la carrera vuelve igual.
+  const size = await page.evaluate(() => window.MCRespaldo ? MCRespaldo.usage().then(u => ({ localStorageKB: Math.round(u.localStorageBytes / 1024), careerKB: Math.round(u.careerBytes / 1024) })) : null);
   const before = await page.evaluate(() => { save(); return { id: career.id, season: career.season, round: career.round, points: career.points, squad: career.players.length, budget: career.budget, keys: Object.keys(localStorage).filter(k => /^(mc_|modo_carrera)/.test(k)).sort() }; });
   await page.reload({ waitUntil: 'load' });
   await page.waitForTimeout(1500);
@@ -102,8 +103,36 @@ async function playCase(browser, cs) {
 
   await ctx.close();
   for (const s of seasons) delete s.allResults;
-  return { case: cs, boot, created, seasons, save: { before, after, reloadOk }, errors, missing: [...missing].sort(), ms: Date.now() - t0,
+  return { case: cs, boot, created, seasons, save: { before, after, reloadOk }, size, errors, missing: [...missing].sort(), ms: Date.now() - t0,
     ok: errors.length === 0 && reloadOk && seasons.every(s => s.userMatches > 0) };
+}
+
+async function pruebaEspacio(browser) {
+  const errors = [], missing = new Set();
+  const { ctx, page } = await newPage(browser, errors, missing);
+  await page.goto(URL, { waitUntil: 'load' }); await page.waitForTimeout(1200);
+  if (!(await page.evaluate(() => !!window.MCRespaldo))) { await ctx.close(); return { ok: null, nota: 'sin módulo de respaldo (versión base)' }; }
+  const snap = await page.evaluate(async () => {
+    go('newcareer'); const c = document.getElementById('country'); c.value = 'Argentina'; fillClubs();
+    document.getElementById('clubChoice').value = 'Boca Juniors'; createCareer();
+    for (let i = 0; i < 3; i++) { openMatch(); mcSimEnd(); match.finished = true; }
+    save(); await MCRespaldo.flush();
+    const okBefore = { round: career.round, seq: career._guardado };
+    // simular almacenamiento lleno SOLO para la carrera
+    const proto = Storage.prototype, o = proto.setItem;
+    proto.setItem = function (k, v) { if (String(k).startsWith('mc_career_v7_')) throw new DOMException('lleno', 'QuotaExceededError'); return o.call(this, k, v); };
+    for (let i = 0; i < 2; i++) { openMatch(); mcSimEnd(); match.finished = true; }
+    save();
+    const modal = document.getElementById('modal').classList.contains('open') && /Sin espacio/.test(document.getElementById('sheet').textContent);
+    await MCRespaldo.flush();
+    proto.setItem = o;
+    return { okBefore, lost: { round: career.round, seq: career._guardado, points: career.points }, modal };
+  });
+  await page.reload({ waitUntil: 'load' }); await page.waitForTimeout(800);
+  const res = await page.evaluate(async () => { const r = await MCRespaldo.ready; return { estado: r, round: career.round, seq: career._guardado, points: career.points }; });
+  await ctx.close();
+  const ok = snap.modal && res.estado === 'recuperada' && res.round === snap.lost.round && res.points === snap.lost.points && errors.length === 0;
+  return { ok, snap, res, errors };
 }
 
 const browser = await chromium.launch();
@@ -112,9 +141,10 @@ for (const cs of CASES) {
   try { results.push(await playCase(browser, cs)); }
   catch (e) { results.push({ case: cs, ok: false, crash: String(e && e.stack || e) }); }
 }
+const espacio = await pruebaEspacio(browser).catch(e => ({ ok: false, crash: String(e && e.stack || e) }));
 await browser.close();
 const fingerprint = sha(results.map(r => (r.seasons || []).map(s => s.hash)));
-const out = { name: NAME, seed: SEED, fingerprint, ok: results.every(r => r.ok), results };
+const out = { name: NAME, seed: SEED, fingerprint, ok: results.every(r => r.ok) && espacio.ok !== false, results, espacio };
 mkdirSync('tests/out', { recursive: true });
 writeFileSync(`tests/out/${NAME}.json`, JSON.stringify(out, null, 1));
 // Resumen legible en el registro de GitHub Actions
@@ -124,8 +154,10 @@ for (const r of results) {
   if (r.crash) console.log('CRASH', r.crash);
   if (r.created && !r.created.ok) console.log('NO SE CREÓ', JSON.stringify(r.created));
   for (const s of r.seasons || []) console.log(`  temporada ${s.season}: partidos usuario ${s.userMatches} (goles/p ${s.userGoalsPerMatch}), liga ${s.league.matches} partidos, goles/p ${s.league.goalsPerMatch}, local ${s.league.homeWin}, empates ${s.league.draw}, dif>=5: ${s.league.diff5plus}, máx goles ${s.league.maxGoals}, puesto ${s.position}, pts ${s.points}, presupuesto ${s.budget}, hash ${s.hash}`);
+  if (r.size) console.log('  tamaño: carrera ' + r.size.careerKB + ' KB · localStorage total ' + r.size.localStorageKB + ' KB');
   if (r.save) console.log('  guardado/recarga:', r.save.reloadOk ? 'OK' : 'FALLÓ', JSON.stringify(r.save.after));
   console.log('  archivos inexistentes pedidos:', (r.missing || []).length, (r.missing || []).slice(0, 5).join(' | '));
   console.log('  errores:', r.errors ? r.errors.length : '-'); (r.errors || []).slice(0, 15).forEach(e => console.log('   ', e.slice(0, 300)));
 }
+console.log('\n== Almacenamiento lleno (recuperación):', JSON.stringify(espacio));
 process.exit(out.ok ? 0 : 1);
