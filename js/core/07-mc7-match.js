@@ -9,7 +9,7 @@ let tmr=null;
 function stopTimer(){if(tmr){clearInterval(tmr);tmr=null}}
 window.mcStopMatchTimer=stopTimer;
 const label=m=>m.clock.x>0?`${m.clock.limit}+${m.clock.x}`:`${m.clock.base}`;
-function ev(m,title,msg,key,side){m.events.push({lbl:label(m),min:m.clock.base+m.clock.x,title,msg,key:!!key,side:side||''})}
+function ev(m,title,msg,key,side){m.evSeq=(m.evSeq||0)+1;m.events.push({id:m.evSeq,lbl:label(m),min:m.clock.base+m.clock.x,title,msg,key:!!key,side:side||''})}
 function ps(m,key,name,pos,g,side){return m.pst[key]||(m.pst[key]={key,name,pos,g,side,a:0,gl:0,y:0,r:0,sv:0,on:0})}
 window.createMatch=function(){
  matchPaused=false;mcReplaceUnavailable();

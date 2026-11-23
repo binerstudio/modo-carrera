@@ -1,5 +1,5 @@
 {
- "N": 600,
+ "N": 300,
  "ligas": {
   "España": {
    "partidos": 306,
@@ -272,71 +272,71 @@
   {
    "prueba": "Mejor estado físico (95 vs 60)",
    "campo": "pts",
-   "con": 1.337,
+   "con": 1.323,
    "sin": 1.037,
    "ok": true
   },
   {
    "prueba": "Moral alta (95 vs 40)",
    "campo": "pts",
-   "con": 1.498,
-   "sin": 1.23,
+   "con": 1.5,
+   "sin": 1.207,
    "ok": true
   },
   {
    "prueba": "Entrenador bueno (88 vs 52)",
    "campo": "pts",
-   "con": 1.412,
-   "sin": 1.292,
+   "con": 1.397,
+   "sin": 1.29,
    "ok": true
   },
   {
    "prueba": "Química alta (1 vs 0.2)",
    "campo": "pts",
-   "con": 1.412,
-   "sin": 1.26,
+   "con": 1.397,
+   "sin": 1.243,
    "ok": true
   },
   {
    "prueba": "Táctica ofensiva genera más remates",
    "campo": "tiros",
-   "con": 14.82,
-   "sin": 12.68,
+   "con": 14.48,
+   "sin": 12.5,
    "ok": true
   },
   {
    "prueba": "Táctica defensiva concede menos",
    "campo": "gc",
-   "con": 0.793,
-   "sin": 1.19,
+   "con": 0.783,
+   "sin": 1.177,
    "ok": true
   },
   {
    "prueba": "Lluvia: más errores individuales",
    "campo": "errores",
-   "con": 0.512,
-   "sin": 0.332,
+   "con": 0.517,
+   "sin": 0.33,
    "ok": true
   },
   {
    "prueba": "Partido decisivo: más tarjetas",
    "campo": "tarjetas",
-   "con": 4.77,
-   "sin": 3.16,
+   "con": 4.74,
+   "sin": 3.28,
    "ok": true
   },
   {
    "prueba": "Equipo superior gana más",
    "campo": "pts",
-   "con": 2.585,
-   "sin": 1.338,
+   "con": 2.627,
+   "sin": 1.31,
    "ok": true
   },
   {
    "prueba": "Localía da ventaja",
    "campo": "pts",
-   "con": 1.5183333333333333,
-   "sin": 1.2083333333333333,
+   "con": 1.5966666666666667,
+   "sin": 1.1466666666666667,
    "ok": true
   }
  ],

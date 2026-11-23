@@ -44,7 +44,7 @@ function preparar(m,ctx){
  if(cl[2].pesado&&ce[0]!=='Irregular'&&R()<.4)ce=CESPED[2];
  const imp=ctx.importancia!=null?ctx.importancia:1;
  m.v2={version:VERSION,clima:cl[0],cesped:ce[0],fx:Object.assign({pase:0,remate:0,error:1,fatiga:1,ritmo:0,lejos:0},cl[2],{pase:(cl[2].pase||0)+(ce[2].pase||0),error:(cl[2].error||1)*(ce[2].error||1)}),
-  importancia:imp,arbitro:ctx.arbitro||{severidad:+(0.8+R()*0.45).toFixed(2),precision:+(0.86+R()*0.11).toFixed(3)},
+  semilla:ctx.semilla||'',importancia:imp,arbitro:ctx.arbitro||{severidad:+(0.8+R()*0.45).toFixed(2),precision:+(0.86+R()*0.11).toFixed(3)},
   quimica:{o:ctx.quimicaO!=null?ctx.quimicaO:.7,r:ctx.quimicaR!=null?ctx.quimicaR:.7},
   dt:{o:ctx.dtO!=null?ctx.dtO:70,r:ctx.dtR!=null?ctx.dtR:70},
   var:{revisiones:0,anulados:0,penales:0},errores:{o:0,r:0},arbitrales:0,rebotes:0};
@@ -118,7 +118,46 @@ function revisaGol(m,side,API,type){const V=m.v2;
  if(R()<.12){V.var.revisiones++;API.ev(m,'📺 VAR',`Revisión del VAR... el gol es válido.`,false,side)}
  return true}
 
-function ataque(m,side,API,kind){
+
+/* ===================== NARRACIÓN DE LAS JUGADAS (12.7) =====================
+   El motor deja escrita cada jugada completa (quién recupera, cada pase y su tipo, conducciones,
+   gambetas, el defensor que cierra y el remate con su resultado) y la posesión de cada minuto.
+   El simulador 2D solo reproduce esto. La narración usa un azar PROPIO y fijo por partido, para que
+   goles, tiros y resultados salgan exactamente de las mismas probabilidades calibradas. */
+const DR=new WeakMap();
+function hs(s){let h=2166136261;s=String(s);for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function drng(m){let f=DR.get(m);if(!f){let a=hs((m.home||'')+'|'+(m.away||'')+'|'+((m.v2&&m.v2.semilla)||''));f=()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};DR.set(m,f)}return f}
+function marcar(m,acc){const E=m.events&&m.events[m.events.length-1];if(E&&!E.acc)E.acc=acc;return acc}
+function secuencia(m,side,kind,type,sh,as,defE,gkE,extra){
+ const D=drng(m),home=side==='o',mine=home?m.own:m.riv,theirs=home?m.riv:m.own,N=e=>e?nm(e):null;
+ const pk=L=>L.length?L[Math.floor(D()*L.length)]:null,del=(g,ex)=>mine.filter(e=>e.g===g&&!ex.includes(e));
+ const out=[],fin={t:type==='cabezazo'||type==='corner'?'cabezazo':'remate',j:N(sh),tipo:type,res:null,arq:N(gkE),def:N(defE),zona:D()<.3?'alto':'bajo'};
+ if(kind==='corner'){out.push({t:'corner',j:N(as||pk(del('MED',[sh])))},{t:'pase',de:N(as),a:N(sh),tipo:'centro'});out.push(fin);return out}
+ if(type==='tirolibre'){const inf=pk(theirs.filter(e=>e.g!=='POR'))||defE;out.push({t:'falta',de:N(inf),a:N(sh)},{t:'tirolibre',j:N(sh)});fin.t='remate';out.push(fin);return out}
+ if(kind==='rebote'){out.push({t:'rebote',j:N(sh)});out.push(fin);return out}
+ if(kind==='error'){out.push({t:'error',j:N(extra&&extra.who),a:N(as||sh)});if(as&&as!==sh)out.push({t:'pase',de:N(as),a:N(sh),tipo:'corto'});out.push(fin);return out}
+ /* juego abierto: recuperación y circulación hacia adelante */
+ const ex=[sh,as].filter(Boolean),rec=pk(type==='contra'?del('DEF',ex).concat(del('MED',ex)):del('DEF',ex).concat(del('MED',ex)).concat(del('POR',ex)))||as||sh;
+ out.push({t:'recupera',j:N(rec),de:N(pk(theirs.filter(e=>e.g!=='POR')))});
+ let cur=rec;const np=type==='contra'?(D()<.5?0:1):1+Math.floor(D()*3);
+ for(let i=0;i<np;i++){const L=(i<np-1?del('MED',ex):del('MED',ex).concat(del('DEL',ex))).filter(e=>e!==cur);const nx=pk(L);if(!nx)break;
+  out.push({t:'pase',de:N(cur),a:N(nx),tipo:type==='contra'||D()<.22?'largo':'corto'});cur=nx;if(D()<.35)out.push({t:'conduce',j:N(cur)})}
+ if(as&&as!==cur&&as!==sh){out.push({t:'pase',de:N(cur),a:N(as),tipo:'corto'});cur=as}
+ if(type==='filtrado'||type==='contra'){if(cur!==sh)out.push({t:'pase',de:N(cur),a:N(sh),tipo:'filtrado'})}
+ else if(type==='centro'||type==='cabezazo'){if(cur!==sh){out.push({t:'conduce',j:N(cur),banda:true},{t:'pase',de:N(cur),a:N(sh),tipo:'centro'})}}
+ else if(cur!==sh)out.push({t:'pase',de:N(cur),a:N(sh),tipo:'corto'});
+ if(type==='individual'&&defE)out.push({t:'gambeta',j:N(sh),rival:N(defE)});
+ else if(defE&&D()<.6)out.push({t:'cierre',j:N(defE),a:N(sh)});
+ out.push(fin);return out}
+/* posesión de un minuto (sin remate): cadena de pases y, a veces, pérdida y recuperación */
+function posesion(m,pO){const V=m.v2,D=drng(m),eq=D()<pO?'o':'r',L=(eq==='o'?m.own:m.riv),O=(eq==='o'?m.riv:m.own);if(!L.length||!O.length)return;
+ const pk=A=>A.length?A[Math.floor(D()*A.length)]:null;const camp=L.filter(e=>e.g!=='POR');
+ let cur=pk(D()<.12?L.filter(e=>e.g==='POR'):camp.filter(e=>e.g!=='DEL'))||pk(camp);const pases=[nm(cur)];const n=1+Math.floor(D()*4);
+ for(let i=0;i<n;i++){const nx=pk(camp.filter(e=>e!==cur&&(i<1?true:e.g!=='DEF')));if(!nx)break;pases.push(nm(nx));cur=nx}
+ const pierde=D()<.38;V.posesion=V.posesion||[];V.pseq=(V.pseq||0)+1;
+ V.posesion.push({id:V.pseq,min:m.minute,eq,pases,recupera:pierde?nm(pk(O.filter(e=>e.g!=='POR'))):null});if(V.posesion.length>8)V.posesion.shift()}
+
+function ataque(m,side,API,kind,who){
  const V=m.v2,home=side==='o',mine=home?m.own:m.riv,theirs=home?m.riv:m.own,other=home?'r':'o';
  if(!mine.length||!theirs.length)return;
  const gkE=theirs.find(e=>e.g==='POR')||theirs[0],club=API.club(m,side);
@@ -152,10 +191,11 @@ function ataque(m,side,API,kind){
  const pOn=clamp(.36+d*.002+tOn+(rq-SA.grl)*.003-(dq-SD.grl)*.0015+V.fx.remate+lejos,.2,.75);
  const gp=clamp(.215+(rq-gq)*.0022+d*.003+clamp((F.cv||0)+(FD.ocv||0),-.06,.06)+tCv,.05,.55);
  if(home)m.xgH+=pOn*gp;else m.xgA+=pOn*gp;
- if(R()>pOn){API.miss(m,side,type,sh,defE,gkE,false);return}
+ const acc=secuencia(m,side,kind,type,sh,as,defE,gkE,{who}),fin=acc[acc.length-1];
+ if(R()>pOn){fin.res=drng(m)()<.15?'palo':'afuera';API.miss(m,side,type,sh,defE,gkE,false);marcar(m,acc);return}
  if(home)m.onH++;else m.onA++;
- if(R()<gp){if(revisaGol(m,side,API,type))API.goal(m,side,sh,type==='afuera'||type==='individual'||type==='rebote'||type==='tirolibre'?null:as,'play',type,nm(defE),nm(gkE));return}
- if(home)m.savesA++;else m.savesH++;API.ps(m,gkE,other).sv++;API.miss(m,side,type,sh,defE,gkE,true);
+ if(R()<gp){if(revisaGol(m,side,API,type)){fin.res='gol';API.goal(m,side,sh,type==='afuera'||type==='individual'||type==='rebote'||type==='tirolibre'?null:as,'play',type,nm(defE),nm(gkE))}else fin.res='anulado';marcar(m,acc);return}
+ fin.res='atajada';if(home)m.savesA++;else m.savesH++;API.ps(m,gkE,other).sv++;API.miss(m,side,type,sh,defE,gkE,true);marcar(m,acc);
  /* rebote: la pelota queda viva tras la atajada */
  if(kind!=='rebote'){const ga=at(gkE).v,pr=clamp(.13+(at(sh).v.reacciones-ga.manejo)*.003,.05,.25);if(R()<pr){V.rebotes++;ataque(m,side,API,'rebote')}}
 }
@@ -163,11 +203,12 @@ function penal(m,side,API,vic,defE,gkE){const V=m.v2,home=side==='o',mine=home?m
  const tk=mine.filter(e=>e.g!=='POR');const sh=R()<.7?tk.slice().sort((a,b)=>remate(b,'pen')-remate(a,'pen'))[0]:wpick(tk,e=>q(remate(e,'pen')));
  if(home){m.shotsH++;m.onH++}else{m.shotsA++;m.onA++}
  API.ev(m,'⚠ PENAL',`${nm(defE)} derriba a ${nm(vic)} dentro del área: penal para ${API.club(m,side)}. ${nm(sh)} toma la pelota.`,true,side);
+ const pacc=marcar(m,[{t:'falta',de:nm(defE),a:nm(vic),area:true},{t:'penal',j:nm(sh),res:null,arq:nm(gkE)}]),pf=pacc[1];
  if(R()<.3*V.arbitro.severidad)API.yellow(m,defE,other,'por el penal cometido');
  const gp=clamp(.76+(remate(sh,'pen')-atajada(gkE))*.004,.6,.9);
  if(home)m.xgH+=.76;else m.xgA+=.76;
- if(R()<gp)API.goal(m,side,sh,null,'pen','pen',nm(defE),nm(gkE));
- else{const sv=R()<.6;if(sv){if(home)m.savesA++;else m.savesH++;API.ps(m,gkE,other).sv++}
+ if(R()<gp){pf.res='gol';API.goal(m,side,sh,null,'pen','pen',nm(defE),nm(gkE))}
+ else{const sv=R()<.6;pf.res=sv?'atajada':'afuera';if(sv){if(home)m.savesA++;else m.savesH++;API.ps(m,gkE,other).sv++}
   API.ev(m,'PENAL FALLADO',sv?`${nm(gkE)} adivina la intención de ${nm(sh)} y ataja el penal.`:`${nm(sh)} le pega muy fuerte y la pelota ${pick(['se va por arriba del travesaño','pega en el palo y sale'])}.`,true,side)}}
 
 /* ---------- un minuto de juego ---------- */
@@ -180,6 +221,7 @@ function minuto(m,API){
  const SO=fuerzas(m,'o'),SR=fuerzas(m,'r'),FO=m.fxO,FR=m.fxR,hb=m.venue==='a'?-1:m.venue==='n'?0:1,d=SO.grl-SR.grl;
  const tgt=clamp(50+(SO.mid-SR.mid)*.35+d*.25+FO.pos-FR.pos+hb*1.5+(SO.n-SR.n)*4,26,76);m.pos=clamp(m.pos+(tgt-m.pos)*.12+(R()*5-2.5),24,76);
  const pO=m.pos/100,manO=11-SO.n,manR=11-SR.n;
+ if(m.events)posesion(m,pO);
  const tcap=t=>0.22*Math.tanh(t/0.22),lead=m.h-m.a,ease=L=>L>=2?Math.exp(-0.38*(L-1)):1;
  const tension=1-(V.importancia-1)*.12,amb=(1+V.fx.ritmo)*tension;
  const aO=clamp(.106*amb*Math.exp(d*0.03+(SO.att-SR.def)*.005+(m.pos-50)*.004+tcap(FO.cr+FR.ex)+hb*.1-manO*.3+manR*.2)*ease(lead),.02,.22);
@@ -193,7 +235,7 @@ function minuto(m,API){
   if(R()<pe){const back=L.filter(e=>e.g==='DEF'||e.g==='POR');if(!back.length)continue;
    const who=wpick(back,e=>(1.2-energia(e))*(110-at(e).v.reacciones)),opp=side==='o'?'r':'o';V.errores[side]++;
    API.ev(m,'❗ ERROR INDIVIDUAL',`${nm(who)} (${API.club(m,side)}) ${pick(['falla en el control','entrega mal en salida','calcula mal el rebote','se resbala'])} y le deja la pelota servida a ${API.club(m,opp)}.`,true,opp);
-   ataque(m,opp,API,'error')}}
+   ataque(m,opp,API,'error',who)}}
  /* córners */
  if(R()<.1*(FO.corner+FR.corner)/2){const wo=pO*FO.corner,o=R()<wo/(wo+(1-pO)*FR.corner),side=o?'o':'r';if(o)m.cornersH++;else m.cornersA++;
   if(R()<.32)ataque(m,side,API,'corner');else if(R()<.35){const dl=(o?m.riv:m.own).filter(e=>e.g==='DEF');API.ev(m,'TIRO DE ESQUINA',`Córner para ${API.club(m,side)}; ${dl.length?nm(pick(dl)):'la defensa'} despeja de cabeza.`,false,side)}}

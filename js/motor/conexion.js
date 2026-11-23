@@ -37,7 +37,7 @@ if(typeof oMatch==='function')window.createMatch=function(){
    const ages=new Map();try{(window.rosterFor?rosterFor(match.away):[]).forEach(x=>ages.set(x[0],x[3]))}catch(e){}
    match.riv.concat(match.rivBench||[]).forEach(e=>{if(e.age==null&&ages.has(e.name))e.age=ages.get(e.name)});
    let dtR=70;try{const co=window.mcCoachOf?mcCoachOf(match.away):null;if(co&&co.lvl)dtR=co.lvl}catch(e){}
-   const V=MCMotor.preparar(match,{importancia:importancia(match),quimicaO:quimica(),dtR});
+   const V=MCMotor.preparar(match,{importancia:importancia(match),quimicaO:quimica(),dtR,semilla:career.id+'|'+career.season+'|'+career.round});
    const ar=V.arbitro.severidad>=1.1?'estricto':V.arbitro.severidad<=.9?'permisivo':'equilibrado';
    const imp=V.importancia>=1.4?' · Partido decisivo':V.importancia>=1.2?' · Eliminación directa':V.importancia>1?' · Recta final':'';
    if(window.mcMatchEv)mcMatchEv(match,'🏟 PREVIA',`Clima: ${V.clima} · Césped: ${V.cesped} · Árbitro ${ar}${imp}. Química del equipo: ${Math.round(V.quimica.o*100)}%.`,false,'');

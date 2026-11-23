@@ -25,6 +25,8 @@ jobs:
         run: node tests/motor.mjs 1000
       - name: Jugar temporadas con semilla fija
         run: node tests/regresion.mjs http://localhost:8080/index.html ${{ github.ref_name }}
+      - name: Auditoría de eventos del motor v2 (30 partidos)
+        run: node tests/eventos.mjs http://localhost:8080/index.html 30
       - name: Simulador 2D en vivo (capturas en el artefacto)
         run: node tests/partido2d.mjs http://localhost:8080/index.html
       - name: Tres temporadas sin intervención (IA y mercado)
