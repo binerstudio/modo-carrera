@@ -42,11 +42,11 @@ function atributos(info){
 
 /* ---------- calibración (etapa 4): perillas del motor, todas en un solo lugar ---------- */
 const CAL={
- nivel:70,atributos:.66,   // atributos comprimidos alrededor de 70 (1 = sin comprimir)
+ nivel:70,atributos:.67,   // atributos comprimidos alrededor de 70 (1 = sin comprimir)
  satura:14,                // y saturados: las diferencias enormes pesan menos que en línea recta (tanh)
  punteria:.11,            // error base de los remates (radianes)
  alcanceArquero:1.7,      // alcance del arquero parado (m)
- remate:.55,               // ganas de patear (multiplica el xG al decidir)
+ remate:.62,               // ganas de patear (multiplica el xG al decidir)
  cuidado:2.1,              // cuánto pesa perder la pelota al elegir un pase o una conducción
  faltaArea:.026,            // el defensor se cuida en su área (multiplica la chance de falta)
  desfase:3.4,              // cuánto se pasa de la línea el delantero que espera (offsides)
@@ -56,7 +56,9 @@ const CAL={
  centro:1.3,               // ganas de tirar centros desde la banda
  bloqueaCentro:.25,        // centros que tapa el que marca al centrador (muchos se van al córner)        // despejes de cabeza apurados en el área propia que terminan en córner
  dia:1.2,                  // forma del día de cada equipo: desvío (en puntos de atributo) sorteado con la semilla
-  local:.10                 // local: algo más de confianza (menos error al ejecutar) e intensidad (se cansa menos)
+ toque:1,                  // ticks de más que se toma el que recibe antes de decidir (ritmo de pases)
+ costoPase:.0015,          // costo fijo de cada pase frente a seguir con la pelota (ritmo de pases)
+ local:.105                // local: algo más de confianza (menos error al ejecutar) e intensidad (se cansa menos)
 };
 /* ---------- táctica y formación ---------- */
 /* mismos valores que usa el juego (js/core/07-mc7-match.js: ownTac / rivalTac) */
@@ -372,7 +374,7 @@ P.tomar=function(j,manos){
  }else if(!B.ultimo||B.ultimo.eq!==j.eq)j.recibioDe=null;
  B.dueno=j;B.ultimo=j;B.tipo='control';B.tiro=null;B.destino=null;B.desde=null;B.vx=B.vy=B.vz=0;B.z=0;
  j.manos=!!manos;j.conPelota=0;j.accion=null;
- j.ctrl=manos?18+MATH.floor(this.R()*15):clamp(MATH.round(3-(j.a.control-50)/25),1,4);j.prox=this.t+j.ctrl;
+ j.ctrl=manos?18+MATH.floor(this.R()*15):clamp(MATH.round(3-(j.a.control-50)/25),1,4)+CAL.toque;j.prox=this.t+j.ctrl;
 };
 P.controles=function(){
  const B=this.B,R=this.R;if(B.enRed)return;
@@ -546,6 +548,7 @@ P.decidir=function(j){
    if(MATH.abs(ty-j.y)>28&&pr.p>.4&&pq.p<.3)u+=.006*(1+T.W*.5)*exito;                       // cambio de frente
    if(q.pared&&q.pared.hasta>this.t&&j.recibioDe===q)u+=.012*exito;                // pared: devolverla al que picó
    if(q.corrida&&q.corrida.hasta>this.t)u+=(tax>offs?.022:.008)*exito;             // pase al que pica al espacio (a la espalda de la defensa vale más)
+   u-=CAL.costoPase;
    opts.push({u,tipo:'pase',q,tx,ty,alto,vh,vz,d:d0,r});if(u>cota)cota=u
   }
  }
