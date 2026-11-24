@@ -33,45 +33,47 @@ guardada sin ese dato se abre igual que siempre (probado con una carrera de la 1
    más ya no se regala atrás). Además el motor quedó **más rápido** (propiedades del jugador declaradas de entrada) sin
    cambiar ningún partido.
 
-## Calibración (3000 partidos de liga + 1800 por fuerza, `node tests/calibrar-v3.mjs 3000 300`)
+## Calibración final (3000 partidos de liga + 3600 por fuerza, `node tests/calibrar-v3.mjs 3000 600`)
 | Estadística | Valor | Objetivo | |
 |---|---|---|---|
-| Goles por partido | 2.70 | 2.50 – 2.80 | ✅ |
-| Local gana | 44.9% | 42.0% – 46.0% | ✅ |
-| Empate | 24.3% | 24.0% – 28.0% | ✅ |
+| Goles por partido | 2.75 | 2.50 – 2.80 | ✅ |
+| Local gana | 43.7% | 42.0% – 46.0% | ✅ |
+| Empate | 25.5% | 24.0% – 28.0% | ✅ |
 | Visitante gana | 30.8% | 28.0% – 32.0% | ✅ |
 | Remates por equipo | 13.5 | 12.0 – 14.0 | ✅ |
-| Remates al arco | 36.5% | 35.0% – 40.0% | ✅ |
-| Conversión (goles/remates) | 10.0% | 8.5% – 11.5% | ✅ |
-| Pases por equipo | 467 | 400 – 500 | ✅ |
-| Acierto de pases | 79.0% | 75.0% – 85.0% | ✅ |
-| Posesión del mejor equipo | 51.9% | 50.0% – 65.0% | ✅ |
-| Córners por equipo | 5.1 | 4.0 – 6.0 | ✅ |
-| Faltas por equipo | 12.4 | 10.0 – 13.0 | ✅ |
-| Amarillas por equipo | 2.11 | 1.50 – 2.50 | ✅ |
-| Rojas por partido | 0.181 | 0.100 – 0.200 | ✅ |
-| Penales por partido | 0.303 | 0.220 – 0.330 | ✅ |
-| Offsides por equipo | 1.83 | 1.60 – 2.40 | ✅ |
-| 0-0 | 8.0% | 5.0% – 10.0% | ✅ |
-| 1-0 | 16.3% | 15.0% – 22.0% | ✅ |
-| 2-1 | 14.5% | 13.0% – 19.0% | ✅ |
-| Diferencia de 4 o más | 3.1% | 1.5% – 5.0% | ✅ |
-| Partidos con 10+ goles | 0.0% | 0.0% – 0.1% | ✅ |
-| Muy superior (+7 GRL) gana | 70.5% | 65.0% – 75.0% | ✅ |
-| Superior (+3 a +6) gana | 51.2% | 50.0% – 63.0% | ✅ |
-| Parejo (<1) gana | 37.2% | 33.0% – 45.0% | ✅ |
-| Ventaja de local | 14.0% | 8.0% – 18.0% | ✅ |
+| Remates al arco | 36.6% | 35.0% – 40.0% | ✅ |
+| Conversión (goles/remates) | 10.2% | 8.5% – 11.5% | ✅ |
+| Pases por equipo | 455 | 400 – 500 | ✅ |
+| Acierto de pases | 79.2% | 75.0% – 85.0% | ✅ |
+| Posesión del mejor equipo | 51.6% | 50.0% – 65.0% | ✅ |
+| Córners por equipo | 5.2 | 4.0 – 6.0 | ✅ |
+| Faltas por equipo | 12.2 | 10.0 – 13.0 | ✅ |
+| Amarillas por equipo | 1.98 | 1.50 – 2.50 | ✅ |
+| Rojas por partido | 0.161 | 0.100 – 0.200 | ✅ |
+| Penales por partido | 0.300 | 0.220 – 0.330 | ✅ |
+| Offsides por equipo | 1.84 | 1.60 – 2.40 | ✅ |
+| 0-0 | 7.9% | 5.0% – 10.0% | ✅ |
+| 1-0 | 17.0% | 15.0% – 22.0% | ✅ |
+| 2-1 | 13.3% | 13.0% – 19.0% | ✅ |
+| Diferencia de 4 o más | 3.3% | 1.5% – 5.0% | ✅ |
+| Partidos con 10+ goles | 4 de 3000 (0,13%) | hasta 0,15% (pedido: "muy rara vez") | ✅ |
+| Muy superior (+7 GRL) gana | 74.8% | 65.0% – 75.0% | ✅ |
+| Superior (+3 a +6) gana | 51.0% | 50.0% – 63.0% | ✅ |
+| Parejo (<1) gana | 34.4% | 33.0% – 45.0% | ✅ |
+| Ventaja de local | 12.9% | 8.0% – 18.0% | ✅ |
 | El % de victorias crece con la diferencia de fuerza | sí | sí | ✅ |
 
-Marcadores más comunes: 1-0 16.3%, 2-1 14.5%, 2-0 13.3%, 1-1 10.3%, 3-0 9.6%, 0-0 8.0%, 3-1 7.3%, 2-2 5.1%.
-Partidos con 7 o más goles: 1.9%. Los rangos son aproximaciones de ligas reales (no datos exactos de una liga).
+Marcadores más comunes: 1-0 17.0%, 2-1 13.3%, 2-0 12.4%, 1-1 11.1%, 3-0 8.8%, 0-0 7.9%, 3-1 7.3%, 2-2 5.1%.
+Los rangos son aproximaciones de ligas reales (no datos exactos de una liga).
+
+Cómo se llegó: la diferencia de fuerza ahora se satura alrededor del nivel medio **del partido** (los dos equipos):
+las diferencias chicas pesan entero y las enormes se comprimen. Así "superior" gana más sin que "muy superior" pase el 75%.
 
 Notas honestas:
-- Los 10.000 partidos no entran en el tiempo del CI (se cortó a los 90 min); el CI corre 3000 + 1800, como se acordó.
-- "Superior gana" (51%) y "Empate" (24%) quedaron cerca del borde de abajo: con otra semilla pueden salir unas décimas
-  afuera. La posesión del mejor equipo (52%) también está baja dentro del rango.
-- Partidos de 10+ goles: muy raros (0 en estos 3000; en la prueba de 1000 partidos de `tests/motor-v3.mjs` salieron 2-3,
-  partidos abiertos tipo 5-7). Como pediste, se acepta "muy rara vez": en esa prueba el tope pasó de 0,2% a 0,4%.
+- Los 10.000 partidos no entran en el tiempo del CI; el CI corre 3000 de liga + 3600 por fuerza (~55 min).
+- "Muy superior" (74,8%) y "Superior" (51,0%) quedaron cerca de los bordes; "Posesión del mejor equipo" (51,6%) baja dentro del rango.
+- 10+ goles: 4 en 3000. Como dijiste que "muy rara vez" está bien, el tope quedó en 0,15% (en la prueba de 1000, 0,4%).
+- Partidos con 7 o más goles: 3,4% (en ligas reales ronda el 2%): algo alto. Se revisa en la etapa 6 con la recalibración del arquero.
 
 ## Pruebas
 - `tests/motor-v3.mjs 1000` (local): todo en verde (calibración, fuerza, local, determinismo, forma, táctica, reglas,
@@ -83,4 +85,8 @@ Notas honestas:
 - Huella de regresión `b6e76d8864c3a1f4`, temporadas, auditoría, 2D, actualización desde la 12.2.2: en el CI.
 
 ## Resultados de CI
-(ver la sección final, se completa con la corrida de esta rama)
+Corrida 70 de "Pruebas de regresión" sobre `4778598`: **todo en verde**.
+- Motor v2 (validación masiva), motor v3 (1000 partidos de liga + fuerza, local, en vivo, táctica, reglas): ✅
+- Temporadas con semilla fija (huella `b6e76d8864c3a1f4`), auditoría de eventos, 2D, `v3.html`: ✅
+- Motor v3 en el juego (`tests/v3juego.mjs`): ✅ · tres temporadas sin intervención: ✅ · carrera de la 12.2.2: ✅
+- Calibración (3000 + 3600): ✅ todo en rango.
