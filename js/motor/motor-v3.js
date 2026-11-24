@@ -18,7 +18,7 @@
 'use strict';
 /* referencia local: dentro de un contexto vm el acceso a globales es lento */
 const MATH=Math;
-const VERSION='3.0.0-e3';
+const VERSION='3.0.0-e5';
 const PW=105,PH=68,TPS=10,DT=1/TPS,G=9.81,SUB=4,H=DT/SUB;
 const GY0=34-3.66,GY1=34+3.66,GH=2.44,BR=0.11;            // arco y radio de la pelota
 const AREA_X=16.5,AREA_Y0=34-20.16,AREA_Y1=34+20.16;
