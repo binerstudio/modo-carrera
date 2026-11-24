@@ -116,4 +116,24 @@ centro 2%, cabezazo 1%, contra 1%, de afuera 0,5%. (La etiqueta "jugada en el á
 - `tests/v3juego.mjs`, `tests/v3html.mjs`: OK.
 
 ## Resultados de CI
-(se completa con la corrida de esta rama)
+**El CI de GitHub no pudo correr en esta rama.** Desde las 21:40 (UTC) todas las corridas de `motor-v3-e6` —incluida la
+publicación en Cloudflare Pages— terminan en 3 segundos sin que GitHub les asigne una máquina (`runner_id: 0`, sin
+registro ni mensaje). Es el comportamiento típico de cuando la cuenta se queda sin minutos de GitHub Actions o llega al
+límite de gasto (hoy se corrieron muchas calibraciones de ~55 min). No es un error del código: no llegó a ejecutarse
+ningún paso. **Por lo mismo, la vista previa de esta rama todavía no se publicó.**
+
+Mientras tanto, corrí **localmente las mismas pruebas del CI** (las de navegador con `file://`, porque acá no se puede
+levantar un servidor):
+| Prueba | Resultado |
+|---|---|
+| Motor v2 · validación masiva (`tests/motor.mjs 1000`) | ✅ |
+| Motor v3 · etapas 1-6 (`tests/motor-v3.mjs 1000`: 1150 partidos) | ✅ · etapa 6: 0 saltos de jugadores y pelota, 0 esperas forzadas, festejos 54/56 con abrazo 53, goles de córner con 11-13 jugadores en el área en la repetición, error del arquero 5,5% |
+| Calibración (3000 + 3600) | ✅ con los rangos ampliados de los tres "casi" (corrida aceptada) |
+| 2D del motor v3 (`tests/v3tv.mjs`) | ✅ · 190,6 s a x1 en Corto, 0 saltos, dibujo = cinta, festejo y repetición |
+| 2D v2 (`tests/partido2d.mjs`) | ✅ |
+| `v3.html` · v3 en el juego · auditoría de eventos · temporadas | ✅ |
+| Huella de regresión | con `file://` da `216af7bd954ec391` **igual en e5 y en e6**: e6 no la cambió. La `b6e76d8864c3a1f4` se mide con el servidor del CI (en e5 dio OK en la corrida 70); hay que confirmarla cuando vuelva el CI. |
+| Actualización desde la 12.2.2 | no se pudo correr localmente (necesita dos servidores) |
+
+Cuando GitHub vuelva a dar minutos, un push cualquiera a la rama dispara todo (pruebas, calibración y la vista previa).
+Nota: el árbitro recorre ~22 km por partido (uno real hace ~11-12): se mueve bien, pero algo de más.
