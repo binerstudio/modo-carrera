@@ -42,8 +42,8 @@ function atributos(info){
 
 /* ---------- calibración (etapa 4): perillas del motor, todas en un solo lugar ---------- */
 const CAL={
- nivel:70,atributos:.75,   // atributos comprimidos alrededor de 70 (1 = sin comprimir)
- satura:14,                // y saturados: las diferencias enormes pesan menos que en línea recta (tanh)
+ nivel:70,atributos:.78,   // atributos comprimidos alrededor de 70 (1 = sin comprimir)
+ satura:12,                // y saturados: las diferencias enormes pesan menos que en línea recta (tanh)
  punteria:.11,            // error base de los remates (radianes)
  alcanceArquero:1.7,      // alcance del arquero parado (m)
  remate:.6,               // ganas de patear (multiplica el xG al decidir)
