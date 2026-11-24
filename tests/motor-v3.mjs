@@ -88,7 +88,7 @@ for (let i = 0; i < PARTIDOS.length; i++) {
   if (r.eventos.some(ev => !Number.isFinite(ev.min) || !ev.tipo)) out.errores.push(`partido ${i}: evento sin minuto o tipo`);
   const c = r.cinta, n = c.porCuadro, d = c.datos;
   if (d.length !== c.frames * n) out.errores.push(`partido ${i}: cinta de tamaño incorrecto`);
-  for (let f = 0; f < c.frames; f += 7) { const o = f * n; if (fuera(d[o] / 10, d[o + 1] / 10)) { out.errores.push(`partido ${i}: pelota fuera de lugar en cuadro ${f}`); break; } let mal = false; for (let k = 5; k < n; k += 2) if (fuera(d[o + k] / 10, d[o + k + 1] / 10)) mal = true; if (mal) { out.errores.push(`partido ${i}: jugador fuera de lugar en cuadro ${f}`); break; } }
+  for (let f = 0; f < c.frames; f += 7) { const o = f * n; if (fuera(d[o] / 10, d[o + 1] / 10)) { out.errores.push(`partido ${i}: pelota fuera de lugar en cuadro ${f}`); break; } let mal = false; for (let k = 5; k < n; k += 2) if (d[o + k] !== -32768 && fuera(d[o + k] / 10, d[o + k + 1] / 10)) mal = true; if (mal) { out.errores.push(`partido ${i}: jugador fuera de lugar en cuadro ${f}`); break; } }
   if (r.jugadores.some(j => !Number.isFinite(j.distancia) || !Number.isFinite(j.energiaFinal))) out.errores.push(`partido ${i}: NaN en jugadores`);
   /* estadísticas (solo de los partidos de liga) */
   const s = r.stats, g = r.h + r.a;
