@@ -1323,13 +1323,23 @@ P.patearPenal=function(j){
  for(const p of this.A){if(p===j||p.gk)continue;const w=this.toW(e,PW-9,34+(p.id%5-2)*4);p.orden={tipo:'punto',x:w[0],y:w[1],hasta:this.t+20}}
 };
 
+/* tiros libres y córners: no se patea con un rival todavía a menos de 9,15 m ni con la barrera sin armar; a los 8 s se patea igual */
+P.rivalCerca=function(r){
+ const rad=r.datos&&r.datos.radio||0;if(rad<9||(r.tipo!=='tiro_libre'&&r.tipo!=='corner'))return false;
+ for(const j of this.eq[1-r.e]){if(j.fuera||j.expulsado)continue;
+  if(j.enBarrera){const p=r.plan&&r.plan.get(j.id);if(p&&hyp(j.x-p[0],j.y-p[1])>1)return true}   // la barrera todavía no se armó
+  else if(hyp(j.x-r.x,j.y-r.y)<rad)return true}
+ return false;
+};
 /* ---------- un tick ---------- */
 P.tick=function(){
  const B=this.B;
  if(this.estado==='parado'){
   this.objetivos();this.mover();
-  const r=this.rean;if(r){r.timer--;B.x=r.x;B.y=r.y;B.z=0;B.vx=B.vy=B.vz=0;
-   const d=hyp(r.ej.x-r.x,r.ej.y-r.y);if(r.timer<=0&&(d<2||r.timer<-40))this.ejecutarReanudacion()}
+  const r=this.rean;if(r){r.timer--;B.x=r.x;B.y=r.y;B.z=0;B.vx=B.vy=B.vz=0;if(B.dueno&&B.dueno.eq!==r.e)B.dueno=null;   // el rival suelta la pelota y se aleja
+  
+   const d=hyp(r.ej.x-r.x,r.ej.y-r.y);const listo=r.timer<=0&&d<2&&!this.rivalCerca(r);r.listo=listo?(r.listo||0)+1:0;
+   if(r.listo>=(r.tipo==='tiro_libre'||r.tipo==='corner'?5:1)||r.timer<-80)this.ejecutarReanudacion()}
  }else{
   this.st.ticksJuego++;
   if(B.dueno)this.actuar(B.dueno);
