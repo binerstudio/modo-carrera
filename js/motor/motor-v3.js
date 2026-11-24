@@ -43,10 +43,10 @@ function atributos(info){
 /* ---------- calibración (etapa 4): perillas del motor, todas en un solo lugar ---------- */
 const CAL={
  nivel:70,atributos:.67,   // atributos comprimidos alrededor de 70 (1 = sin comprimir)
- satura:14,                // y saturados: las diferencias enormes pesan menos que en línea recta (tanh)
+ satura:17,                // y saturados: las diferencias enormes pesan menos que en línea recta (tanh)
  punteria:.11,            // error base de los remates (radianes)
  alcanceArquero:1.7,      // alcance del arquero parado (m)
- remate:.62,               // ganas de patear (multiplica el xG al decidir)
+ remate:.6,               // ganas de patear (multiplica el xG al decidir)
  cuidado:2.1,              // cuánto pesa perder la pelota al elegir un pase o una conducción
  faltaArea:.026,            // el defensor se cuida en su área (multiplica la chance de falta)
  desfase:3.4,              // cuánto se pasa de la línea el delantero que espera (offsides)
@@ -58,7 +58,7 @@ const CAL={
  dia:1.2,                  // forma del día de cada equipo: desvío (en puntos de atributo) sorteado con la semilla
  toque:1,                  // ticks de más que se toma el que recibe antes de decidir (ritmo de pases)
  costoPase:.0015,          // costo fijo de cada pase frente a seguir con la pelota (ritmo de pases)
- local:.105                // local: algo más de confianza (menos error al ejecutar) e intensidad (se cansa menos)
+ local:.115                // local: algo más de confianza (menos error al ejecutar) e intensidad (se cansa menos)
 };
 /* ---------- táctica y formación ---------- */
 /* mismos valores que usa el juego (js/core/07-mc7-match.js: ownTac / rivalTac) */
@@ -240,6 +240,7 @@ P.ajustarPorResultado=function(){
   const dif=this.goles[e]-this.goles[1-e],min=this.minAbs();let dM=0,dP=0,dD=0;
   if(dif>=3){dM=-.85;dP=-.7;dD=-.5}else if(dif===2){dM=-.35;dP=-.3;dD=-.2}else if(dif===1&&min>70){dM=-.2;dP=-.1;dD=-.1}
   else if(dif<=-2){dM=.3;dP=.15}else if(dif===-1&&min>70){dM=.3;dP=.2;dD=.1}
+  else if(dif===0&&min>75&&e===1&&!this.opt.neutral){dM=-.2;dP=-.1}   // de visitante, empatando al final, se conforma
   const T=tactica(this.tacBase[e]);T.M=clamp(T.M+dM,-1,1);T.Pz=clamp(T.Pz+dP,-1,1);T.D=clamp(T.D+dD,-1,1);
   T.contrapresion=T.Pz+T.M*.5>.25;T.umbralPresion=62-T.Pz*36;T.bloque=T.D>.33?'alto':T.D<-.33?'bajo':'medio';
   this.tac[e]=T;
@@ -472,7 +473,7 @@ P.decidir=function(j){
  const T=this.tac[e],tr=this.trans[e],contra=tr&&tr.tipo==='contra'&&tr.hasta>this.t;
  /* posesión: perder la pelota pesa más; directo: avanzar pesa más */
  /* perder la pelota cerca del arco propio pesa mucho más */
- const dif=this.goles[e]-this.goles[1-e],relajo=dif>=3?.35:dif===2?.8:1;
+ const dif=this.goles[e]-this.goles[1-e],relajo=dif>=4?.12:dif>=3?.25:dif===2?.75:1;
  const pesoPerder=(CAL.cuidado+(T.posesion?.6:0)+(1-T.directo)*.4)*(1+.5*MATH.max(0,(40-ax)/40)),avance=contra?.03:T.directo*.012;
  const salida=(j.gk||j.linea==='def')&&ax<35;
  const opts=[];
@@ -1061,7 +1062,7 @@ P.crearJugador=function(raw,e,id,sl){
   gk:!!sl.gk,bx:sl.gk?3:30+sl.rel*36,by:sl.gk?34:34+sl.uy*23,apoyo:null,corrida:null,pared:null,orden:null,desfase:0,
   vmax:6.6+(a.velocidad-50)*.05,acc:3+(a.aceleracion-50)*.04,energia:clamp(fit/100,.55,1),fit,
   x:0,y:0,vx:0,vy:0,tx:0,ty:0,urg:.6,cdToque:0,cdEntrada:0,superado:0,ctrl:0,prox:0,accion:null,manos:false,conPelota:0,recibioDe:null,recibir:null,saque:null,tiroTarget:false,_marca:-1,
-  amarilla:false,expulsado:false,fuera:false,lesion:null,enBarrera:false,
+  amarilla:false,expulsado:false,fuera:false,lesion:null,enBarrera:false,ultRecibo:null,ultGambeta:-1e9,penalLado:0,ensayada:0,convertido:false,
   s:{pases:0,pasesOk:0,remates:0,goles:0,asist:0,quites:0,intercepciones:0,gambetas:0,distancia:0,faltas:0,faltasRecibidas:0,offsides:0,entro:sl.entro==null?0:sl.entro,salio:null}};
  if(j.gk){j.vmax=6.2+(a.velocidad-50)*.03;j.acc=3.2+(a.reflejos-50)*.02}
  return j;
@@ -1349,7 +1350,7 @@ P.tick=function(){
  if(this.tParte%600===300&&!this.fin){
   for(const j of this.A){if(j.lesion)continue;const p=.0002*(1+(1-j.energia)*5)*(1.45-j.a.resistencia/100)*(1+(100-j.fit)/40);if(this.R()<p)this.lesionar(j,'cansancio',this.R()<.3)}
  }
- if(this.parte===2&&this.tParte===25*60*TPS)this.ajustarPorResultado();   // minuto 70: el que gana por uno se cuida, el que pierde va
+ if(this.parte===2&&(this.tParte===25*60*TPS||this.tParte===31*60*TPS))this.ajustarPorResultado();   // minuto 70: el que gana por uno se cuida, el que pierde va
  /* gancho de prueba: expulsión forzada en un minuto (solo la usan las pruebas automáticas) */
  const fr=this.opt.forzarRoja;
  if(fr&&!this._roja&&this.estado==='juego'&&this.minAbs()>=fr.minuto){this._roja=true;
