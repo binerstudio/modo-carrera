@@ -57,8 +57,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
-      - name: Motor v3 · calibración (3.000 partidos de liga + 900 por fuerza; 10.000 no entran en el tiempo del CI)
-        run: node tests/calibrar-v3.mjs 3000 150
+      - name: Motor v3 · calibración (3.000 partidos de liga + 1.800 por fuerza; 10.000 no entran en el tiempo del CI)
+        run: node tests/calibrar-v3.mjs 3000 300
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: calibracion-v3, path: tests/out/calibracion-v3.json }
