@@ -34,7 +34,7 @@ canvas{display:block;width:100%;height:auto;border-radius:10px;background:#2f7d3
 </style></head>
 <body><main>
 <h1>Motor v3 · prueba visual</h1>
-<p class="nota">Página de prueba, no enlazada desde el juego. El partido se simula con el motor v3 (etapa 2: táctica y orden) y se dibuja desde arriba exactamente con las posiciones de la cinta (10 por segundo). Los atributos de los jugadores son estimados.</p>
+<p class="nota">Página de prueba, no enlazada desde el juego. El partido se simula con el motor v3 (etapas 1 a 3: cancha, táctica, reglas y pelota parada) y se dibuja desde arriba exactamente con las posiciones de la cinta (10 por segundo). Los atributos de los jugadores son estimados.</p>
 <div class="cfg">
  <div class="eq"><b>Local</b>
   <label>Club <select id="cL"></select></label>
@@ -101,7 +101,7 @@ for(const s of ['L','V']){
 const tacDe=s=>({formation:$('f'+s).value,style:$('s'+s).value,depth:+$('d'+s).value,pressing:+$('p'+s).value,width:+$('w'+s).value,rhythm:+$('r'+s).value,mentality:50});
 
 /* ---------- estado de la reproducción ---------- */
-const S={r:null,k:0,frac:0,play:false,vel:1,last:0,kits:null,t2:0,nombres:false};
+const S={r:null,k:0,frac:0,play:false,vel:1,last:0,kits:null,t2:0,nombres:false,porId:null};
 function simular(){
  $('estado').textContent='Simulando…';$('simular').disabled=true;
  setTimeout(()=>{
@@ -111,6 +111,8 @@ function simular(){
   S.r=r;S.k=0;S.frac=0;S.play=false;
   try{S.kits=window.MCCamisetas?MCCamisetas.partido(cL,cV):null}catch(e){S.kits=null}
   const e2=r.eventos.find(e=>e.tipo==='segundo_tiempo');S.t2=e2?e2.t:Infinity;
+  /* titular de cada puesto (id) al empezar: los que entraron después se toman de los eventos de cambio */
+  S.porId=[];for(const j of r.jugadores)if(j.entro===0)S.porId[j.id]=j;
   $('linea').max=r.cinta.frames-1;$('linea').value=0;$('play').disabled=false;$('play').textContent='▶ Play';
   $('nL').textContent=cL;$('nV').textContent=cV;
   $('estado').textContent=`Listo en ${Math.round(performance.now()-t0)} ms · ${r.h}-${r.a} · ${r.cinta.frames} cuadros`;
@@ -125,7 +127,11 @@ function stats(){
   row('Contraataques',s.contras[0],s.contras[1])+row('Desmarques · paredes',`${s.desmarques[0]} · ${s.paredes[0]}`,`${s.desmarques[1]} · ${s.paredes[1]}`)+
   row('Largo × ancho con pelota (m)',`${f[0].con.largo} × ${f[0].con.ancho}`,`${f[1].con.largo} × ${f[1].con.ancho}`)+
   row('Largo × ancho sin pelota (m)',`${f[0].sin.largo} × ${f[0].sin.ancho}`,`${f[1].sin.largo} × ${f[1].sin.ancho}`)+
-  row('Altura de la línea sin pelota (m)',f[0].sin.alturaLinea,f[1].sin.alturaLinea)+row('xG',s.xg[0],s.xg[1]);
+  row('Altura de la línea sin pelota (m)',f[0].sin.alturaLinea,f[1].sin.alturaLinea)+row('xG',s.xg[0],s.xg[1])+
+  row('Faltas',s.faltas[0],s.faltas[1])+row('Amarillas · rojas',`${s.amarillas[0]} · ${s.rojas[0]}`,`${s.amarillas[1]} · ${s.rojas[1]}`)+
+  row('Offsides',s.offsides[0],s.offsides[1])+row('Córners',s.corners[0],s.corners[1])+row('Penales (goles)',`${s.penales[0]} (${s.penalesGol[0]})`,`${s.penales[1]} (${s.penalesGol[1]})`)+
+  row('Tiros libres (directos)',`${s.tirosLibres[0]} (${s.tirosLibresDirectos[0]})`,`${s.tirosLibres[1]} (${s.tirosLibresDirectos[1]})`)+
+  row('Cambios · lesiones',`${s.cambios[0]} · ${s.lesiones[0]}`,`${s.cambios[1]} · ${s.lesiones[1]}`)+row('Descuento',s.descuento[0]+"'",s.descuento[1]+"'");
 }
 /* ---------- dibujo ---------- */
 const E=10; // píxeles por metro
@@ -147,26 +153,45 @@ function dibujar(){
  cancha();const r=S.r;if(!r)return;
  const c=r.cinta,n=c.porCuadro,d=c.datos,k=S.k,k2=Math.min(k+1,c.frames-1),f=S.frac,o=k*n,o2=k2*n;
  const lp=(i)=>(d[o+i]+(d[o2+i]-d[o+i])*f)/10;
- const dueno=d[o+3];
+ const dueno=d[o+3],t=c.t[k],enJuego=d[o+4]===1;
+ /* quién ocupa cada puesto ahora, tarjetas y lesiones hasta este momento */
+ const ocup=S.porId.slice(),tarj={},les={};
+ for(const e of r.eventos){if(e.t>t)break;
+  if(e.tipo==='cambio'){const n=r.jugadores.find(j=>j.nombre===e.entra&&j.id===e.sid);if(n)ocup[e.sid]=n}
+  if(e.tipo==='amarilla')tarj[e.jid]=e.segunda?'roja':'amarilla';if(e.tipo==='roja')tarj[e.jid]='roja';if(e.tipo==='lesion')les[e.jid]=1}
+ /* pelota parada: cartel y distancia reglamentaria */
+ let rean=null;for(const e of r.eventos){if(e.t>t)break;if(/^(tiro_libre|corner|penal|lateral|saque_arco|offside|falta)$/.test(e.tipo))rean=e;if(e.tipo==='saque_centro'||e.tipo==='gol')rean=null}
+ if(!enJuego&&rean&&/tiro_libre|corner|penal/.test(rean.tipo)){
+  const bx0=lp(0),by0=lp(1);cx.setLineDash([6,5]);cx.strokeStyle='rgba(255,255,255,.55)';cx.lineWidth=1.5;cx.beginPath();cx.arc(bx0*E,by0*E,9.15*E,0,7);cx.stroke();cx.setLineDash([]);
+ }
  /* jugadores */
  for(let j=0;j<22;j++){
-  const x=lp(5+j*2),y=lp(6+j*2),J=r.jugadores[j],eq=J.equipo,gk=J.rol==='POR';
+  const x=lp(5+j*2),y=lp(6+j*2),J=ocup[j]||r.jugadores[j],eq=J.equipo,gk=J.rol==='POR'||J.rolInicial==='POR';
+  if(y<-1||y>PH+1)continue;   // expulsado o fuera de la cancha
   cx.beginPath();cx.arc(x*E,y*E,8,0,7);cx.fillStyle=col(eq,gk);cx.fill();
   cx.lineWidth=dueno===j?3:1.5;cx.strokeStyle=dueno===j?'#ffe066':col2(eq);cx.stroke();
   const num=String(J.id-(eq?11:0)+1);cx.fillStyle=luz(col(eq,gk))>.55?'#111':'#fff';cx.font='bold 9px system-ui';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(num,x*E,y*E+.5);
   if(S.nombres){const nm=J.nombre.split(' ').slice(-1)[0];cx.font='10px system-ui';cx.fillStyle='rgba(255,255,255,.9)';cx.fillText(nm,x*E,y*E-14)}
+  if(tarj[j]){cx.fillStyle=tarj[j]==='roja'?'#e53935':'#ffd54f';cx.fillRect(x*E+6,y*E-12,5,7)}
+  if(les[j]){cx.fillStyle='#fff';cx.fillRect(x*E-11,y*E-11,6,2);cx.fillRect(x*E-9,y*E-13,2,6)}
  }
+ if(!enJuego&&rean){const N2={tiro_libre:rean.modo==='directo'?`TIRO LIBRE DIRECTO · barrera de ${rean.barrera}`:rean.indirecto?'TIRO LIBRE INDIRECTO':rean.barrera?`TIRO LIBRE · barrera de ${rean.barrera}`:'TIRO LIBRE',corner:'CÓRNER'+(rean.marca?` · marca ${rean.marca==='hombre'?'al hombre':'en zona'}`:''),penal:'PENAL',lateral:'LATERAL',saque_arco:'SAQUE DE ARCO',offside:'OFFSIDE',falta:'FALTA'};
+  const txt=N2[rean.tipo];if(txt){cx.font='bold 22px system-ui';const w=cx.measureText(txt).width+28;cx.fillStyle='rgba(8,17,30,.78)';cx.fillRect(cv.width/2-w/2,14,w,36);cx.fillStyle='#e2bd70';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(txt,cv.width/2,32)}}
  /* pelota: sombra en el piso y la pelota más grande cuanto más alta */
  const bx=lp(0),by=lp(1),bz=lp(2);
  cx.beginPath();cx.ellipse(bx*E+bz*3,by*E+bz*2,4,3,0,0,7);cx.fillStyle='rgba(0,0,0,.35)';cx.fill();
  cx.beginPath();cx.arc(bx*E,by*E-bz*2,4+bz*.6,0,7);cx.fillStyle='#fff';cx.fill();cx.lineWidth=1;cx.strokeStyle='#222';cx.stroke();
  /* reloj, marcador y eventos hasta el tick actual */
- const t=c.t[k];let g=[0,0];const vistos=[];
- for(const e of r.eventos){if(e.t>t)break;if(e.tipo==='gol')g[e.equipo]++;if(/gol|remate|atajada|palo|corner|entretiempo|segundo_tiempo|final|bloqueo/.test(e.tipo))vistos.push(e)}
+ let g=[0,0];const vistos=[];
+ for(const e of r.eventos){if(e.t>t)break;if(e.tipo==='gol')g[e.equipo]++;if(/^(gol|remate|atajada|palo|corner|entretiempo|segundo_tiempo|final|bloqueo|falta|amarilla|roja|penal|tiro_libre|offside|lesion|cambio|descuento|ventaja|suspendido)$/.test(e.tipo))vistos.push(e)}
  $('gol').textContent=g[0]+' - '+g[1];
  const seg=t<S.t2?t/10:2700+(t-S.t2)/10;$('reloj').textContent=String(Math.floor(seg/60)).padStart(2,'0')+':'+String(Math.floor(seg%60)).padStart(2,'0');
- const N={gol:'⚽ GOL',remate:'Remate',atajada:'Atajada',palo:'Palo',corner:'Córner',entretiempo:'Entretiempo',segundo_tiempo:'Segundo tiempo',final:'Final',bloqueo:'Bloqueo'};
- $('eventos').innerHTML=vistos.slice(-4).reverse().map(e=>`<div>${e.min}' · ${N[e.tipo]||e.tipo}${e.jugador?' · '+e.jugador:''}${e.tipo==='remate'?(e.aPuerta?' (al arco)':' (afuera)'):''}${e.asistencia?' · asist. '+e.asistencia:''}</div>`).join('')||'<div style="color:var(--suave)">Sin jugadas todavía</div>';
+ const N={gol:'⚽ GOL',remate:'Remate',atajada:'Atajada',palo:'Palo',corner:'Córner',entretiempo:'Entretiempo',segundo_tiempo:'Segundo tiempo',final:'Final',bloqueo:'Bloqueo',
+  falta:'Falta',amarilla:'🟨 Amarilla',roja:'🟥 Roja',penal:'Penal',tiro_libre:'Tiro libre',offside:'Offside',lesion:'Lesión',cambio:'🔁 Cambio',descuento:'Descuento',ventaja:'Ventaja',suspendido:'Suspendido'};
+ const det=e=>e.tipo==='remate'?(e.penal?` (penal: patea a la ${e.lado}, el arquero ${e.arqueroSeTira==='se queda'?'se queda':'se tira a la '+e.arqueroSeTira})`:e.aPuerta?' (al arco)':' (afuera)')+(e.tiroLibre?' · tiro libre':''):
+  e.tipo==='falta'?(e.sobre?` sobre ${e.sobre}`:'')+` (${e.gravedad})${e.ventaja?' · ventaja':''}`:e.tipo==='amarilla'||e.tipo==='roja'?` (${e.motivo})`:e.tipo==='cambio'?`: sale ${e.sale}, entra ${e.entra} (${e.motivo})`:
+  e.tipo==='tiro_libre'?(e.indirecto?' indirecto':e.barrera?` · barrera de ${e.barrera} (${e.modo})`:''):e.tipo==='descuento'?` +${e.minutos}'`:e.tipo==='lesion'?(e.grave?' (grave)':' (leve)'):'';
+ $('eventos').innerHTML=vistos.slice(-5).reverse().map(e=>`<div>${e.min}' · ${N[e.tipo]||e.tipo}${e.tipo==='cambio'?'':e.jugador?' · '+e.jugador:''}${det(e)}${e.asistencia?' · asist. '+e.asistencia:''}</div>`).join('')||'<div style="color:var(--suave)">Sin jugadas todavía</div>';
  if(!S.play)$('linea').value=k;
 }
 function bucle(ts){
@@ -181,7 +206,26 @@ $('play').onclick=()=>{if(!S.r)return;S.play=!S.play;$('play').textContent=S.pla
 for(const b of document.querySelectorAll('.vel'))b.onclick=()=>{S.vel=+b.dataset.v;document.querySelectorAll('.vel').forEach(x=>x.classList.toggle('on',x===b))};
 $('linea').oninput=()=>{S.k=+$('linea').value;S.frac=0;dibujar()};
 $('nombres').onclick=()=>{S.nombres=!S.nombres;$('nombres').classList.toggle('on',S.nombres);dibujar()};
-window.V3={estado:()=>({k:S.k,play:S.play,vel:S.vel,frames:S.r?S.r.cinta.frames:0,marcador:S.r?[S.r.h,S.r.a]:null,reloj:$('reloj').textContent,gol:$('gol').textContent}),simular,ir:k=>{S.k=k;S.frac=0;dibujar()}};
+/* pelota parada número i de un tipo: va al último cuadro antes de que se juegue y mide cómo están parados */
+function pelotaParada(tipo,i,filtro){
+ const r=S.r,c=r.cinta,n=c.porCuadro,d=c.datos,lista=r.eventos.filter(e=>e.tipo===tipo&&(!filtro||filtro(e)));const ev=lista[i||0];if(!ev)return null;
+ let k=0;while(k<c.frames-1&&c.t[k]<ev.t)k++;while(k<c.frames-1&&d[k*n+4]===0)k++;k=Math.max(0,k-2);
+ S.k=k;S.frac=0;S.play=false;dibujar();
+ const o=k*n,bx=d[o]/10,by=d[o+1]/10,P=[];
+ const ocup=S.porId.slice();for(const e of r.eventos){if(e.t>c.t[k])break;if(e.tipo==='cambio'){const q=r.jugadores.find(j=>j.nombre===e.entra&&j.id===e.sid);if(q)ocup[e.sid]=q}}
+ for(let j=0;j<22;j++)P.push({id:j,eq:(ocup[j]||r.jugadores[j]).equipo,x:d[o+5+j*2]/10,y:d[o+6+j*2]/10});
+ const enCancha=P.filter(p=>p.y>-1&&p.y<PH+1),dist=p=>Math.hypot(p.x-bx,p.y-by);
+ const izq=bx<52.5,enArea=p=>(izq?p.x<16.5:p.x>PW-16.5)&&Math.abs(p.y-34)<20.16;
+ const rivales=enCancha.filter(p=>p.eq!==ev.equipo),propios=enCancha.filter(p=>p.eq===ev.equipo);
+ return{evento:{tipo:ev.tipo,min:ev.min,barrera:ev.barrera||0,modo:ev.modo||null},cuadro:k,pelota:[bx,by],enBarrera:rivales.filter(p=>dist(p)>8.4&&dist(p)<10.5).length,rivalesCerca:rivales.filter(p=>dist(p)<8.4&&!(p.x<.8||p.x>PW-.8)).length,   // el arquero sobre su línea puede estar más cerca
+  propiosEnArea:propios.filter(enArea).length,rivalesEnArea:rivales.filter(enArea).length,enAreaTotal:enCancha.filter(enArea).length,
+  cerca:rivales.filter(p=>dist(p)<8.4).map(p=>({nombre:(ocup[p.id]||r.jugadores[p.id]).nombre,rol:(ocup[p.id]||r.jugadores[p.id]).rol,d:+dist(p).toFixed(2),x:p.x,y:p.y}))};
+}
+/* para la prueba: primera semilla cuyo partido tenga penal, tiro libre con barrera y córner (sin cinta, rápido) */
+function buscarSemilla(max){const cL=$('cL').value,cV=$('cV').value;
+ for(let sd=1;sd<=(max||60);sd++){const r=M.simular(equipo(cL,tacDe('L')),equipo(cV,tacDe('V')),{semilla:sd,cinta:false}),ev=r.eventos;
+  if(ev.some(e=>e.tipo==='penal')&&ev.some(e=>e.tipo==='tiro_libre'&&e.barrera>=2)&&ev.some(e=>e.tipo==='corner'))return sd}return null}
+window.V3={pelotaParada,buscarSemilla,eventos:()=>S.r?S.r.eventos:[],semilla:v=>{$('semilla').value=v},estado:()=>({k:S.k,play:S.play,vel:S.vel,frames:S.r?S.r.cinta.frames:0,marcador:S.r?[S.r.h,S.r.a]:null,reloj:$('reloj').textContent,gol:$('gol').textContent}),simular,ir:k=>{S.k=k;S.frac=0;dibujar()}};
 cancha();requestAnimationFrame(bucle);
 })();
 </script>

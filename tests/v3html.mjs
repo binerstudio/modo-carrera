@@ -42,13 +42,35 @@ for (const [k, n] of [[20000, 'minuto33'], [40000, 'minuto65']]) { await page.ev
 /* al final, el marcador dibujado es el del motor */
 const fin = await page.evaluate(() => { V3.ir(V3.estado().frames - 1); return V3.estado(); });
 if (fin.gol !== fin.marcador.join(' - ')) fallas.push(`marcador dibujado ${fin.gol} distinto del resultado ${fin.marcador.join('-')}`);
+/* pelota parada (etapa 3): busca un partido con penal, tiro libre con barrera y córner, y mira cómo se paran */
+const semilla = await page.evaluate(() => V3.buscarSemilla(80));
+const pp = {};
+if (!semilla) fallas.push('no se encontró un partido con penal, barrera y córner en 80 semillas');
+else {
+  await page.evaluate(s => V3.semilla(String(s)), semilla);
+  await page.click('#simular');
+  await page.waitForFunction(s => window.V3 && V3.estado().frames > 0 && document.getElementById('semilla').value === String(s) && /Listo/.test(document.getElementById('estado').textContent), semilla, { timeout: 60000 });
+  pp.semilla = semilla;
+  pp.barrera = await page.evaluate(() => V3.pelotaParada('tiro_libre', 0, e => e.barrera >= 2));
+  await page.locator('canvas').screenshot({ path: 'tests/out/v3-barrera.png' });
+  pp.corner = await page.evaluate(() => V3.pelotaParada('corner', 0));
+  await page.locator('canvas').screenshot({ path: 'tests/out/v3-corner.png' });
+  pp.penal = await page.evaluate(() => V3.pelotaParada('penal', 0));
+  await page.locator('canvas').screenshot({ path: 'tests/out/v3-penal.png' });
+  const b = pp.barrera, c = pp.corner, p = pp.penal;
+  if (!b || b.enBarrera < b.evento.barrera) fallas.push(`tiro libre: barrera de ${b && b.evento.barrera} pero hay ${b && b.enBarrera} rivales a 9,15 m`);
+  if (b && b.rivalesCerca > 0) fallas.push(`tiro libre: ${b.rivalesCerca} rivales a menos de 9,15 m`);
+  if (!c || c.propiosEnArea < 3) fallas.push(`córner: solo ${c && c.propiosEnArea} atacantes en el área`);
+  if (!p || p.enAreaTotal > 2) fallas.push(`penal: hay ${p && p.enAreaTotal} jugadores en el área (deberían ser el pateador y el arquero)`);
+}
 /* el lienzo no está vacío: muchos colores distintos */
 const colores = await page.evaluate(() => { const c = document.getElementById('cv'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data, s = new Set(); for (let i = 0; i < d.length; i += 400) s.add(d[i] >> 4 << 8 | d[i + 1] >> 4 << 4 | d[i + 2] >> 4); return s.size; });
 if (colores < 8) fallas.push('el lienzo parece vacío');
 await browser.close();
 const ok = !errors.length && !fallas.length;
-const res = { ok, inicio: e0, despuesX16: e1, avanzoCuadros: avanzo, final: fin, colores, errores: errors, fallas };
+const res = { ok, pelotaParada: pp, inicio: e0, despuesX16: e1, avanzoCuadros: avanzo, final: fin, colores, errores: errors, fallas };
 writeFileSync('tests/out/v3html.json', JSON.stringify(res, null, 1));
 console.log('PÁGINA v3.html', ok ? 'OK' : 'FALLÓ', '·', `${fin.marcador.join('-')} · ${e0.frames} cuadros · x16 avanzó ${avanzo} cuadros en 3 s · reloj final ${fin.reloj}`);
+console.log('pelota parada:', JSON.stringify(pp));
 errors.forEach(e => console.log('ERROR:', e)); fallas.forEach(f => console.log('FALLA:', f));
 process.exit(ok ? 0 : 1);

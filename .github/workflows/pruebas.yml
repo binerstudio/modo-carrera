@@ -23,7 +23,7 @@ jobs:
           sleep 2
       - name: Motor v2 · validación masiva (miles de partidos)
         run: node tests/motor.mjs 1000
-      - name: Motor v3 · etapas 1-2 (1000 partidos, determinismo, forma de equipo y táctica)
+      - name: Motor v3 · etapas 1-3 (1000 partidos, determinismo, forma, táctica, reglas y pelota parada)
         run: node tests/motor-v3.mjs 1000
       - name: Jugar temporadas con semilla fija
         run: node tests/regresion.mjs http://localhost:8080/index.html ${{ github.ref_name }}
@@ -31,7 +31,7 @@ jobs:
         run: node tests/eventos.mjs http://localhost:8080/index.html 30
       - name: Simulador 2D en vivo (capturas en el artefacto)
         run: node tests/partido2d.mjs http://localhost:8080/index.html
-      - name: Página de prueba visual del motor v3 (v3.html, capturas)
+      - name: Página de prueba visual del motor v3 (v3.html, pelota parada, capturas)
         run: node tests/v3html.mjs http://localhost:8080/v3.html
       - name: Tres temporadas sin intervención (IA y mercado)
         run: node tests/temporadas.mjs http://localhost:8080/index.html 3

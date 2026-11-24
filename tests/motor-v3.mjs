@@ -1,4 +1,5 @@
-/* MODO CARRERA · prueba del motor v3 · Etapas 1 y 2 (sin navegador)
+/* MODO CARRERA · prueba del motor v3 · Etapas 1, 2 y 3 (sin navegador)
+   Etapa 3: faltas, tarjetas, penales, offsides, córners, lesiones y cambios en rangos reales; límites de cambios y de jugadores; la expulsión baja el rendimiento.
    Etapa 2: forma de equipo dentro de rangos reales y causa-efecto de la táctica (ver más abajo).
    - N partidos (1000 por defecto) con planteles de la base, alineación 4-3-3 por GRL: ninguno debe fallar.
    - Coherencia: goles del marcador = eventos de gol, posiciones finitas y dentro de la cancha, posesión = 100 %.
@@ -37,19 +38,29 @@ function equipo(name, tac) {
     const roles = M.rolesDe(tac.formation), used = new Set(), xi = []; let k = 0;
     const avg = rows.reduce((a, r) => a + r[2], 0) / rows.length;
     for (const rol of roles) { const g = rol === 'POR' ? 'POR' : GRUPO_LINEA[M.LINEA_ROL[rol]]; const r = rows.find(x => !used.has(x) && x[1] === g) || rows.find(x => !used.has(x) && x[1] !== 'POR') || [name + ' (relleno ' + (++k) + ')', g, Math.round(avg - 6), 25]; used.add(r); xi.push({ name: r[0], pos: r[1], grl: r[2], age: r[3], role: rol }); }
-    return { name, players: xi, tac };
+    return { name, players: xi.concat(banco(name, rows, used)), tac };
   }
   const used = new Set(), xi = [];
   const avg = rows.length ? rows.reduce((a, r) => a + r[2], 0) / rows.length : 60; let k = 0;
   const filler = g => [name + ' (relleno ' + (++k) + ')', g, Math.round(avg - 6), 25];
   GRP.forEach((g, i) => { const r = rows.find(x => !used.has(x) && x[1] === g) || filler(g); used.add(r); xi.push({ name: r[0], pos: r[1], grl: r[2], age: r[3], role: ROLES[i] }); });
-  return { name, players: xi, tac: Object.assign({ formation: '4-3-3' }, tac || {}) };
+  return { name, players: xi.concat(banco(name, rows, used)), tac: Object.assign({ formation: '4-3-3' }, tac || {}) };
+}
+/* banco: los demás jugadores del plantel (hasta 9, con un arquero si hay); si el plantel de la base es corto se completa
+   hasta 7 con suplentes genéricos algo inferiores, solo para la prueba (igual que hace tests/motor.mjs con el motor v2) */
+function banco(name, rows, used) {
+  const resto = rows.filter(r => !used.has(r)), gk = resto.find(r => r[1] === 'POR');
+  const b = (gk ? [gk] : []).concat(resto.filter(r => r !== gk)).slice(0, 9);
+  const avg = rows.length ? rows.reduce((a, r) => a + r[2], 0) / rows.length : 60; let k = 0;
+  while (b.length < 7) b.push([name + ' (suplente genérico ' + (++k) + ')', ['POR', 'DEF', 'MED', 'DEL', 'DEF', 'MED', 'DEL'][b.length], Math.round(avg - 8), 24]);
+  return b.map(r => ({ name: r[0], pos: r[1], grl: r[2], age: r[3] }));
 }
 const clubs = [...byClub.entries()].filter(([, v]) => v.rows.length >= 11).map(([k]) => k).sort();
 
 const out = { N, version: M.VERSION, fallas: [], errores: [], tiempo: {}, estadisticas: {}, determinismo: {}, nota: 'Estadísticas informativas: el motor v3 todavía no está calibrado (etapa 4).' };
 const sum = { goles: 0, rem: 0, arco: 0, pases: 0, pasesOk: 0, altos: 0, corners: 0, lat: 0, quites: 0, inter: 0, gamb: 0, gambOk: 0, xg: 0, pos: [], loc: 0, emp: 0, vis: 0, enJuego: 0, dist: 0, nDist: 0, cab: 0, atajadas: 0, palos: 0, max: 0, marc: {} };
 const tiempos = [];
+const REG = { faltas: 0, amarillas: 0, rojas: 0, penales: 0, penalesGol: 0, offsides: 0, corners: 0, lesiones: 0, cambios: 0, tirosLibres: 0, tirosLibresDirectos: 0, ventajas: 0, descuento1: 0, descuento2: 0, suspendidos: 0, maxCambios: 0, maxVentanas: 0, minEnCancha: 11 };
 const FORMA = { con: { n: 0, largo: 0, ancho: 0, dm: 0, ma: 0, alin: 0 }, sin: { n: 0, largo: 0, ancho: 0, dm: 0, ma: 0, alin: 0 } };
 const fuera = (x, y) => !(x >= -5 && x <= 110 && y >= -5 && y <= 73);
 for (let i = 0; i < N; i++) {
@@ -79,6 +90,19 @@ for (let i = 0; i < N; i++) {
   for (const j of r.jugadores) if (j.pos !== 'POR') { sum.dist += j.distancia; sum.nDist++; }
   for (const e of [0, 1]) for (const f of ['con', 'sin']) { const F = r.forma[e][f], A = FORMA[f]; if (!F.muestras) continue; A.n++; A.largo += F.largo; A.ancho += F.ancho; A.dm += F.entreLineas[0]; A.ma += F.entreLineas[1]; A.alin += F.alineacionLinea; }
   if (!r.forma.every(t => Number.isFinite(t.con.largo) && Number.isFinite(t.sin.largo))) out.errores.push(`partido ${i}: medición de forma inválida`);
+  /* reglas (etapa 3) */
+  for (const k of ['faltas', 'amarillas', 'rojas', 'penales', 'penalesGol', 'offsides', 'corners', 'lesiones', 'cambios', 'tirosLibres', 'tirosLibresDirectos', 'ventajas']) REG[k] += s[k][0] + s[k][1];
+  REG.descuento1 += s.descuento[0]; REG.descuento2 += s.descuento[1]; if (r.suspendido) REG.suspendidos++;
+  REG.maxCambios = Math.max(REG.maxCambios, ...s.cambios); REG.maxVentanas = Math.max(REG.maxVentanas, ...s.ventanas); REG.minEnCancha = Math.min(REG.minEnCancha, ...s.minimoEnCancha);
+  if (s.cambios.some(x => x > 5)) out.errores.push(`partido ${i}: más de 5 cambios (${s.cambios})`);
+  if (s.ventanas.some(x => x > 3)) out.errores.push(`partido ${i}: más de 3 ventanas de cambios (${s.ventanas})`);
+  if (s.minimoEnCancha.some(x => x < 7)) out.errores.push(`partido ${i}: un equipo quedó con menos de 7 (${s.minimoEnCancha})`);
+  const cuenta = t => [0, 1].map(e => r.eventos.filter(ev => ev.tipo === t && ev.equipo === e).length);
+  const cc = cuenta('cambio'), pp = cuenta('penal'), rr = cuenta('roja'), pe = [0, 1].map(e => r.eventos.filter(ev => ev.tipo === 'remate' && ev.penal && ev.equipo === e).length);
+  if (cc.join() !== s.cambios.join()) out.errores.push(`partido ${i}: cambios en eventos ${cc} distintos de las estadísticas ${s.cambios}`);
+  if (rr.join() !== s.rojas.join()) out.errores.push(`partido ${i}: rojas en eventos ${rr} distintas de las estadísticas ${s.rojas}`);
+  if (!r.suspendido && pe.join() !== pp.join()) out.errores.push(`partido ${i}: penales cobrados ${pp} y pateados ${pe} no coinciden`);
+  for (const e of [0, 1]) { const enCancha = r.jugadores.filter(j => j.equipo === e && j.enCanchaAlFinal).length; if (enCancha !== s.enCancha[e]) out.errores.push(`partido ${i}: jugadores en cancha ${enCancha} vs ${s.enCancha[e]}`); }
   if (r.h > r.a) sum.loc++; else if (r.h === r.a) sum.emp++; else sum.vis++;
   const k = r.h + '-' + r.a; sum.marc[k] = (sum.marc[k] || 0) + 1;
 }
@@ -159,11 +183,39 @@ out.formaciones = {};
 for (const f of M.FORMACIONES) {
   try {
     const r = M.simular(equipo(CA, { formation: f }), equipo(CB, { formation: f }), { semilla: 7, cinta: false });
-    const roles = r.jugadores.filter(j => j.equipo === 0).map(j => j.rol), def = roles.filter(x => M.LINEA_ROL[x] === 'def').length;
+    const roles = r.jugadores.filter(j => j.equipo === 0 && j.entro === 0).map(j => j.rolInicial), def = roles.filter(x => M.LINEA_ROL[x] === 'def').length;   // titulares, con su rol al empezar
     out.formaciones[f] = { marcador: `${r.h}-${r.a}`, defensores: def, largoSin: r.forma[0].sin.largo, anchoCon: r.forma[0].con.ancho };
     if (def !== +f.split('-')[0]) out.fallas.push(`Formación ${f}: ${def} defensores en la línea`);
   } catch (e) { out.errores.push(`formación ${f}: ${e.message}`); }
 }
+
+/* ===== ETAPA 3 · reglas y pelota parada =====
+   Promedios por partido (los dos equipos) contra rangos aproximados de ligas profesionales. Son referencias amplias:
+   faltas ~20-28, amarillas ~3-5, rojas ~0,1-0,3, penales ~0,2-0,35, offsides ~3-5, córners ~8-11, lesiones ~0,2-0,8, cambios ~7-9 (con 5 cambios). */
+const RANGO_REGLAS = { faltas: [18, 30], amarillas: [2.5, 5.5], rojas: [0.05, 0.4], penales: [0.12, 0.5], offsides: [1.5, 6], corners: [6, 13], lesiones: [0.1, 1], cambios: [5, 10] };
+const nP = out.partidos || 1;
+out.reglas = { porPartido: {}, limites: { maxCambiosEquipo: REG.maxCambios, maxVentanasEquipo: REG.maxVentanas, minimoJugadoresEnCancha: REG.minEnCancha, suspendidos: REG.suspendidos } };
+for (const k of ['faltas', 'amarillas', 'rojas', 'penales', 'penalesGol', 'offsides', 'corners', 'lesiones', 'cambios', 'tirosLibres', 'tirosLibresDirectos', 'ventajas', 'descuento1', 'descuento2']) out.reglas.porPartido[k] = +(REG[k] / nP).toFixed(3);
+out.reglas.porPartido.conversionPenales = +(REG.penalesGol / (REG.penales || 1)).toFixed(3);
+for (const [k, [lo, hi]] of Object.entries(RANGO_REGLAS)) { const v = out.reglas.porPartido[k]; if (!(v >= lo && v <= hi)) out.fallas.push(`Reglas: ${k} por partido = ${v} fuera del rango real [${lo}, ${hi}]`); }
+if (REG.maxCambios > 5) out.fallas.push('Reglas: hubo más de 5 cambios en un equipo');
+if (REG.maxVentanas > 3) out.fallas.push('Reglas: hubo más de 3 ventanas de cambios');
+if (REG.minEnCancha < 7) out.fallas.push('Reglas: un equipo quedó con menos de 7 jugadores');
+/* la expulsión baja el rendimiento: el mismo partido, con y sin una roja forzada al minuto 20 para el equipo de prueba */
+function serieRoja(roja) {
+  const S = { n: 0, pts: 0, dif: 0, xgPropio: 0, xgRival: 0, posesion: 0 };
+  for (let i = 0; i < NT; i++) {
+    const loc = i % 2 === 0, e = loc ? 0 : 1, yo = equipo(CA), el = equipo(CB);
+    let r; try { r = M.simular(loc ? yo : el, loc ? el : yo, { semilla: 70000 + i, cinta: false, forzarRoja: roja ? { equipo: e, minuto: 20 } : null }); } catch (err) { out.errores.push(`roja forzada: ${err.message}`); continue; }
+    const gf = loc ? r.h : r.a, gc = loc ? r.a : r.h;
+    S.n++; S.pts += gf > gc ? 3 : gf === gc ? 1 : 0; S.dif += gf - gc; S.xgPropio += r.stats.xg[e]; S.xgRival += r.stats.xg[1 - e]; S.posesion += r.stats.posesion[e];
+  }
+  const o = {}; for (const k in S) if (k !== 'n') o[k] = +(S[k] / (S.n || 1)).toFixed(3); o.partidos = S.n; return o;
+}
+const conRoja = serieRoja(true), sinRoja = serieRoja(false);
+out.reglas.expulsion = { conRoja, sinRoja };
+if (!(conRoja.dif < sinRoja.dif)) out.fallas.push(`Expulsión: la diferencia de gol no bajó (${conRoja.dif} vs ${sinRoja.dif})`);
+if (!(conRoja.xgPropio / (conRoja.xgPropio + conRoja.xgRival) < sinRoja.xgPropio / (sinRoja.xgPropio + sinRoja.xgRival))) out.fallas.push('Expulsión: la proporción de xG no bajó');
 
 /* física de la pelota (sin jugadores) */
 {
@@ -201,7 +253,7 @@ if (out.partidos < N * 0.95) out.fallas.push(`se jugaron solo ${out.partidos} de
 if (usoRandom) out.fallas.push('se usó Math.random');
 
 mkdirSync('tests/out', { recursive: true }); writeFileSync('tests/out/motor-v3.json', JSON.stringify(out, null, 1));
-console.log(`MOTOR v3 (etapas 1-2) · ${out.fallas.length ? 'FALLÓ' : 'OK'} · ${out.partidos} partidos sin errores: ${out.errores.length === 0 ? 'sí' : 'no'}`);
+console.log(`MOTOR v3 (etapas 1-3) · ${out.fallas.length ? 'FALLÓ' : 'OK'} · ${out.partidos} partidos sin errores: ${out.errores.length === 0 ? 'sí' : 'no'}`);
 console.log('tiempo por partido', JSON.stringify(out.tiempo));
 console.log('determinismo', out.determinismo.mismaSemilla ? 'OK' : 'FALLÓ', '· semillas distintas →', out.determinismo.semillasDistintasDistinto ? 'partidos distintos' : 'IGUALES', '· huellas', h1.join(' '));
 console.log('estadísticas (solo informativas, sin calibrar):');
@@ -210,6 +262,9 @@ console.log('forma (promedio de todos los equipos):', JSON.stringify(out.forma))
 console.log('tácticas (' + NT + ' partidos por serie, ' + CA + ' vs ' + CB + '):');
 for (const p of out.tacticas.pruebas) console.log(p.ok ? '  ✔' : '  ✘', p.prueba, JSON.stringify(Object.fromEntries(Object.entries(p).filter(([k]) => !['prueba', 'ok', 'campo', 'criterio'].includes(k)))));
 console.log('formaciones', JSON.stringify(out.formaciones));
+console.log('reglas por partido:', JSON.stringify(out.reglas.porPartido));
+console.log('límites:', JSON.stringify(out.reglas.limites));
+console.log('expulsión (roja forzada al 20\'):', JSON.stringify(out.reglas.expulsion));
 console.log('física', JSON.stringify(out.fisica));
 console.log('atributos', JSON.stringify(out.atributos));
 console.log('ejemplo:', out.ejemplo.partido);
