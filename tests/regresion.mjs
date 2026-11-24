@@ -161,7 +161,7 @@ async function pruebaPWA(browser) {
   await p2.route('**/js/mc12-diseno.js*', async route => { tapado = await p2.evaluate(() => document.documentElement.classList.contains('mc-cargando')).catch(() => null); route.continue(); });
   await p2.goto(URL, { waitUntil: 'load' });
   await ctx2.close();
-  const ok = r.manifest === 'MODO CARRERA' && r.sw && r.reg && r.visible && r.motorOpc === 'v1/v2' && (r.visibles || []).includes('motor') && tapado === true && errors.length === 0;
+  const ok = r.manifest === 'MODO CARRERA' && r.sw && r.reg && r.visible && r.motorOpc === 'v1/v2/v3' && (r.visibles || []).includes('motor') && tapado === true && errors.length === 0;
   r.tapadoMientrasCarga = tapado;
   return { ok, ...r, errors };
 }

@@ -36,6 +36,8 @@ const CORE=[
   'js/motor/atributos.js',
   'js/motor/motor-v2.js',
   'js/motor/conexion.js',
+  'js/motor/motor-v3.js',
+  'js/motor/conexion-v3.js',
   'js/ia/mercado-ia.js',
   'js/ia/partidos-ia.js',
   'js/partido2d/camisetas.js',

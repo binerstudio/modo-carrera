@@ -301,6 +301,23 @@ if (!(F.muySuperior.gana >= .60 && F.muySuperior.gana <= .80)) out.fallas.push(`
   out.atributos.sinMCAtributos = { ok: Number.isFinite(r2.h), origen: r2.jugadores[0].origenAtributos };
   if (!Number.isFinite(r2.h) || r2.jugadores[0].origenAtributos !== 'grl') out.fallas.push('Sin MCAtributos el motor no funciona');
 }
+/* ETAPA 5 · en vivo: avanzar de a un minuto sin tocar nada da exactamente lo mismo que simular() */
+{
+  const sinCinta = r => JSON.stringify({ h: r.h, a: r.a, ev: r.eventos, st: r.stats });
+  const a1 = M.simular(A, B, { semilla: 4242, cinta: false });
+  const V = M.enVivo(A, B, { semilla: 4242, cinta: false }); let minutos = 0;
+  for (const parte of [1, 2]) { if (!V.empezar(parte)) break; while (!V.minuto()) minutos++; }
+  const a2 = V.resultado();
+  out.enVivo = { igualQueSimular: sinCinta(a1) === sinCinta(a2), minutos, marcador: `${a2.h}-${a2.a}` };
+  if (!out.enVivo.igualQueSimular) out.fallas.push('En vivo: avanzar de a un minuto no da lo mismo que simular()');
+  /* un cambio y un cambio de táctica en vivo no rompen nada */
+  const W2 = M.enVivo(A, B, { semilla: 99, cinta: false, dtExterno: [true, true] }); W2.empezar(1); for (let k = 0; k < 20; k++) W2.minuto();
+  const sale = W2.enCancha(0).find((c, i) => i > 0), banco = A.players[11];
+  const hecho = W2.cambio(0, sale, Object.assign({ clave: 'banco0' }, banco), 'prueba'); W2.tactica(0, { style: 'Ofensivo', formation: '4-4-2' });
+  while (!W2.minuto()); W2.empezar(2); while (!W2.minuto());
+  const r3 = W2.resultado(); out.enVivo.cambio = { hecho, entro: r3.jugadores.some(j => j.nombre === banco.name), terminado: W2.terminado };
+  if (!hecho || !out.enVivo.cambio.entro || !W2.terminado) out.fallas.push('En vivo: el cambio o la táctica en vivo fallaron');
+}
 /* un partido de ejemplo guardado para inspección (sin la cinta completa) */
 const ej = M.simular(A, B, { semilla: 2026 });
 out.ejemplo = { partido: `${ej.local} ${ej.h}-${ej.a} ${ej.visitante}`, stats: ej.stats, goles: ej.eventos.filter(e => e.tipo === 'gol'), remates: ej.eventos.filter(e => e.tipo === 'remate').slice(0, 10), cuadros: ej.cinta.frames, hz: ej.cinta.hz, cuadro100: M.cuadro(ej.cinta, 100) };
@@ -309,7 +326,7 @@ if (out.partidosLiga < N * 0.95) out.fallas.push(`se jugaron solo ${out.partidos
 if (usoRandom) out.fallas.push('se usó Math.random');
 
 mkdirSync('tests/out', { recursive: true }); writeFileSync('tests/out/motor-v3.json', JSON.stringify(out, null, 1));
-console.log(`MOTOR v3 (etapas 1-4) · ${out.fallas.length ? 'FALLÓ' : 'OK'} · ${out.partidos} partidos sin errores: ${out.errores.length === 0 ? 'sí' : 'no'}`);
+console.log(`MOTOR v3 (etapas 1-5) · ${out.fallas.length ? 'FALLÓ' : 'OK'} · ${out.partidos} partidos sin errores: ${out.errores.length === 0 ? 'sí' : 'no'}`);
 console.log('tiempo por partido', JSON.stringify(out.tiempo));
 console.log('determinismo', out.determinismo.mismaSemilla ? 'OK' : 'FALLÓ', '· semillas distintas →', out.determinismo.semillasDistintasDistinto ? 'partidos distintos' : 'IGUALES', '· huellas', h1.join(' '));
 console.log('estadísticas (solo informativas, sin calibrar):');
@@ -324,6 +341,7 @@ console.log('expulsión (roja forzada al 20\'):', JSON.stringify(out.reglas.expu
 console.log('calibración (' + out.partidosLiga + ' partidos de liga):');
 for (const c of out.calibracion) console.log(c.ok ? '  ✔' : '  ✘', c.estadistica.padEnd(32), String(c.valor).padStart(8), '  rango', c.rango.join(' – '));
 console.log('local:', JSON.stringify(out.local), '· fuerza:', JSON.stringify(out.fuerza));
+console.log('en vivo:', JSON.stringify(out.enVivo));
 console.log('física', JSON.stringify(out.fisica));
 console.log('atributos', JSON.stringify(out.atributos));
 console.log('ejemplo:', out.ejemplo.partido);

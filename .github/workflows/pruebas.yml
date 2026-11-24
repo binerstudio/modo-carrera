@@ -23,7 +23,7 @@ jobs:
           sleep 2
       - name: Motor v2 · validación masiva (miles de partidos)
         run: node tests/motor.mjs 1000
-      - name: Motor v3 · etapas 1-4 (1000 partidos de liga calibrados, fuerza, local, determinismo, forma, táctica, reglas)
+      - name: Motor v3 · etapas 1-5 (1000 partidos de liga calibrados, fuerza, local, en vivo, determinismo, forma, táctica, reglas)
         run: node tests/motor-v3.mjs 1000
       - name: Jugar temporadas con semilla fija
         run: node tests/regresion.mjs http://localhost:8080/index.html ${{ github.ref_name }}
@@ -33,6 +33,8 @@ jobs:
         run: node tests/partido2d.mjs http://localhost:8080/index.html
       - name: Página de prueba visual del motor v3 (v3.html, pelota parada, capturas)
         run: node tests/v3html.mjs http://localhost:8080/v3.html
+      - name: Motor v3 en el juego (Ajustes, partido en vivo, cambios, fechas, guardado, vuelta a v2)
+        run: node tests/v3juego.mjs http://localhost:8080/index.html
       - name: Tres temporadas sin intervención (IA y mercado)
         run: node tests/temporadas.mjs http://localhost:8080/index.html 3
       - name: Carrera guardada con la 12.2.2 se abre con esta versión
