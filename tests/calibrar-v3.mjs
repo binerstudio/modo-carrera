@@ -75,7 +75,8 @@ if (!isMainThread) {
     for (const [r, m] of rs) { const gf = m.local ? r.h : r.a, gc = m.local ? r.a : r.h; if (gf > gc) gana++; else if (gf === gc) empata++; }
     fuerza[cat] = { partidos: rs.length, gana: rs.length ? gana / rs.length : 0, empata: rs.length ? empata / rs.length : 0 };
   }
-  /* ---------- tabla: valor vs objetivo (rangos de ligas reales, aproximados) ---------- */
+  /* ---------- tabla: valor vs objetivo (rangos de ligas reales, aproximados) ----------
+     Etapa 6: penales (hasta 0,34), 2-1 (desde 12%) y muy superior (hasta 78%) se ampliaron un poco: quedaron "casi en rango" y el usuario los aceptó. */
   const T = [
     ['Goles por partido', S.goles / n, 2.5, 2.8, 2],
     ['Local gana', pct(S.loc), .42, .46, '%'], ['Empate', pct(S.emp), .24, .28, '%'], ['Visitante gana', pct(S.vis), .28, .32, '%'],
@@ -83,10 +84,10 @@ if (!isMainThread) {
     ['Pases por equipo', pe(S.pases), 400, 500, 0], ['Acierto de pases', S.ok / S.pases, .75, .85, '%'],
     ['Posesión del mejor equipo', (S.posMejor || 0) / (S.nPosMejor || 1) / 100, .50, .65, '%'],
     ['Córners por equipo', pe(S.corners), 4, 6, 1], ['Faltas por equipo', pe(S.faltas), 10, 13, 1], ['Amarillas por equipo', pe(S.am), 1.5, 2.5, 2],
-    ['Rojas por partido', S.rojas / n, .1, .2, 3], ['Penales por partido', S.pen / n, .22, .33, 3], ['Offsides por equipo', pe(S.off), 1.6, 2.4, 2],
-    ['0-0', (marc['0-0'] || 0) / n, .05, .10, '%'], ['1-0', (marc['1-0'] || 0) / n, .15, .22, '%'], ['2-1', (marc['2-1'] || 0) / n, .13, .19, '%'],
+    ['Rojas por partido', S.rojas / n, .1, .2, 3], ['Penales por partido', S.pen / n, .22, .34, 3], ['Offsides por equipo', pe(S.off), 1.6, 2.4, 2],
+    ['0-0', (marc['0-0'] || 0) / n, .05, .10, '%'], ['1-0', (marc['1-0'] || 0) / n, .15, .22, '%'], ['2-1', (marc['2-1'] || 0) / n, .12, .19, '%'],
     ['Diferencia de 4 o más', (S.goleada || 0) / n, .015, .05, '%'], ['Partidos con 10+ goles', (S.diez || 0) / n, 0, .0015, '%'],
-    ['Muy superior (+7 GRL) gana', fuerza.muySuperior.gana, .65, .75, '%'], ['Superior (+3 a +6) gana', fuerza.superior.gana, .50, .63, '%'], ['Parejo (<1) gana', fuerza.parejo.gana, .33, .45, '%'],
+    ['Muy superior (+7 GRL) gana', fuerza.muySuperior.gana, .65, .78, '%'], ['Superior (+3 a +6) gana', fuerza.superior.gana, .50, .63, '%'], ['Parejo (<1) gana', fuerza.parejo.gana, .33, .45, '%'],
     ['Ventaja de local (gana local − gana visitante)', pct(S.loc) - pct(S.vis), .08, .18, '%'],
     ['Goles por error del arquero', (S.gkErr || 0) / (S.goles || 1), 0, .10, '%']
   ];
