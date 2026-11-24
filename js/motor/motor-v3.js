@@ -42,10 +42,10 @@ function atributos(info){
 
 /* ---------- calibración (etapa 4): perillas del motor, todas en un solo lugar ---------- */
 const CAL={
- nivel:70,atributos:.76,   // atributos comprimidos alrededor de 70 (1 = sin comprimir)
+ nivel:70,atributos:.79,   // atributos comprimidos alrededor de 70 (1 = sin comprimir)
  satura:10,                // y saturados: las diferencias enormes pesan menos que en línea recta (tanh)
  punteria:.118,           // error base de los remates (radianes)
- alcanceArquero:1.5,
+ alcanceArquero:1.3,
  atajadaBorde:.62,         // cuánto le cuesta al arquero llegar al límite de su alcance      // alcance del arquero parado (m)
  remate:.6,               // ganas de patear (multiplica el xG al decidir)
  cuidado:2.1,              // cuánto pesa perder la pelota al elegir un pase o una conducción
