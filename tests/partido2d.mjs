@@ -28,7 +28,7 @@ for (const [a, b, f] of [['River Plate', 'Boca Juniors', 'poses-river-boca'], ['
 await page.evaluate(() => document.getElementById('hojaPoses').remove());
 await page.evaluate(() => { openMatch(); go('match'); });
 await page.waitForTimeout(800);
-const montado = await page.evaluate(() => ({ host: !!document.getElementById('m2dHost'), canvas: !!document.querySelector('#m2dHost canvas'), cams: [...document.querySelectorAll('.m2d-cams button')].map(b => b.textContent) }));
+const montado = await page.evaluate(() => ({ host: !!document.getElementById('m2dHost'), canvas: !!document.querySelector('#m2dHost canvas'), cams: [...document.querySelectorAll('.m2d-cams button[data-c]')].map(b => b.textContent), pantallaCompleta: !!document.querySelector('.m2d-cams button[data-fs]') }));
 await page.screenshot({ path: 'tests/out/2d-0-previa.png' });
 await page.evaluate(() => { mcSpeed(4); });           // arranca el partido en x4
 const muestras = []; let adelantado = 0, retuvo = 0, i = 0; const t0 = Date.now();

@@ -96,6 +96,7 @@ for (let i = 0; i < PARTIDOS.length; i++) {
   nLiga++;
   if (!g2.has(a)) g2.set(a, LG.grlXI(a)); if (!g2.has(b)) g2.set(b, LG.grlXI(b));
   if (Math.abs(g2.get(a) - g2.get(b)) >= 2) { sum.posMejor = (sum.posMejor || 0) + (g2.get(a) > g2.get(b) ? s.posesion[0] : s.posesion[1]); sum.nPosMejor = (sum.nPosMejor || 0) + 1; }
+  sum.gkErr = (sum.gkErr || 0) + (s.golesErrorArquero ? s.golesErrorArquero[0] + s.golesErrorArquero[1] : 0); sum.origen = sum.origen || {}; for (const [o, v] of Object.entries(s.origenGoles || {})) sum.origen[o] = (sum.origen[o] || 0) + v;
   sum.goles += g; sum.max = Math.max(sum.max, g); sum.rem += s.remates[0] + s.remates[1]; sum.arco += s.alArco[0] + s.alArco[1]; sum.pases += s.pases[0] + s.pases[1]; sum.pasesOk += s.pasesOk[0] + s.pasesOk[1];
   sum.altos += s.pasesAltos[0] + s.pasesAltos[1]; sum.corners += s.corners[0] + s.corners[1]; sum.lat += s.laterales[0] + s.laterales[1]; sum.quites += s.quites[0] + s.quites[1]; sum.inter += s.intercepciones[0] + s.intercepciones[1];
   sum.gamb += s.gambetas[0] + s.gambetas[1]; sum.gambOk += s.gambetasOk[0] + s.gambetasOk[1]; sum.xg += s.xg[0] + s.xg[1]; sum.pos.push(s.posesion[0]); sum.enJuego += s.minutosEnJuego;
@@ -319,6 +320,44 @@ if (!(F.muySuperior.gana >= .60 && F.muySuperior.gana <= .80)) out.fallas.push(`
   const r3 = W2.resultado(); out.enVivo.cambio = { hecho, entro: r3.jugadores.some(j => j.nombre === banco.name), terminado: W2.terminado };
   if (!hecho || !out.enVivo.cambio.entro || !W2.terminado) out.fallas.push('En vivo: el cambio o la táctica en vivo fallaron');
 }
+/* ETAPA 6 · lo que dibuja el 2D: la cinta no salta, nadie se teletransporta, festejos, árbitro, córners de gol, arquero */
+{
+  const NS = 20; let saltosJ = 0, saltosB = 0, forz = 0, goles = 0, conFestejo = 0, conAbrazo = 0, arbFuera = 0, arbKm = 0, log = null;
+  const corners = [];
+  for (let i = 0; i < NS; i++) {
+    const [, h, a] = LG.fixture[(i * 37) % LG.fixture.length];
+    let r; try { r = M.simular(equipo(h), equipo(a), { semilla: 'e6-' + i, cintaCada: 1 }); } catch (e) { out.errores.push(`etapa 6: ${e.message}`); continue; }
+    const c = r.cinta, n = c.porCuadro, d = c.datos, F = c.frames; forz += r.stats.forzados || 0;
+    const idx = t => { let k = Math.max(0, Math.min(F - 1, t - c.t[0])); while (k > 0 && c.t[k] > t) k--; while (k < F - 1 && c.t[k] < t) k++; return k; };
+    const camb = new Set(r.eventos.filter(e => e.tipo === 'cambio').map(e => idx(e.t) + '|' + e.sid));
+    const seg = r.eventos.find(e => e.tipo === 'segundo_tiempo'), k2 = seg ? idx(seg.t) : -9;
+    for (let k = 1; k < F; k++) {
+      if (k === k2 || c.t[k] !== c.t[k - 1] + 1) continue; const o = k * n, q = (k - 1) * n;
+      if (Math.hypot(d[o] - d[q], d[o + 1] - d[q + 1]) / 10 > 5) { saltosB++; log = log || { pelota: true, partido: i, t: c.t[k] }; }
+      for (let j = 0; j < 22; j++) { if (camb.has(k + '|' + j)) continue; const dd = Math.hypot(d[o + 5 + j * 2] - d[q + 5 + j * 2], d[o + 6 + j * 2] - d[q + 6 + j * 2]) / 10; if (dd > 1.5) { saltosJ++; log = log || { partido: i, t: c.t[k], puesto: j, d: dd }; } }
+      for (let s = 0; s < 3; s++) { const ia = c.salientes + s * 2; if (d[o + ia] === -32768 || d[q + ia] === -32768) continue; if (Math.hypot(d[o + ia] - d[q + ia], d[o + ia + 1] - d[q + ia + 1]) / 10 > 1.5) { saltosJ++; log = log || { saliente: s, partido: i, t: c.t[k] }; } }
+      const ax = d[o + c.arbitro] / 10, ay = d[o + c.arbitro + 1] / 10; if (ax < -2 || ax > 107 || ay < -2 || ay > 70) arbFuera++;
+      arbKm += Math.hypot(d[o + c.arbitro] - d[q + c.arbitro], d[o + c.arbitro + 1] - d[q + c.arbitro + 1]) / 10000;
+    }
+    for (const g of r.eventos.filter(e => e.tipo === 'gol')) {
+      goles++;
+      if (g.festejo) { conFestejo++; const k = idx(g.t + 120), o = k * n, j = g.jid, x = d[o + 5 + j * 2], y = d[o + 6 + j * 2];
+        if ([...Array(22).keys()].some(q => q !== j && Math.hypot(d[o + 5 + q * 2] - x, d[o + 6 + q * 2] - y) / 10 < 2.5)) conAbrazo++; }
+      if (g.origen === 'corner') { const der = g.x > 52.5; let max = 0;
+        for (let k = idx(g.t - 45); k <= idx(g.t + 15); k++) { const o = k * n; let m = 0; for (let j = 0; j < 22; j++) { const x = d[o + 5 + j * 2] / 10, y = d[o + 6 + j * 2] / 10; if ((der ? x > 88.5 : x < 16.5) && y > 13.84 && y < 54.16) m++; } max = Math.max(max, m); }
+        corners.push(max); }
+    }
+  }
+  const gkErr = (sum.gkErr || 0) / (sum.goles || 1);
+  out.etapa6 = { partidos: NS, saltosJugadores: saltosJ, saltosPelota: saltosB, primerSalto: log, esperasForzadas: forz, goles, festejos: conFestejo, conAbrazo, arbitroFueraDeLugar: arbFuera, arbitroKmPorPartido: +(arbKm / NS).toFixed(1),
+    golesDeCorner: corners.length, jugadoresEnElAreaEnLaRepeticion: corners, golesErrorArquero: +gkErr.toFixed(3), origenGoles: Object.fromEntries(Object.entries(sum.origen || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => [k, +(v / (sum.goles || 1)).toFixed(3)])) };
+  if (saltosJ || saltosB) out.fallas.push(`Etapa 6: la cinta tiene saltos (jugadores ${saltosJ}, pelota ${saltosB}) ${JSON.stringify(log)}`);
+  if (forz) out.fallas.push(`Etapa 6: ${forz} pelotas paradas se ejecutaron acomodando jugadores de golpe`);
+  if (conFestejo < goles * .85 || conAbrazo < conFestejo * .8) out.fallas.push(`Etapa 6: festejos ${conFestejo}/${goles}, con abrazo ${conAbrazo}`);
+  if (arbFuera || out.etapa6.arbitroKmPorPartido < 4) out.fallas.push(`Etapa 6: árbitro raro (fuera ${arbFuera}, ${out.etapa6.arbitroKmPorPartido} km)`);
+  if (corners.some(x => x < 5)) out.fallas.push(`Etapa 6: un gol de córner con menos de 5 jugadores en el área (${corners})`);
+  if (!(gkErr < .10)) out.fallas.push(`Etapa 6: goles por error del arquero ${(100 * gkErr).toFixed(1)}% (máximo 10%)`);
+}
 /* un partido de ejemplo guardado para inspección (sin la cinta completa) */
 const ej = M.simular(A, B, { semilla: 2026 });
 out.ejemplo = { partido: `${ej.local} ${ej.h}-${ej.a} ${ej.visitante}`, stats: ej.stats, goles: ej.eventos.filter(e => e.tipo === 'gol'), remates: ej.eventos.filter(e => e.tipo === 'remate').slice(0, 10), cuadros: ej.cinta.frames, hz: ej.cinta.hz, cuadro100: M.cuadro(ej.cinta, 100) };
@@ -327,7 +366,7 @@ if (out.partidosLiga < N * 0.95) out.fallas.push(`se jugaron solo ${out.partidos
 if (usoRandom) out.fallas.push('se usó Math.random');
 
 mkdirSync('tests/out', { recursive: true }); writeFileSync('tests/out/motor-v3.json', JSON.stringify(out, null, 1));
-console.log(`MOTOR v3 (etapas 1-5) · ${out.fallas.length ? 'FALLÓ' : 'OK'} · ${out.partidos} partidos sin errores: ${out.errores.length === 0 ? 'sí' : 'no'}`);
+console.log(`MOTOR v3 (etapas 1-6) · ${out.fallas.length ? 'FALLÓ' : 'OK'} · ${out.partidos} partidos sin errores: ${out.errores.length === 0 ? 'sí' : 'no'}`);
 console.log('tiempo por partido', JSON.stringify(out.tiempo));
 console.log('determinismo', out.determinismo.mismaSemilla ? 'OK' : 'FALLÓ', '· semillas distintas →', out.determinismo.semillasDistintasDistinto ? 'partidos distintos' : 'IGUALES', '· huellas', h1.join(' '));
 console.log('estadísticas (solo informativas, sin calibrar):');
@@ -343,6 +382,7 @@ console.log('calibración (' + out.partidosLiga + ' partidos de liga):');
 for (const c of out.calibracion) console.log(c.ok ? '  ✔' : '  ✘', c.estadistica.padEnd(32), String(c.valor).padStart(8), '  rango', c.rango.join(' – '));
 console.log('local:', JSON.stringify(out.local), '· fuerza:', JSON.stringify(out.fuerza));
 console.log('en vivo:', JSON.stringify(out.enVivo));
+console.log('etapa 6:', JSON.stringify(out.etapa6));
 console.log('física', JSON.stringify(out.fisica));
 console.log('atributos', JSON.stringify(out.atributos));
 console.log('ejemplo:', out.ejemplo.partido);

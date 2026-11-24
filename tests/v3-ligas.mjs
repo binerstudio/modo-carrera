@@ -60,6 +60,6 @@ export function armar(W) {
 export function resumen(r) {
   const s = r.stats;
   return { h: r.h, a: r.a, rem: s.remates, arco: s.alArco, pases: s.pases, ok: s.pasesOk, pos: s.posesion, corners: s.corners, faltas: s.faltas, am: s.amarillas, rojas: s.rojas,
-    pen: s.penales, penGol: s.penalesGol, off: s.offsides, lat: s.laterales, xg: s.xg, enJuego: s.minutosEnJuego, cambios: s.cambios, lesiones: s.lesiones,
+    pen: s.penales, penGol: s.penalesGol, gkErr: s.golesErrorArquero || [0, 0], origen: s.origenGoles || {}, off: s.offsides, lat: s.laterales, xg: s.xg, enJuego: s.minutosEnJuego, cambios: s.cambios, lesiones: s.lesiones,
     km: r.jugadores.filter(j => j.pos !== 'POR' && j.entro === 0).reduce((a, j) => a + j.distancia, 0) / Math.max(1, r.jugadores.filter(j => j.pos !== 'POR' && j.entro === 0).length) / 1000 };
 }

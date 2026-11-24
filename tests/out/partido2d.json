@@ -1,0 +1,158 @@
+{
+ "ok": false,
+ "realismo": {
+  "muestras": 95,
+  "cercaPelota": 2.07,
+  "largo": [
+   43.8,
+   41.3
+  ],
+  "ancho": [
+   34.1,
+   34.2
+  ],
+  "arqueroLinea": [
+   5.9,
+   5.6
+  ],
+  "pctSuelta": 3.2,
+  "maxCerca": 7,
+  "sueltaMaxSeg": 2.7,
+  "camara": {
+   "zoomMin": 1.05,
+   "zoomMax": 1.48
+  },
+  "repeticiones": 1,
+  "rendimiento": {
+   "msPromedio": 0.52,
+   "msMax": 44.9,
+   "cuadros": 18422,
+   "msCuadroTotal": 0.61,
+   "fps": 387,
+   "cuadrosLentos": 238,
+   "tiempoJuego": 650,
+   "tiempoReal": 48
+  }
+ },
+ "montado": {
+  "host": true,
+  "canvas": true,
+  "cams": [
+   "TV",
+   "Cenital",
+   "Seguimiento",
+   "Táctica",
+   "⛶"
+  ]
+ },
+ "fin": {
+  "done": true,
+  "h": 1,
+  "a": 1,
+  "vis": "1 - 1",
+  "eventos": 45,
+  "corte": 45,
+  "goles": [
+   "28' Nicolas Retamar (Maximiliano Amarfil) · filtrado",
+   "73' Lucas Beltrán (Thiago Almada) · filtrado"
+  ],
+  "estado": {
+   "v3": null,
+   "rend": {
+    "msPromedio": 0.52,
+    "msMax": 44.9,
+    "cuadros": 18422,
+    "msCuadroTotal": 0.61,
+    "fps": 387,
+    "cuadrosLentos": 238,
+    "tiempoJuego": 650,
+    "tiempoReal": 48
+   },
+   "repeticiones": 1,
+   "enRepeticion": false,
+   "zoom": 1.07,
+   "med": {
+    "cerca": 0,
+    "largo0": 39.7,
+    "ancho0": 17,
+    "arq0": 0.6,
+    "largo1": 48,
+    "ancho1": 31.4,
+    "arq1": 7.4,
+    "suelta": false,
+    "sueltaMax": 2.7,
+    "enJugada": true
+   },
+   "saltosJugadores": 0,
+   "saltoLog": null,
+   "jugada": "OCASIÓN DE GOL",
+   "mostrados": 42,
+   "eventos": 45,
+   "camara": "tac",
+   "jugadores": 22,
+   "goles": [
+    1,
+    1
+   ],
+   "cuadros": 650.222175999994,
+   "teletransportes": 0,
+   "teleLog": null,
+   "estados": {
+    "caminando": 2,
+    "corriendo": 17,
+    "trotando": 2,
+    "esprintando": 1
+   },
+   "tacticos": {
+    "arco": 2,
+    "atacando": 10,
+    "defendiendo": 10
+   },
+   "acciones": {},
+   "posesionId": 92
+  }
+ },
+ "estadosVistos": {
+  "estados": [
+   "quieto",
+   "caminando",
+   "retrocediendo",
+   "trotando",
+   "lateral",
+   "corriendo",
+   "esprintando",
+   "girando"
+  ],
+  "tacticos": [
+   "arco",
+   "defendiendo",
+   "presionando",
+   "atacando",
+   "apoyo",
+   "marcando",
+   "desmarcandose",
+   "buscando",
+   "quieto"
+  ],
+  "acciones": [
+   "lamento",
+   "pide",
+   "controlando",
+   "abrazo",
+   "pasando",
+   "levantandose",
+   "proteccion",
+   "estirada",
+   "entrada",
+   "saque"
+  ]
+ },
+ "segundosReales": 47,
+ "muestras": 95,
+ "retuvoDuranteJugadas": 31,
+ "adelantado": 0,
+ "errores": [],
+ "fallas": [
+  "Faltan botones de cámara"
+ ]
+}

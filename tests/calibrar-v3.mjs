@@ -59,7 +59,8 @@ if (!isMainThread) {
   const marc = {};
   for (const [r, m] of liga) {
     const gl = r.h + r.a; add('goles', gl); add(r.h > r.a ? 'loc' : r.h === r.a ? 'emp' : 'vis', 1);
-    for (const k of ['rem', 'arco', 'pases', 'ok', 'corners', 'faltas', 'am', 'rojas', 'pen', 'penGol', 'off', 'lat', 'cambios', 'lesiones']) add(k, r[k] ? r[k][0] + r[k][1] : 0);
+    for (const k of ['rem', 'arco', 'pases', 'ok', 'corners', 'faltas', 'am', 'rojas', 'pen', 'penGol', 'off', 'lat', 'cambios', 'lesiones', 'gkErr']) add(k, r[k] ? r[k][0] + r[k][1] : 0);
+    for (const [o, v] of Object.entries(r.origen || {})) S['o_' + o] = (S['o_' + o] || 0) + v;
     add('xg', r.xg[0] + r.xg[1]); add('enJuego', r.enJuego); add('km', r.km);
     /* posesión del mejor equipo (por GRL del XI) */
     const gh = g.get(m.h), ga = g.get(m.a); if (Math.abs(gh - ga) >= 2) { add('posMejor', gh > ga ? r.pos[0] : r.pos[1]); add('nPosMejor', 1); }
@@ -86,7 +87,8 @@ if (!isMainThread) {
     ['0-0', (marc['0-0'] || 0) / n, .05, .10, '%'], ['1-0', (marc['1-0'] || 0) / n, .15, .22, '%'], ['2-1', (marc['2-1'] || 0) / n, .13, .19, '%'],
     ['Diferencia de 4 o más', (S.goleada || 0) / n, .015, .05, '%'], ['Partidos con 10+ goles', (S.diez || 0) / n, 0, .0015, '%'],
     ['Muy superior (+7 GRL) gana', fuerza.muySuperior.gana, .65, .75, '%'], ['Superior (+3 a +6) gana', fuerza.superior.gana, .50, .63, '%'], ['Parejo (<1) gana', fuerza.parejo.gana, .33, .45, '%'],
-    ['Ventaja de local (gana local − gana visitante)', pct(S.loc) - pct(S.vis), .08, .18, '%']
+    ['Ventaja de local (gana local − gana visitante)', pct(S.loc) - pct(S.vis), .08, .18, '%'],
+    ['Goles por error del arquero', (S.gkErr || 0) / (S.goles || 1), 0, .10, '%']
   ];
   const fmt = (v, d) => d === '%' ? (100 * v).toFixed(1) + '%' : (+v).toFixed(d);
   const VERDE = '\x1b[32m', ROJO = '\x1b[31m', FIN = '\x1b[0m';
@@ -97,7 +99,7 @@ if (!isMainThread) {
   console.log('Estadística'.padEnd(48) + 'Valor'.padStart(10) + '   Objetivo');
   for (const f of filas) console.log(`${f.ok ? VERDE + '✔' : ROJO + '✘'} ${f.estadistica.padEnd(46)}${f.texto.padStart(10)}   ${f.rango}${FIN}`);
   const info = { xgPorPartido: S.xg / n, lateralesPorEquipo: pe(S.lat), minutosEnJuego: S.enJuego / n, kmPorJugador: S.km / n, cambiosPorPartido: S.cambios / n, lesionesPorPartido: S.lesiones / n,
-    conversionPenales: S.penGol / (S.pen || 1), sieteOMasGoles: (S.siete || 0) / n, marcadoresMasComunes: Object.entries(marc).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([k, v]) => `${k} ${(100 * v / n).toFixed(1)}%`), fuerza };
+    conversionPenales: S.penGol / (S.pen || 1), origenGoles: Object.fromEntries(Object.entries(S).filter(([k]) => k.startsWith('o_')).map(([k, v]) => [k.slice(2), +(v / S.goles).toFixed(3)]).sort((a, b) => b[1] - a[1])), sieteOMasGoles: (S.siete || 0) / n, marcadoresMasComunes: Object.entries(marc).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([k, v]) => `${k} ${(100 * v / n).toFixed(1)}%`), fuerza };
   console.log('informativo:', JSON.stringify(info));
   errores.slice(0, 10).forEach(e => console.log('ERROR:', e));
   mkdirSync('tests/out', { recursive: true });

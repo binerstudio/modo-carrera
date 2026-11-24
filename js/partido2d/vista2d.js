@@ -560,7 +560,15 @@ function frame(ts){S.raf=0;if(!S.cv||!S.cv.isConnected){return}
  resize();const m=S.m;
  if(m&&Q.on){try{frameV3(real,crudo)}catch(e){console.warn('MC2D v3',e)}if(S.banner){S.banner.t-=real;if(S.banner.t<=0)S.banner=null}if(S.big){S.big.t-=real;if(S.big.t<=0)S.big=null}
   const R=Q.live,Z=R?cuadroEn(Q.tv.cuadros,R.tp+12):null;Q.fut=Z?[Z.A.d[0]/10,Z.A.d[1]/10]:null}
- else if(m&&!S.rep){syncPlayers();
+ else if(m&&!S.rep){/* v1/v2: con la duración corta el 2D va más rápido; se divide en sub-pasos chicos para que nada salte */
+  const n=Math.max(1,Math.ceil(dt/.2));for(let q=0;q<n;q++)pasoV2(m,dt/n,q===n-1?real:0)}
+ if(m&&!S.rep&&!Q.on)grabar();
+ if(S.rep&&!Q.on){S.rep.t+=real*S.rep.v;if(S.rep.t>=S.rep.fin){S.rep=null;S.zoom=1.1;if(!S.play)next()}else{const L=S.rep.L;let i=0;while(i<L.length-2&&L[i+1].t<S.rep.t)i++;const A=L[i].b,B=(L[i+1]||L[i]).b;S.rep.b={x:(A.x+B.x)/2,y:(A.y+B.y)/2,fly:null}}}
+ camara(real);
+ if(visible()){const t0=performance.now();if(Q.on&&Q.rep)dibujarRepV3();else if(S.rep)dibujarRepeticion();else draw();const ms=performance.now()-t0;S.perf.n++;S.perf.tot+=ms;if(ms>S.perf.max&&S.perf.n>30)S.perf.max=ms}
+ if(S.perf)S.perf.frame+=performance.now()-tf0;S.raf=requestAnimationFrame(frame)}
+function pasoV2(m,dt,real){
+syncPlayers();
   /* la circulación de posesión se corta en cuanto el motor produce un evento */
   if(S.play&&S.play.filler&&S.shown<(m.events||[]).length&&!S.ball.fly){S.play=null;S.sp.forEach(s=>{if(!s.out)s.ov=null})}
   if(!S.play)next();runPlay(dt);
@@ -576,11 +584,6 @@ function frame(ts){S.raf=0;if(!S.cv||!S.cv.isConnected){return}
   ballStep(dt);S.sp.forEach(s=>{step(s,dt);if(s.cardT>0)s.cardT-=dt;else s.card=null});
   if(S.ref){const r=S.ref;r.ov={x:clamp(S.ball.x-dirOf(0)*8,8,97),y:clamp(S.ball.y+12,6,62),run:.7};step(r,dt)}
   if(S.banner){S.banner.t-=real;if(S.banner.t<=0)S.banner=null}if(S.big){S.big.t-=real;if(S.big.t<=0)S.big=null}}
- if(m&&!S.rep&&!Q.on)grabar();
- if(S.rep&&!Q.on){S.rep.t+=real*S.rep.v;if(S.rep.t>=S.rep.fin){S.rep=null;S.zoom=1.1;if(!S.play)next()}else{const L=S.rep.L;let i=0;while(i<L.length-2&&L[i+1].t<S.rep.t)i++;const A=L[i].b,B=(L[i+1]||L[i]).b;S.rep.b={x:(A.x+B.x)/2,y:(A.y+B.y)/2,fly:null}}}
- camara(real);
- if(visible()){const t0=performance.now();if(Q.on&&Q.rep)dibujarRepV3();else if(S.rep)dibujarRepeticion();else draw();const ms=performance.now()-t0;S.perf.n++;S.perf.tot+=ms;if(ms>S.perf.max&&S.perf.n>30)S.perf.max=ms}
- if(S.perf)S.perf.frame+=performance.now()-tf0;S.raf=requestAnimationFrame(frame)}
 /* ---------- repetición: se graban posiciones reales (20 por segundo) y se vuelven a dibujar en cámara lenta ---------- */
 function prims(o){const r={};for(const k in o){const v=o[k];if(v===null||typeof v!=='object'&&typeof v!=='function')r[k]=v}return r}
 let recT=0;function grabar(){if(S.t-recT<.05)return;recT=S.t;S.rec.push({t:S.t,sp:S.sp.map(prims),ref:S.ref?prims(S.ref):null,b:prims(S.ball),cx:S.camX,cy:S.camY});
