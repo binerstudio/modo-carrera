@@ -42,8 +42,8 @@ function atributos(info){
 
 /* ---------- calibración (etapa 4): perillas del motor, todas en un solo lugar ---------- */
 const CAL={
- nivel:70,atributos:.78,   // atributos comprimidos alrededor de 70 (1 = sin comprimir)
- satura:12,                // y saturados: las diferencias enormes pesan menos que en línea recta (tanh)
+ nivel:70,atributos:.75,   // atributos comprimidos alrededor de 70 (1 = sin comprimir)
+ satura:10,                // y saturados: las diferencias enormes pesan menos que en línea recta (tanh)
  punteria:.11,            // error base de los remates (radianes)
  alcanceArquero:1.7,      // alcance del arquero parado (m)
  remate:.6,               // ganas de patear (multiplica el xG al decidir)
@@ -58,7 +58,7 @@ const CAL={
  dia:1.2,                  // forma del día de cada equipo: desvío (en puntos de atributo) sorteado con la semilla
  toque:1,                  // ticks de más que se toma el que recibe antes de decidir (ritmo de pases)
  costoPase:.0015,          // costo fijo de cada pase frente a seguir con la pelota (ritmo de pases)
- local:.115                // local: algo más de confianza (menos error al ejecutar) e intensidad (se cansa menos)
+ local:.14                 // local: algo más de confianza (menos error al ejecutar) e intensidad (se cansa menos)
 };
 /* ---------- táctica y formación ---------- */
 /* mismos valores que usa el juego (js/core/07-mc7-match.js: ownTac / rivalTac) */
@@ -121,6 +121,8 @@ function Partido(loc,vis,R,opt){
  this.conf=opt.neutral?[1,1]:[1-CAL.local,1];this.tacBase=[null,null];this.dia=[0,0];
  this.ultRemate=[null,null];this.ultCorner=null;
  this.J=[];this.eq=[[],[]];this.banco=[[],[]];this.cambios=[null,null];this.salidos=[];this.interr=[0,0];this.fin=false;this.suspendido=false;this.ventaja=null;this.paraLesion=null;this.enEntretiempo=false;
+ /* nivel medio del partido (GRL de los dos XI): las diferencias entre los equipos se saturan alrededor de este centro */
+ {const gl=T=>(T.players||[]).slice(0,11).map(p=>{const q=p.p||p;return +(q.rating||q.grl||p.r)||60}),g=gl(loc).concat(gl(vis));this.centro=g.length?g.reduce((x,y)=>x+y,0)/g.length:CAL.nivel}
  [loc,vis].forEach((T,e)=>{
   const lista=(T.players||[]).slice(0,11);
   if(lista.length<7)throw new Error('motor v3: '+(T.name||'equipo')+' tiene menos de 7 jugadores');
@@ -1058,7 +1060,8 @@ P.crearJugador=function(raw,e,id,sl){
  const A=atributos(info),fit=raw.fit!=null?+raw.fit:p0.fitness!=null?+p0.fitness:95;
  /* calibración: en la cancha los atributos pesan comprimidos alrededor de un nivel medio (mismo orden, menos distancia),
     para que el mejor gane más pero no siempre. Los atributos originales no se tocan. */
- const a={},dia=this.dia?this.dia[e]:0;for(const k in A.v)a[k]=typeof A.v[k]==='number'?CAL.nivel+CAL.satura*MATH.tanh((A.v[k]-CAL.nivel)*CAL.atributos/CAL.satura)+dia:A.v[k];
+ const c0=this.centro!=null?this.centro:CAL.nivel,base=CAL.nivel+(c0-CAL.nivel)*CAL.atributos;
+ const a={},dia=this.dia?this.dia[e]:0;for(const k in A.v)a[k]=typeof A.v[k]==='number'?base+CAL.satura*MATH.tanh((A.v[k]-c0)*CAL.atributos/CAL.satura)+dia:A.v[k];
  const j={raw,clave:raw.clave!=null?raw.clave:null,id,eq:e,i:sl.i,nombre:String(info.name||('Jugador '+(sl.i+1))),pos:GRUPO(info.pos),rol:sl.rol,rolInicial:sl.rol,linea:sl.linea,rel:sl.rel,uy:sl.uy,grl:info.grl,a,origenAtributos:A.origen,
   gk:!!sl.gk,bx:sl.gk?3:30+sl.rel*36,by:sl.gk?34:34+sl.uy*23,apoyo:null,corrida:null,pared:null,orden:null,desfase:0,
   vmax:6.6+(a.velocidad-50)*.05,acc:3+(a.aceleracion-50)*.04,energia:clamp(fit/100,.55,1),fit,
