@@ -90,8 +90,12 @@ La táctica usa **los mismos valores que ya maneja el juego**: `style`, `mentali
 - revisa que avance a la velocidad pedida, que no haya errores de la página y que el marcador dibujado al final sea el del motor;
 - guarda capturas `v3-*.png` (en CI van a la rama `capturas-ci`).
 
-### Resultados de CI
-(se completa con la corrida de la rama)
+### Resultados de CI (run 42, commit `4891087`): todo en verde
+- Motor v2: OK.
+- **Motor v3, etapas 1-2: OK** en 7:37 (1000 partidos, determinismo, forma y 8 pruebas de táctica).
+- Temporadas con semilla fija: **HUELLA `b6e76d8864c3a1f4` · OK**.
+- Auditoría de eventos: OK · Simulador 2D: OK · Tres temporadas: OK · Actualización desde la 12.2.2: OK.
+- **`v3.html`: OK.** Partido 3-5, 56.400 cuadros; en x16 avanzó 479 cuadros en 3 s. Las capturas están en la rama `capturas-ci`.
 
 ### Estadísticas generales (solo informadas, **sin calibrar**: etapa 4)
 | | v3 etapa 2 | v3 etapa 1 | referencia aproximada |
