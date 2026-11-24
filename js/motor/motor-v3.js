@@ -42,13 +42,13 @@ function atributos(info){
 
 /* ---------- calibración (etapa 4): perillas del motor, todas en un solo lugar ---------- */
 const CAL={
- nivel:70,atributos:.78,   // atributos comprimidos alrededor de 70 (1 = sin comprimir)
+ nivel:70,atributos:.76,   // atributos comprimidos alrededor de 70 (1 = sin comprimir)
  satura:10,                // y saturados: las diferencias enormes pesan menos que en línea recta (tanh)
- punteria:.11,            // error base de los remates (radianes)
+ punteria:.118,           // error base de los remates (radianes)
  alcanceArquero:1.7,      // alcance del arquero parado (m)
- remate:.56,              // ganas de patear (multiplica el xG al decidir)
+ remate:.6,               // ganas de patear (multiplica el xG al decidir)
  cuidado:2.1,              // cuánto pesa perder la pelota al elegir un pase o una conducción
- faltaArea:.023,            // el defensor se cuida en su área (multiplica la chance de falta)
+ faltaArea:.021,            // el defensor se cuida en su área (multiplica la chance de falta)
  desfase:3.4,              // cuánto se pasa de la línea el delantero que espera (offsides)
  rebotaAfuera:.85,          // atajadas que se van por el costado del arco (córners)
  despejeCorner:.7,
@@ -58,7 +58,7 @@ const CAL={
  dia:1.2,                  // forma del día de cada equipo: desvío (en puntos de atributo) sorteado con la semilla
  toque:1,                  // ticks de más que se toma el que recibe antes de decidir (ritmo de pases)
  costoPase:.0015,          // costo fijo de cada pase frente a seguir con la pelota (ritmo de pases)
- local:.125                // local: algo más de confianza (menos error al ejecutar) e intensidad (se cansa menos)
+ local:.12                 // local: algo más de confianza (menos error al ejecutar) e intensidad (se cansa menos)
 };
 /* ---------- táctica y formación ---------- */
 /* mismos valores que usa el juego (js/core/07-mc7-match.js: ownTac / rivalTac) */
