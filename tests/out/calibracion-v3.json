@@ -3,58 +3,58 @@
  "pares": {
   "muySuperior": {
    "partidos": 600,
-   "gana": 0.705,
-   "empata": 0.19166666666666668
+   "gana": 0.7216666666666667,
+   "empata": 0.17666666666666667
   },
   "superior": {
    "partidos": 600,
-   "gana": 0.5116666666666667,
-   "empata": 0.26166666666666666
+   "gana": 0.47,
+   "empata": 0.28
   },
   "parejo": {
    "partidos": 600,
-   "gana": 0.37166666666666665,
+   "gana": 0.39666666666666667,
    "empata": 0.3016666666666667
   }
  },
- "segundos": 645.928,
+ "segundos": 629.243,
  "filas": [
   {
    "estadistica": "Goles por partido",
-   "valor": 2.696,
+   "valor": 2.6787,
    "objetivo": [
     2.5,
     2.8
    ],
    "ok": true,
-   "texto": "2.70",
+   "texto": "2.68",
    "rango": "2.50 – 2.80"
   },
   {
    "estadistica": "Local gana",
-   "valor": 0.4487,
+   "valor": 0.4473,
    "objetivo": [
     0.42,
     0.46
    ],
    "ok": true,
-   "texto": "44.9%",
+   "texto": "44.7%",
    "rango": "42.0% – 46.0%"
   },
   {
    "estadistica": "Empate",
-   "valor": 0.243,
+   "valor": 0.2447,
    "objetivo": [
     0.24,
     0.28
    ],
    "ok": true,
-   "texto": "24.3%",
+   "texto": "24.5%",
    "rango": "24.0% – 28.0%"
   },
   {
    "estadistica": "Visitante gana",
-   "valor": 0.3083,
+   "valor": 0.308,
    "objetivo": [
     0.28,
     0.32
@@ -65,62 +65,62 @@
   },
   {
    "estadistica": "Remates por equipo",
-   "valor": 13.5445,
+   "valor": 13.3217,
    "objetivo": [
     12,
     14
    ],
    "ok": true,
-   "texto": "13.5",
+   "texto": "13.3",
    "rango": "12.0 – 14.0"
   },
   {
    "estadistica": "Remates al arco",
-   "valor": 0.3654,
+   "valor": 0.366,
    "objetivo": [
     0.35,
     0.4
    ],
    "ok": true,
-   "texto": "36.5%",
+   "texto": "36.6%",
    "rango": "35.0% – 40.0%"
   },
   {
    "estadistica": "Conversión (goles/remates)",
-   "valor": 0.0995,
+   "valor": 0.1005,
    "objetivo": [
     0.085,
     0.115
    ],
    "ok": true,
-   "texto": "10.0%",
+   "texto": "10.1%",
    "rango": "8.5% – 11.5%"
   },
   {
    "estadistica": "Pases por equipo",
-   "valor": 466.9365,
+   "valor": 466.0227,
    "objetivo": [
     400,
     500
    ],
    "ok": true,
-   "texto": "467",
+   "texto": "466",
    "rango": "400 – 500"
   },
   {
    "estadistica": "Acierto de pases",
-   "valor": 0.7904,
+   "valor": 0.7908,
    "objetivo": [
     0.75,
     0.85
    ],
    "ok": true,
-   "texto": "79.0%",
+   "texto": "79.1%",
    "rango": "75.0% – 85.0%"
   },
   {
    "estadistica": "Posesión del mejor equipo",
-   "valor": 0.5188,
+   "valor": 0.5186,
    "objetivo": [
     0.5,
     0.65
@@ -131,7 +131,7 @@
   },
   {
    "estadistica": "Córners por equipo",
-   "valor": 5.1195,
+   "valor": 5.1235,
    "objetivo": [
     4,
     6
@@ -142,7 +142,7 @@
   },
   {
    "estadistica": "Faltas por equipo",
-   "valor": 12.4355,
+   "valor": 12.4253,
    "objetivo": [
     10,
     13
@@ -153,90 +153,90 @@
   },
   {
    "estadistica": "Amarillas por equipo",
-   "valor": 2.1118,
+   "valor": 2.0973,
    "objetivo": [
     1.5,
     2.5
    ],
    "ok": true,
-   "texto": "2.11",
+   "texto": "2.10",
    "rango": "1.50 – 2.50"
   },
   {
    "estadistica": "Rojas por partido",
-   "valor": 0.1813,
+   "valor": 0.1747,
    "objetivo": [
     0.1,
     0.2
    ],
    "ok": true,
-   "texto": "0.181",
+   "texto": "0.175",
    "rango": "0.100 – 0.200"
   },
   {
    "estadistica": "Penales por partido",
-   "valor": 0.3027,
+   "valor": 0.3237,
    "objetivo": [
     0.22,
     0.33
    ],
    "ok": true,
-   "texto": "0.303",
+   "texto": "0.324",
    "rango": "0.220 – 0.330"
   },
   {
    "estadistica": "Offsides por equipo",
-   "valor": 1.8308,
+   "valor": 1.8182,
    "objetivo": [
     1.6,
     2.4
    ],
    "ok": true,
-   "texto": "1.83",
+   "texto": "1.82",
    "rango": "1.60 – 2.40"
   },
   {
    "estadistica": "0-0",
-   "valor": 0.08,
+   "valor": 0.0733,
    "objetivo": [
     0.05,
     0.1
    ],
    "ok": true,
-   "texto": "8.0%",
+   "texto": "7.3%",
    "rango": "5.0% – 10.0%"
   },
   {
    "estadistica": "1-0",
-   "valor": 0.1633,
+   "valor": 0.173,
    "objetivo": [
     0.15,
     0.22
    ],
    "ok": true,
-   "texto": "16.3%",
+   "texto": "17.3%",
    "rango": "15.0% – 22.0%"
   },
   {
    "estadistica": "2-1",
-   "valor": 0.1453,
+   "valor": 0.1347,
    "objetivo": [
     0.13,
     0.19
    ],
    "ok": true,
-   "texto": "14.5%",
+   "texto": "13.5%",
    "rango": "13.0% – 19.0%"
   },
   {
    "estadistica": "Diferencia de 4 o más",
-   "valor": 0.0307,
+   "valor": 0.03,
    "objetivo": [
     0.015,
     0.05
    ],
    "ok": true,
-   "texto": "3.1%",
+   "texto": "3.0%",
    "rango": "1.5% – 5.0%"
   },
   {
@@ -252,46 +252,46 @@
   },
   {
    "estadistica": "Muy superior (+7 GRL) gana",
-   "valor": 0.705,
+   "valor": 0.7217,
    "objetivo": [
     0.65,
     0.75
    ],
    "ok": true,
-   "texto": "70.5%",
+   "texto": "72.2%",
    "rango": "65.0% – 75.0%"
   },
   {
    "estadistica": "Superior (+3 a +6) gana",
-   "valor": 0.5117,
+   "valor": 0.47,
    "objetivo": [
     0.5,
     0.63
    ],
-   "ok": true,
-   "texto": "51.2%",
+   "ok": false,
+   "texto": "47.0%",
    "rango": "50.0% – 63.0%"
   },
   {
    "estadistica": "Parejo (<1) gana",
-   "valor": 0.3717,
+   "valor": 0.3967,
    "objetivo": [
     0.33,
     0.45
    ],
    "ok": true,
-   "texto": "37.2%",
+   "texto": "39.7%",
    "rango": "33.0% – 45.0%"
   },
   {
    "estadistica": "Ventaja de local (gana local − gana visitante)",
-   "valor": 0.1403,
+   "valor": 0.1393,
    "objetivo": [
     0.08,
     0.18
    ],
    "ok": true,
-   "texto": "14.0%",
+   "texto": "13.9%",
    "rango": "8.0% – 18.0%"
   },
   {
@@ -307,40 +307,40 @@
   }
  ],
  "info": {
-  "xgPorPartido": 4.488929999999995,
-  "lateralesPorEquipo": 38.82833333333333,
-  "minutosEnJuego": 77.81003333333325,
-  "kmPorJugador": 13.442803499999982,
-  "cambiosPorPartido": 8.55,
-  "lesionesPorPartido": 0.6753333333333333,
-  "conversionPenales": 0.6508810572687225,
-  "sieteOMasGoles": 0.019,
+  "xgPorPartido": 4.39799333333333,
+  "lateralesPorEquipo": 38.61666666666667,
+  "minutosEnJuego": 77.71976666666687,
+  "kmPorJugador": 13.427049149999997,
+  "cambiosPorPartido": 8.561666666666667,
+  "lesionesPorPartido": 0.673,
+  "conversionPenales": 0.6632337796086509,
+  "sieteOMasGoles": 0.019666666666666666,
   "marcadoresMasComunes": [
-   "1-0 16.3%",
-   "2-1 14.5%",
-   "2-0 13.3%",
-   "1-1 10.3%",
-   "3-0 9.6%",
-   "0-0 8.0%",
-   "3-1 7.3%",
-   "2-2 5.1%",
-   "3-2 4.1%",
-   "4-1 3.8%"
+   "1-0 17.3%",
+   "2-1 13.5%",
+   "2-0 12.9%",
+   "1-1 11.3%",
+   "3-0 9.8%",
+   "3-1 8.1%",
+   "0-0 7.3%",
+   "2-2 4.7%",
+   "4-1 4.2%",
+   "3-2 3.9%"
   ],
   "fuerza": {
    "muySuperior": {
     "partidos": 600,
-    "gana": 0.705,
-    "empata": 0.19166666666666668
+    "gana": 0.7216666666666667,
+    "empata": 0.17666666666666667
    },
    "superior": {
     "partidos": 600,
-    "gana": 0.5116666666666667,
-    "empata": 0.26166666666666666
+    "gana": 0.47,
+    "empata": 0.28
    },
    "parejo": {
     "partidos": 600,
-    "gana": 0.37166666666666665,
+    "gana": 0.39666666666666667,
     "empata": 0.3016666666666667
    }
   }
