@@ -45,7 +45,8 @@ const CAL={
  nivel:70,atributos:.76,   // atributos comprimidos alrededor de 70 (1 = sin comprimir)
  satura:10,                // y saturados: las diferencias enormes pesan menos que en línea recta (tanh)
  punteria:.118,           // error base de los remates (radianes)
- alcanceArquero:1.7,      // alcance del arquero parado (m)
+ alcanceArquero:1.5,
+ atajadaBorde:.62,         // cuánto le cuesta al arquero llegar al límite de su alcance      // alcance del arquero parado (m)
  remate:.6,               // ganas de patear (multiplica el xG al decidir)
  cuidado:2.1,              // cuánto pesa perder la pelota al elegir un pase o una conducción
  faltaArea:.021,            // el defensor se cuida en su área (multiplica la chance de falta)
@@ -58,7 +59,10 @@ const CAL={
  dia:1.2,                  // forma del día de cada equipo: desvío (en puntos de atributo) sorteado con la semilla
  toque:1,                  // ticks de más que se toma el que recibe antes de decidir (ritmo de pases)
  costoPase:.0015,          // costo fijo de cada pase frente a seguir con la pelota (ritmo de pases)
- local:.12                 // local: algo más de confianza (menos error al ejecutar) e intensidad (se cansa menos)
+ local:.12,
+ errorAtajable:.8,
+ festejo:150,               // ticks de festejo después de un gol (15 s) antes de volver caminando         // para el informe: un gol con chance de atajarlo de 80% o más es error del arquero
+                // local: algo más de confianza (menos error al ejecutar) e intensidad (se cansa menos)
 };
 /* ---------- táctica y formación ---------- */
 /* mismos valores que usa el juego (js/core/07-mc7-match.js: ownTac / rivalTac) */
@@ -114,7 +118,7 @@ function Partido(loc,vis,R,opt){
  this.st={pases:z(),pasesOk:z(),pasesAltos:z(),remates:z(),alArco:z(),atajadas:z(),bloqueos:z(),palos:z(),corners:z(),laterales:z(),saquesArco:z(),
   quites:z(),intercepciones:z(),gambetas:z(),gambetasOk:z(),cabezazos:z(),xg:z(),posTicks:z(),ticksJuego:0,
   posesiones:z(),recuperaciones:z(),recupCampoRival:z(),alturaRecup:z(),pelotazos:z(),desmarques:z(),paredes:z(),cambiosFrente:z(),contras:z(),contrapresiones:z(),repliegues:z(),
-  faltas:z(),amarillas:z(),rojas:z(),penales:z(),penalesPateados:z(),penalesGol:z(),offsides:z(),tirosLibres:z(),tirosLibresDirectos:z(),lesiones:z(),cambios:z(),ventajas:z(),despejes:z(),centros:z(),origenGoles:{}};
+  faltas:z(),amarillas:z(),rojas:z(),penales:z(),penalesPateados:z(),penalesGol:z(),offsides:z(),tirosLibres:z(),tirosLibresDirectos:z(),lesiones:z(),cambios:z(),ventajas:z(),despejes:z(),centros:z(),golesErrorArquero:z(),origenGoles:{}};
  this.trans=[null,null];this.lin=[30,30];this.ctrlEq=-1;
  const mf=()=>({n:0,largo:0,ancho:0,dDM:0,dMA:0,linea:0,bloque:0,alin:0});this.md=[[mf(),mf()],[mf(),mf()]];
  /* local (equipo 0): confianza e intensidad; el neutral se pide con opt.neutral */
@@ -147,7 +151,10 @@ function Partido(loc,vis,R,opt){
  this.B={x:52.5,y:34,z:0,vx:0,vy:0,vz:0,dueno:null,ultimo:null,tipo:'muerta',desde:null,destino:null,tiro:null,ultTiro:null,enRed:false,sinDueno:0,off:null};
  this.anadido=[0,0];   // el descuento se calcula al minuto 45 de cada tiempo, según las interrupciones
  this.cada=MATH.max(1,opt.cintaCada|0||5);
- this.cinta=opt.cinta===false?null:{t:[],d:[]};
+ this.cinta=opt.cinta===false&&!opt.alCuadro?null:{t:[],d:[]};
+ /* árbitro (se mueve siguiendo la jugada; no usa el azar, así no cambia ningún partido) y jugadores que salen caminando */
+ this.arbitro={x:52.5-6,y:34+9,vx:0,vy:0};
+ this.salientes=[null,null,null];this.festejo=null;this.forzados=0;
 }
 const P=Partido.prototype;
 
@@ -184,7 +191,8 @@ P.lineaOffside=function(e){const c=this._offs;if(c&&c.t===this.t&&c[e]!=null)ret
 /* ---------- reanudaciones ---------- */
 P.reanudar=function(tipo,e,x,y,espera,extra){
  if(this.fin)return;
- const B=this.B;B.x=x;B.y=y;B.z=0;B.vx=B.vy=B.vz=0;B.dueno=null;B.tiro=null;B.ultTiro=null;B.tipo='muerta';B.destino=null;B.enRed=false;B.off=null;
+ const B=this.B;B.vx=B.vy=B.vz=0;B.dueno=null;B.tiro=null;   // la pelota no salta: vuelve rodando al lugar del saque (ver tick)
+ B.ultTiro=null;B.tipo='muerta';B.destino=null;B.enRed=false;B.off=null;
  for(const j of this.A){j.manos=false;j.accion=null;j.ctrl=0;j.superado=0;j.orden=null;j.enBarrera=false;j.corrida=null;j.pared=null}
  this.ventaja=null;this.paraLesion=null;
  this.estado='parado';this.rean={tipo,e,x,y,ej:null,timer:espera,plan:null,datos:null};
@@ -207,9 +215,11 @@ P.colocarSaqueCentro=function(e){
  const ej=this.rean.ej;ej.x=52.5-this.dir(e)*.6;ej.y=34;
 };
 P.ejecutarReanudacion=function(){
- const r=this.rean,B=this.B;if(r.tipo==='saque_centro')this.colocarSaqueCentro(r.e);
+ const r=this.rean,B=this.B;if(r.tipo==='saque_centro'&&r.datos&&r.datos.inicio)this.colocarSaqueCentro(r.e);
  const ej=r.ej;
- if(r.tipo!=='saque_centro'){const d=this.dir(r.e);ej.x=clamp(r.x-d*.5,-.5,PW+.5);ej.y=r.y;ej.vx=ej.vy=0;this.posicionesParado(true)}
+ if(r.tipo!=='saque_centro'){const d=this.dir(r.e);if(r.forzado){ej.x=clamp(r.x-d*.5,-.5,PW+.5);ej.y=r.y}ej.vx=ej.vy=0;this.posicionesParado(r.forzado?'total':true)}   // el que patea ya está al lado de la pelota
+ else if(!(r.datos&&r.datos.inicio)){ej.vx=ej.vy=0}
+ this.festejo=null;
  this.cambioPosesion(r.e,r.x,false);
  B.x=r.x;B.y=r.y;B.dueno=ej;B.ultimo=ej;B.tipo='control';ej.ctrl=0;ej.prox=this.t;ej.conPelota=0;ej.saque=r.tipo;
  if(r.tipo==='saque_centro')this.ev('saque_centro',r.e,ej);
@@ -258,8 +268,14 @@ P.gol=function(e){
  else if(u){autor=u;enContra=true}
  if(autor&&!enContra)autor.s.goles++;if(asist)asist.s.asist++;
  const origen=enContra?'en_contra':(ut&&ut.j===autor&&ut.ctx?ut.ctx.origen:'area');this.st.origenGoles[origen]=(this.st.origenGoles[origen]||0)+1;
- B.ultTiro=null;this.ev('gol',e,autor,{origen,clave:autor?autor.clave:null,asistClave:asist?asist.clave:null,enContra,asistencia:asist?asist.nombre:null,aid:asist?asist.id:null,marcador:this.goles.slice(),xg:tiro?+tiro.xg.toFixed(3):null});
+ /* gol por error del arquero: remate atajable que se le escapa (dentro de su alcance, chance alta), arquero muy adelantado ante un remate de lejos, o en contra del propio arquero */
+ const gv=ut&&ut.j===autor&&!enContra?ut.gkEval:null;
+ const errorArquero=!!((enContra&&u&&u.gk)||(gv&&!gv.superado&&((gv.p!=null&&gv.p>=CAL.errorAtajable)||(gv.linea>=7&&gv.dist>=20))));
+ if(errorArquero)this.st.golesErrorArquero[e]++;
+ B.ultTiro=null;this.ev('gol',e,autor,{origen,clave:autor?autor.clave:null,asistClave:asist?asist.clave:null,enContra,errorArquero,arqueroP:gv&&gv.p!=null?gv.p:null,asistencia:asist?asist.nombre:null,aid:asist?asist.id:null,marcador:this.goles.slice(),xg:tiro?+tiro.xg.toFixed(3):null,festejo:autor&&!enContra?CAL.festejo:0});
  B.enRed=true;this.interrumpir(35);this.ajustarPorResultado();
+ if(autor&&!enContra){const gx=B.x>52.5?PW:0,orden=this.eq[e].filter(j=>!j.gk&&j!==autor).sort((p,q)=>hyp(p.x-autor.x,p.y-autor.y)-hyp(q.x-autor.x,q.y-autor.y)||p.id-q.id).map(j=>j.id);
+  this.festejo={eq:e,autor,t0:this.t,hasta:this.t+CAL.festejo,punto:[gx?PW-2.5:2.5,autor.y<34?1.2:PH-1.2],orden}}
  if(tiro&&tiro.penal)this.st.penalesGol[tiro.j.eq]++;
  this.reanudar('saque_centro',1-e,52.5,34,420);
 };
@@ -323,16 +339,24 @@ P.chequeoTiro=function(){
   if(T.penal)return this.atajadaPenal(T,gk,e);
   const lat=MATH.abs(B.y-gk.y),tv=(this.t-T.t0)*DT,a=gk.a,reac=.32-a.reflejos*.002+(T.libre?.12:0);
   const alcance=CAL.alcanceArquero+clamp((tv-reac)*6.5,0,1.8+a.estirada*.013),sp=hyp(B.vx,B.vy);
+  /* para el origen del gol: ¿era atajable? ¿el arquero estaba en su lugar? */
+  T.gkEval={lat:+lat.toFixed(2),alcance:+alcance.toFixed(2),z:+B.z.toFixed(2),p:null,linea:+MATH.abs(this.ax(e,gk.x)-PW).toFixed(1),dist:+hyp(this.ax(e,T.x0!=null?T.x0:B.x)-PW,(T.y0!=null?T.y0:B.y)-34).toFixed(1),superado:!!gk.superado,atajo:false};
   if(lat<=alcance&&B.z<=2.7&&!gk.superado){
-   const p=lat<.5?.96:clamp(.95-.3*(lat/alcance)-MATH.max(0,sp-24)*.012+(a.reflejos-70)*.004,.05,.97);
+   /* cerca del cuerpo es casi segura; la dificultad sube recién cerca del límite de su alcance (y con remates muy fuertes) */
+   const rr=lat/alcance,p=clamp(.995-CAL.atajadaBorde*rr*rr*rr*rr-MATH.max(0,sp-24)*.012*rr+(a.reflejos-70)*.004*rr,.05,.995);
+   T.gkEval.p=+p.toFixed(3);
    if(this.R()<p){
     this.st.atajadas[1-e]++;
     const pc=clamp(.25+a.manejo*.006-(sp-15)*.02,.05,.9);
     if(this.R()<pc&&this.enArea(gk)){this.ev('atajada',1-e,gk,{rematador:T.j.nombre,retenida:true});this.tomar(gk,true);return false}
     this.ev('atajada',1-e,gk,{rematador:T.j.nombre,retenida:false});
-    const s=B.y>gk.y?1:-1;
-    if(this.R()<CAL.rebotaAfuera){B.vx=B.vx*(.25+this.R()*.25);B.vy=s*(5+this.R()*6)}          // la manda afuera, por el costado del arco
-    else{B.vx=-B.vx*(.15+this.R()*.25);B.vy=s*(3+this.R()*6)}
+    T.gkEval.atajo=true;
+    const s=B.y>gk.y?1:-1,dw=this.dir(e),dl=MATH.max(0,PW-bax);
+    let afuera=this.R()<CAL.rebotaAfuera;
+    if(afuera){/* la manda al córner: que cruce la línea afuera del palo */
+     const vxn=dw*MATH.max(1.5,MATH.abs(B.vx)*(.25+this.R()*.25)),tl=MATH.max(.12,dl/MATH.abs(vxn)),ty=s>0?GY1+.8+this.R()*2:GY0-.8-this.R()*2,vyn=(ty-B.y)/tl;
+     if(MATH.abs(vyn)<=16){B.vx=vxn;B.vy=vyn}else afuera=false}
+    if(!afuera){B.vx=-dw*MATH.abs(B.vx)*(.15+this.R()*.25);B.vy=s*(3+this.R()*6)}          // rechazo hacia adelante
     B.vz=1+this.R()*3;B.z=MATH.max(B.z,.2);B.ultimo=gk;B.tiro=null;gk.cdToque=6;
    }
   }
@@ -604,7 +628,7 @@ P.actuar=function(j){
    const rel=hyp(D.vx-j.vx,D.vy-j.vy);
    if(this.contacto(D,j,{porDetras:false,vel:rel,exito:true}))return;
    this.st.quites[D.eq]++;D.s.quites++;this.ev('quite',D.eq,D,{a:j.nombre});
-   if(R()<.55){this.tomar(D,false)}else{B.dueno=null;this.desviar(D,3,7,0,.5);D.cdToque=2;j.cdToque=6}
+   if(R()<.55&&hyp(D.x-B.x,D.y-B.y)<1.8){this.tomar(D,false)}else{B.dueno=null;this.desviar(D,3,7,0,.5);D.cdToque=2;j.cdToque=6}
    j.cdEntrada=10}
   return}
  if(op.tipo==='tiro'){this.remate(j,false,op.xg);return}
@@ -676,7 +700,7 @@ P.remate=function(j,cabeza,xg0,ext){
  /* ¿va al arco? (proyección sin desvíos) */
  const yg=ay+MATH.tan(ang)*(PW-ax),zg=B.z+B.vz*T-.5*G*T*T;
  const aPuerta=yg>GY0+BR&&yg<GY1-BR&&zg<GH-BR&&zg>-1;
- B.tiro={j,t0:this.t,xg,aPuerta,vistos:new Set(),gkVisto:false,bloqueado:false,libre:!!ext.libre,ctx:this.contextoRemate(j,!!cabeza,!!ext.libre,dg)};B.ultTiro=B.tiro;
+ B.tiro={j,t0:this.t,x0:B.x,y0:B.y,gkEval:null,xg,aPuerta,vistos:new Set(),gkVisto:false,bloqueado:false,libre:!!ext.libre,ctx:this.contextoRemate(j,!!cabeza,!!ext.libre,dg)};B.ultTiro=B.tiro;
  this.marcarOffside(j,null);
  this.st.remates[e]++;j.s.remates++;this.st.xg[e]+=xg;if(aPuerta)this.st.alArco[e]++;
  j.cdToque=5;j.accion=null;
@@ -725,9 +749,21 @@ P.objetivos=function(){
   if(sp>1&&MATH.abs(B.vx)>.1){const t=(gk.x-B.x)/B.vx;if(t>0){gk.tx=gk.x;gk.ty=clamp(B.y+B.vy*t,GY0-1.5,GY1+1.5);gk.urg=1;gk.tiroTarget=true}}}
  /* en reanudaciones: el ejecutor va al lugar; en el saque del medio, cada uno en su campo */
  if(this.estado==='parado'&&this.rean){const r=this.rean;
-  if(r.tipo==='saque_centro'){for(const j of this.A){const mio=j.eq===r.e;const ax=j.gk?3:MATH.min(j.bx*.85,mio?50:42);j.tx=this.wx(j.eq,ax);j.ty=this.wy(j.eq,j.by);j.urg=.5}
-   r.ej.tx=r.x-this.dir(r.e)*.5;r.ej.ty=r.y;r.ej.urg=1}
+  if(r.tipo==='saque_centro'){const F=this.festejo&&this.t<this.festejo.hasta?this.festejo:null;
+   if(F)this.objetivosFestejo(F);
+   else{for(const j of this.A){const mio=j.eq===r.e;const ax=j.gk?3:MATH.min(j.bx*.85,mio?50:42);j.tx=this.wx(j.eq,ax);j.ty=this.wy(j.eq,j.by);j.urg=.42}   // vuelven caminando a su campo
+    r.ej.tx=r.x-this.dir(r.e)*.5;r.ej.ty=r.y;r.ej.urg=hyp(r.ej.x-r.ej.tx,r.ej.y-r.ej.ty)<4?1:.42}}
   else this.posicionesParado(false)}
+};
+/* festejo de gol: el goleador corre al córner (o a la tribuna), los compañeros lo alcanzan y se abrazan; los rivales se lamentan */
+P.objetivosFestejo=function(F){
+ const a=F.autor,k=(this.t-F.t0);
+ for(const j of this.A){
+  if(j===a){j.tx=F.punto[0];j.ty=F.punto[1];j.urg=k<60?1:.5;continue}
+  if(j.eq===F.eq&&!j.gk&&a){const i=F.orden.indexOf(j.id);if(i<0||i>6){j.tx=j.x;j.ty=j.y;j.urg=.2;continue}
+   const ang=i*.9+.4,rad=.9+(i>3?.5:0);j.tx=clamp(a.x+MATH.cos(ang)*rad,.6,PW-.6);j.ty=clamp(a.y+MATH.sin(ang)*rad,.6,PH-.6);j.urg=.95;continue}
+  j.tx=j.x+j.vx*.2;j.ty=j.y+j.vy*.2;j.urg=.15;   // el resto frena y se queda (los rivales, lamentándose)
+ }
 };
 /* forma del equipo: tres líneas a distancia real, corta y angosta sin pelota, larga y ancha con pelota,
    corrida hacia el lado de la pelota sin abandonar el otro */
@@ -927,7 +963,9 @@ P.mover=function(){
   /* la pelota va pegada al pie, medio metro adelante */
   c.conPelota++;
   const sp=hyp(c.vx,c.vy);let ux,uy;if(sp>.3){ux=c.vx/sp;uy=c.vy/sp}else{ux=this.dir(c.eq);uy=0}
-  if(c.manos){B.x=c.x;B.y=c.y;B.z=1}else{B.x=c.x+ux*.5;B.y=c.y+uy*.5;B.z=0}
+  {const px=c.manos?c.x:c.x+ux*.5,py=c.manos?c.y:c.y+uy*.5,dd=hyp(px-B.x,py-B.y);
+   if(dd>2.2){B.x+=(px-B.x)/dd*2.2;B.y+=(py-B.y)/dd*2.2}else{B.x=px;B.y=py}   // nunca salta: si estaba lejos, llega en uno o dos cuadros
+   B.z=c.manos?1:MATH.max(0,B.z-.5)}
   B.vx=c.vx;B.vy=c.vy;B.vz=0;
   /* cerca de la raya el que la lleva frena y vuelve a decidir: no se la lleva afuera */
   if(!c.manos){const m=1.1;let toco=false;
@@ -941,6 +979,32 @@ P.mover=function(){
 };
 
 /* =================== ETAPA 3 · REGLAS Y PELOTA PARADA =================== */
+/* salir de la cancha caminando por el punto más cercano de la línea; con lugar propio en la cinta si dejó su puesto a otro */
+P.salir=function(j,propio){
+ const dy=j.y<34?-1.6:PH+1.6,dx=j.x<4?-1.6:j.x>PW-4?PW+1.6:null;
+ j.saliendo=dx!=null&&MATH.abs(j.x-(dx<0?0:PW))<MATH.abs(j.y-(dy<0?0:PH))?[dx,j.y]:[clamp(j.x,1,PW-1),dy];
+ if(!propio)return -1;
+ let k=this.salientes.indexOf(null);if(k<0){k=0;const v=this.salientes[0];if(v&&v.saliendo){v.x=v.saliendo[0];v.y=v.saliendo[1];v.saliendo=null}}
+ this.salientes[k]=j;return k;
+};
+P.moverSalientes=function(){
+ const mov=j=>{const s=j.saliendo;if(!s)return;const dx=s[0]-j.x,dy=s[1]-j.y,d=hyp(dx,dy),v=(j.lesion?1.1:1.7)*DT;
+  j.vx=d?dx/d*v/DT:0;j.vy=d?dy/d*v/DT:0;
+  if(d<=v){j.x=s[0];j.y=s[1];j.saliendo=null;j.vx=j.vy=0;const k=this.salientes.indexOf(j);if(k>=0)this.salientes[k]=null}else{j.x+=dx/d*v;j.y+=dy/d*v}};
+ for(const j of this.J)if(j.saliendo)mov(j);
+ for(const j of this.salidos)if(j.saliendo)mov(j);
+};
+/* árbitro: acompaña la jugada en diagonal, a unos 12 m de la pelota y del lado de adentro; en las faltas y tarjetas se acerca */
+P.moverArbitro=function(){
+ const A=this.arbitro,B=this.B,r=this.estado==='parado'?this.rean:null;let tx,ty,urg=.75;
+ if(r&&r.tipo!=='saque_centro'){tx=r.x+(r.x<52.5?7:-7);ty=r.y+(r.y<34?6:-6)}
+ else if(r){tx=52.5+6;ty=34+9;urg=.45}
+ else{tx=B.x*.82+52.5*.18;ty=B.y+(B.y<34?12:-12)}
+ tx=clamp(tx,3,PW-3);ty=clamp(ty,3,PH-3);
+ const dx=tx-A.x,dy=ty-A.y,d=hyp(dx,dy),vm=7*urg,want=d<.3?0:MATH.min(vm,d*.9),wx=d?dx/d*want:0,wy=d?dy/d*want:0;
+ let ax=wx-A.vx,ay=wy-A.vy;const m=hyp(ax,ay),ac=3*DT;if(m>ac){ax*=ac/m;ay*=ac/m}
+ A.vx+=ax;A.vy+=ay;A.x+=A.vx*DT;A.y+=A.vy*DT;
+};
 P.activos=function(){this.A=this.eq[0].concat(this.eq[1])};
 P.minAbs=function(){return(this.parte===1?0:45)+this.tParte/TPS/60};
 P.toW=function(e,ax,ay){return[this.wx(e,ax),this.wy(e,ay)]};
@@ -1026,7 +1090,7 @@ P.retirar=function(j){
  j.fuera=true;j.s.salio=+this.minAbs().toFixed(1);
  const k=L.indexOf(j);if(k>=0)L.splice(k,1);
  if(B.dueno===j){B.dueno=null;B.tipo='suelta'}
- j.x=52.5+(e?4:-4)+(j.i%5)*.8;j.y=-3;j.vx=j.vy=0;
+ this.salir(j,false);
  this.activos();this.interrumpir(30);this.minimoEnCancha[e]=MATH.min(this.minimoEnCancha[e],L.length);
  if(j.gk){ /* sin arquero: entra uno del banco si se puede; si no, ataja un jugador de campo */
   const C=this.cambios[e],gkB=this.banco[e].findIndex(r=>GRUPO((r.p||r).pos)==='POR');
@@ -1066,7 +1130,7 @@ P.crearJugador=function(raw,e,id,sl){
   gk:!!sl.gk,bx:sl.gk?3:30+sl.rel*36,by:sl.gk?34:34+sl.uy*23,apoyo:null,corrida:null,pared:null,orden:null,desfase:0,
   vmax:6.6+(a.velocidad-50)*.05,acc:3+(a.aceleracion-50)*.04,energia:clamp(fit/100,.55,1),fit,
   x:0,y:0,vx:0,vy:0,tx:0,ty:0,urg:.6,cdToque:0,cdEntrada:0,superado:0,ctrl:0,prox:0,accion:null,manos:false,conPelota:0,recibioDe:null,recibir:null,saque:null,tiroTarget:false,_marca:-1,
-  amarilla:false,expulsado:false,fuera:false,lesion:null,enBarrera:false,ultRecibo:null,ultGambeta:-1e9,penalLado:0,ensayada:0,convertido:false,
+  amarilla:false,expulsado:false,fuera:false,lesion:null,enBarrera:false,saliendo:null,ultRecibo:null,ultGambeta:-1e9,penalLado:0,ensayada:0,convertido:false,
   s:{pases:0,pasesOk:0,remates:0,goles:0,asist:0,quites:0,intercepciones:0,gambetas:0,distancia:0,faltas:0,faltasRecibidas:0,offsides:0,entro:sl.entro==null?0:sl.entro,salio:null}};
  if(j.gk){j.vmax=6.2+(a.velocidad-50)*.03;j.acc=3.2+(a.reflejos-50)*.02}
  return j;
@@ -1081,8 +1145,9 @@ P.cambio=function(e,sale,raw,motivo,extra){
  const L=this.eq[e],k=L.indexOf(sale);
  if(gk){if(k>=0)L.splice(k,1);L.unshift(nuevo)}else if(k>=0)L[k]=nuevo;
  sale.fuera=true;sale.s.salio=+this.minAbs().toFixed(1);this.salidos.push(sale);this.J[sale.id]=nuevo;
+ const ks=this.salir(sale,true);
  this.activos();
- this.ev('cambio',e,nuevo,{sale:sale.nombre,entra:nuevo.nombre,sid:sale.id,motivo});
+ this.ev('cambio',e,nuevo,{sale:sale.nombre,entra:nuevo.nombre,sid:sale.id,motivo,saleClave:sale.clave,salienteSlot:ks});
 };
 /* el DT decide en cada interrupción */
 P.dt=function(e){
@@ -1236,11 +1301,15 @@ P.posicionesParado=function(forzar){
  const d=r.datos||{},e=r.e;
  for(const j of this.A){const p=r.plan&&r.plan.get(j.id);if(p){j.tx=p[0];j.ty=p[1];j.urg=.9}}   // a su lugar exacto
  r.ej.tx=r.x-this.dir(e)*.5;r.ej.ty=r.y;r.ej.urg=1;
+ /* los compañeros le dejan lugar al que patea */
+ for(const j of this.eq[e]){if(j===r.ej||(r.plan&&r.plan.has(j.id)))continue;const dx=j.tx-r.x,dy=j.ty-r.y,dd=hyp(dx,dy);if(dd<2.5){const k=2.6/(dd||1);j.tx=clamp(r.x+(dd?dx:-this.dir(e))*k,.5,PW-.5);j.ty=clamp(r.y+(dd?dy:1)*k,.5,PH-.5)}}
  const rad=d.radio||0;
  for(const j of this.eq[1-e]){
   if(j.enBarrera)continue;
   let tx=j.tx,ty=j.ty;
-  if(rad>0){const dx=tx-r.x,dy=ty-r.y,dd=hyp(dx,dy);if(dd<rad+.2){const k=(rad+.3)/(dd||1);tx=r.x+(dd?dx:-this.dir(e))*k;ty=r.y+(dd?dy:0)*k}}
+  if(rad>0){const dx=tx-r.x,dy=ty-r.y,dd=hyp(dx,dy),R0=rad>5?rad+1.1:rad+.3;if(dd<R0){const k=R0/(dd||1);tx=r.x+(dd?dx:-this.dir(e))*k;ty=r.y+(dd?dy:0)*k;
+    /* contra la raya: si el empujón lo saca de la cancha, se corre a lo largo */
+    const cx=clamp(tx,.5,PW-.5),cy=clamp(ty,.5,PH-.5);if(hyp(cx-r.x,cy-r.y)<R0-.2){const sx=(dx||-this.dir(e))>0?1:-1,w=MATH.sqrt(MATH.max(0,R0*R0-(cy-r.y)*(cy-r.y)));tx=r.x+sx*w;if(tx<.5||tx>PW-.5)tx=r.x-sx*w;ty=cy}}}
   if(d.fueraArea&&!(j.gk&&r.tipo==='penal')){
    /* afuera del área donde se patea (para el saque de arco es el área propia del que saca) */
    const ae=r.tipo==='saque_arco'?e:1-e;const ax=this.ax(ae,tx),ay=this.ay(ae,ty);
@@ -1248,10 +1317,11 @@ P.posicionesParado=function(forzar){
   }
   if(tx!==j.tx||ty!==j.ty)j.urg=.9;
   j.tx=clamp(tx,.5,PW-.5);j.ty=clamp(ty,.5,PH-.5);
-  if(forzar){const dx=j.x-r.x,dy=j.y-r.y;if(hyp(dx,dy)<rad||d.fueraArea){j.x=j.tx;j.y=j.ty}}
+  if(forzar){const dx=j.x-r.x,dy=j.y-r.y;if((hyp(dx,dy)<rad||d.fueraArea)&&(forzar==='total'||hyp(j.x-j.tx,j.y-j.ty)<.8)){j.x=j.tx;j.y=j.ty}}
  }
- if(r.tipo==='penal'){for(const j of this.eq[e])if(j!==r.ej&&(forzar)){const p=r.plan.get(j.id);if(p){j.x=p[0];j.y=p[1]}}}
- if(forzar&&r.plan)for(const j of this.A){const p=r.plan.get(j.id);if(p&&(j.enBarrera||(r.tipo==='penal'&&j.gk))){j.x=p[0];j.y=p[1];j.vx=j.vy=0}}
+ const cerca=(j,p)=>forzar==='total'||hyp(j.x-p[0],j.y-p[1])<.8;
+ if(r.tipo==='penal'){for(const j of this.eq[e])if(j!==r.ej&&(forzar)){const p=r.plan.get(j.id);if(p&&cerca(j,p)){j.x=p[0];j.y=p[1]}}}
+ if(forzar&&r.plan)for(const j of this.A){const p=r.plan.get(j.id);if(p&&(j.enBarrera||(r.tipo==='penal'&&j.gk))&&cerca(j,p)){j.x=p[0];j.y=p[1];j.vx=j.vy=0}}
 };
 /* después de patear un córner o un tiro libre al área: cada atacante entra a su punto, los marcadores siguen a su hombre */
 P.ordenesPelotaParada=function(r){
@@ -1318,7 +1388,7 @@ P.patearPenal=function(j){
  const yg=34+gLado*2.3,[,gwy]=this.toW(e,PW-.3,yg);
  gk.tx=gk.x;gk.ty=gwy;gk.urg=1;gk.tiroTarget=true;gk.penalLado=gLado;
  const aPuerta=MATH.abs(yt-34)<3.66-BR&&zg<GH-BR&&zg>-.5;
- B.tiro={j,t0:this.t,xg:.76,ctx:{origen:'penal'},aPuerta,vistos:new Set(),gkVisto:false,bloqueado:true,penal:{lado,gLado,yt}};B.ultTiro=B.tiro;B.off=null;
+ B.tiro={j,t0:this.t,x0:B.x,y0:B.y,gkEval:null,xg:.76,ctx:{origen:'penal'},aPuerta,vistos:new Set(),gkVisto:false,bloqueado:true,penal:{lado,gLado,yt}};B.ultTiro=B.tiro;B.off=null;
  this.st.remates[e]++;j.s.remates++;this.st.xg[e]+=.76;if(aPuerta)this.st.alArco[e]++;this.st.penalesPateados[e]++;
  j.cdToque=8;j.accion=null;
  this.ev('remate',e,j,{aPuerta,penal:true,lado:lado<0?'izquierda':lado>0?'derecha':'centro',arqueroSeTira:gLado<0?'izquierda':gLado>0?'derecha':'se queda',xg:.76,dist:11,arquero:gk.nombre});
@@ -1327,6 +1397,13 @@ P.patearPenal=function(j){
 };
 
 /* tiros libres y córners: no se patea con un rival todavía a menos de 9,15 m ni con la barrera sin armar; a los 8 s se patea igual */
+/* saque del medio y penal: se patea con todos en su lugar */
+P.enSuLugar=function(r){
+ if(r.tipo==='saque_centro'){if(r.datos&&r.datos.inicio)return true;if(this.festejo&&this.t<this.festejo.hasta)return false;
+  for(const j of this.A)if(hyp(j.x-j.tx,j.y-j.ty)>1.6)return false;return true}
+ if(r.tipo==='penal'){for(const j of this.A){if(j===r.ej)continue;const p=r.plan&&r.plan.get(j.id);if(p?hyp(j.x-p[0],j.y-p[1])>.7:hyp(j.x-j.tx,j.y-j.ty)>1.2)return false}return true}
+ return true;
+};
 P.rivalCerca=function(r){
  const rad=r.datos&&r.datos.radio||0;if(rad<9||(r.tipo!=='tiro_libre'&&r.tipo!=='corner'))return false;
  for(const j of this.eq[1-r.e]){if(j.fuera||j.expulsado)continue;
@@ -1339,10 +1416,14 @@ P.tick=function(){
  const B=this.B;
  if(this.estado==='parado'){
   this.objetivos();this.mover();
-  const r=this.rean;if(r){r.timer--;B.x=r.x;B.y=r.y;B.z=0;B.vx=B.vy=B.vz=0;if(B.dueno&&B.dueno.eq!==r.e)B.dueno=null;   // el rival suelta la pelota y se aleja
-  
-   const d=hyp(r.ej.x-r.x,r.ej.y-r.y);const listo=r.timer<=0&&d<2&&!this.rivalCerca(r);r.listo=listo?(r.listo||0)+1:0;
-   if(r.listo>=(r.tipo==='tiro_libre'||r.tipo==='corner'?5:1)||r.timer<-80)this.ejecutarReanudacion()}
+  const r=this.rean;if(r){r.timer--;B.vx=B.vy=B.vz=0;B.dueno=null;   // nadie la lleva: el rival la suelta y se aleja; el que patea la recibe al ejecutar
+   /* la pelota vuelve rodando al lugar del saque (durante el festejo queda en la red) */
+   if(!(this.festejo&&this.t<this.festejo.hasta)){const dx=r.x-B.x,dy=r.y-B.y,dd=hyp(dx,dy);if(dd>.05){const st=MATH.min(dd,1.3);B.x+=dx/dd*st;B.y+=dy/dd*st}else{B.x=r.x;B.y=r.y}}
+   B.z=MATH.max(0,B.z-.25);
+   const d=hyp(r.ej.x-r.x,r.ej.y-r.y),pelota=hyp(B.x-r.x,B.y-r.y)<=.05&&B.z<=0;
+   const listo=r.timer<=0&&pelota&&d<.9&&!this.rivalCerca(r)&&this.enSuLugar(r);r.listo=listo?(r.listo||0)+1:0;
+   if(r.timer<-600&&!r.forzado){r.forzado=true;this.forzados++}   // 60 s de espera: se acomoda a los que falten (no pasa en la práctica)
+   if(r.listo>=(r.tipo==='tiro_libre'||r.tipo==='corner'?5:1)||r.forzado){if(r.forzado){B.x=r.x;B.y=r.y;B.z=0}this.ejecutarReanudacion()}}
  }else{
   this.st.ticksJuego++;
   if(B.dueno)this.actuar(B.dueno);
@@ -1370,6 +1451,7 @@ P.tick=function(){
  if(fr&&!this._roja&&this.estado==='juego'&&this.minAbs()>=fr.minuto){this._roja=true;
   const v=this.eq[fr.equipo].filter(j=>j.linea==='med').sort((a,b)=>b.grl-a.grl)[0];if(v){this.st.rojas[v.eq]++;this.ev('roja',v.eq,v,{motivo:'forzada (prueba)'});this.expulsar(v)}}
  if(this.estado==='juego'&&this.t%5===0)this.medir();
+ this.moverSalientes();this.moverArbitro();
  if(this.cinta&&this.t%this.cada===0)this.muestrear();
  this.t++;this.tParte++;
 };
@@ -1388,7 +1470,10 @@ P.medir=function(){
 };
 P.muestrear=function(){
  const B=this.B,f=[MATH.round(B.x*10),MATH.round(B.y*10),MATH.round(B.z*10),B.dueno?B.dueno.id:-1,this.estado==='juego'?1:0];
- for(const j of this.J){f.push(MATH.round(j.x*10),MATH.round(j.y*10))}   // por puesto (id): el que está en cancha, o el expulsado parado al costado
+ for(const j of this.J){f.push(MATH.round(j.x*10),MATH.round(j.y*10))}   // por puesto (id): el que está en cancha, o el expulsado saliendo
+ const A=this.arbitro;f.push(MATH.round(A.x*10),MATH.round(A.y*10));
+ for(const j of this.salientes){if(j){f.push(MATH.round(j.x*10),MATH.round(j.y*10))}else f.push(-32768,-32768)}
+ if(this.opt.alCuadro){this.opt.alCuadro(this.t,f);return}
  this.cinta.t.push(this.t);for(const v of f)this.cinta.d.push(v);
 };
 /* el partido se juega en pasos (así también puede avanzar en vivo, de a un minuto, dentro del juego) */
@@ -1397,7 +1482,8 @@ P.iniciarParte=function(parte){
  this.parte=parte;this.tParte=0;
  const e=parte===1?0:1;
  if(parte===2){this.enEntretiempo=true;this.rean=null;for(const k of [0,1])this.dt(k);this.enEntretiempo=false;if(this.fin)return false}
- this.estado='parado';this.rean={tipo:'saque_centro',e,x:52.5,y:34,ej:null,timer:0,plan:null,datos:{}};
+ this.estado='parado';this.rean={tipo:'saque_centro',e,x:52.5,y:34,ej:null,timer:0,plan:null,datos:{inicio:true}};
+ {const B=this.B;B.x=52.5;B.y=34;B.z=0;B.vx=B.vy=B.vz=0}this.festejo=null;
  const eqJ=this.eq[e].filter(j=>!j.gk);this.rean.ej=eqJ.filter(j=>j.linea==='atq')[0]||eqJ[eqJ.length-1];
  this.colocarSaqueCentro(e);
  for(const j of this.A){j.energia=MATH.min(1,j.energia+(parte===2?.08:0));j.accion=null;j.manos=false;j.superado=0;j.cdToque=0;j.orden=null}
@@ -1449,7 +1535,7 @@ P.resultado=function(){
  const st=this.st,tp=st.posTicks[0]+st.posTicks[1]||1,r2=x=>+x.toFixed(2);
  const cinta=this.cinta?{hz:TPS/this.cada,cada:this.cada,frames:this.cinta.t.length,
   formato:'por cuadro: pelota x,y,z (decímetros), id del dueño (-1 suelta), en juego (1/0), y luego x,y de los 22 jugadores por id (decímetros)',
-  porCuadro:5+this.J.length*2,t:Int32Array.from(this.cinta.t),datos:Int16Array.from(this.cinta.d)}:null;
+  porCuadro:5+this.J.length*2+2+6,arbitro:5+this.J.length*2,salientes:7+this.J.length*2,t:Int32Array.from(this.cinta.t),datos:Int16Array.from(this.cinta.d)}:null;
  return{version:VERSION,semilla:this.opt.semilla,local:this.equipos[0].name,visitante:this.equipos[1].name,
   h:this.goles[0],a:this.goles[1],anadido:this.anadido,ticks:this.t,
   stats:{posesion:[MATH.round(100*st.posTicks[0]/tp),100-MATH.round(100*st.posTicks[0]/tp)],pases:st.pases,pasesOk:st.pasesOk,pasesAltos:st.pasesAltos,
@@ -1460,7 +1546,7 @@ P.resultado=function(){
    alturaRecuperacion:st.alturaRecup.map((h,e)=>r2(h/(st.recuperaciones[e]||1))),pelotazos:st.pelotazos,desmarques:st.desmarques,paredes:st.paredes,cambiosFrente:st.cambiosFrente,
    contras:st.contras,contrapresiones:st.contrapresiones,repliegues:st.repliegues,
    faltas:st.faltas,amarillas:st.amarillas,rojas:st.rojas,penales:st.penales,penalesGol:st.penalesGol,offsides:st.offsides,tirosLibres:st.tirosLibres,tirosLibresDirectos:st.tirosLibresDirectos,
-   lesiones:st.lesiones,cambios:st.cambios,despejes:st.despejes,centros:st.centros,origenGoles:st.origenGoles,ventanas:this.cambios.map(c=>c.ventanas),ventajas:st.ventajas,enCancha:this.eq.map(L=>L.length),minimoEnCancha:this.minimoEnCancha.slice(),descuento:this.anadido.slice()},
+   lesiones:st.lesiones,cambios:st.cambios,despejes:st.despejes,centros:st.centros,origenGoles:st.origenGoles,golesErrorArquero:st.golesErrorArquero,forzados:this.forzados,ventanas:this.cambios.map(c=>c.ventanas),ventajas:st.ventajas,enCancha:this.eq.map(L=>L.length),minimoEnCancha:this.minimoEnCancha.slice(),descuento:this.anadido.slice()},
   arbitro:this.arb,suspendido:this.suspendido,
   tactica:this.tac.map(T=>({estilo:T.style,formacion:T.formation,bloque:T.bloque,directo:r2(T.directo),contrapresion:T.contrapresion,umbralPresion:r2(T.umbralPresion)})),
   forma:this.md.map(f=>{const o=A=>{const k=A.n||1;return{muestras:A.n,largo:r2(A.largo/k),ancho:r2(A.ancho/k),entreLineas:[r2(A.dDM/k),r2(A.dMA/k)],alturaLinea:r2(A.linea/k),alturaBloque:r2(A.bloque/k),alineacionLinea:r2(A.alin/k)}};return{con:o(f[0]),sin:o(f[1])}}),
