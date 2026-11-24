@@ -83,7 +83,7 @@ function tactica(t0){
  M=clamp(M,-1,1);D=clamp(D,-1,1);Pz=clamp(Pz,-1,1);
  return{style:t.style,formation:t.formation,M,W,D,Pz,Q,directo:clamp(dir,0,1),contra,posesion,
   contrapresion:Pz+M*.5>.25,                     // al perder: presión inmediata (si no, repliegue)
-  umbralPresion:62-Pz*30,                        // presiona cuando la pelota pasa esta altura (coordenadas propias)
+  umbralPresion:62-Pz*36,                        // presiona cuando la pelota pasa esta altura (coordenadas propias)
   bloque:D>.33?'alto':D<-.33?'bajo':'medio'};
 }
 /* ---------- partido ---------- */
@@ -602,7 +602,7 @@ P.entradas=function(){
   if(o.gk&&!this.enArea(o))continue;
   if(o.cdEntrada>0||o.superado>0)continue;
   const d=hyp(o.x-c.x,o.y-c.y);if(d>1.4)continue;
-  if(R()>(d<1?.16:.07))continue;
+  const Pz=this.tac[o.eq].Pz;if(R()>(d<1?.16:.07)*(1+.35*Pz))continue;   // con presión alta van más a quitar
   o.cdEntrada=8;
   const g=this.dir(c.eq),frente=(o.x-c.x)*g>0;
   const sp=hyp(c.vx,c.vy),porDetras=sp>2&&((o.x-c.x)*c.vx+(o.y-c.y)*c.vy)<0,rel=hyp(o.vx-c.vx,o.vy-c.vy);
