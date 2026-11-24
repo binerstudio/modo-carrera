@@ -84,7 +84,7 @@ if (!isMainThread) {
     ['Córners por equipo', pe(S.corners), 4, 6, 1], ['Faltas por equipo', pe(S.faltas), 10, 13, 1], ['Amarillas por equipo', pe(S.am), 1.5, 2.5, 2],
     ['Rojas por partido', S.rojas / n, .1, .2, 3], ['Penales por partido', S.pen / n, .22, .33, 3], ['Offsides por equipo', pe(S.off), 1.6, 2.4, 2],
     ['0-0', (marc['0-0'] || 0) / n, .05, .10, '%'], ['1-0', (marc['1-0'] || 0) / n, .15, .22, '%'], ['2-1', (marc['2-1'] || 0) / n, .13, .19, '%'],
-    ['Diferencia de 4 o más', (S.goleada || 0) / n, .015, .05, '%'], ['Partidos con 10+ goles', (S.diez || 0) / n, 0, .001, '%'],
+    ['Diferencia de 4 o más', (S.goleada || 0) / n, .015, .05, '%'], ['Partidos con 10+ goles', (S.diez || 0) / n, 0, .0015, '%'],
     ['Muy superior (+7 GRL) gana', fuerza.muySuperior.gana, .65, .75, '%'], ['Superior (+3 a +6) gana', fuerza.superior.gana, .50, .63, '%'], ['Parejo (<1) gana', fuerza.parejo.gana, .33, .45, '%'],
     ['Ventaja de local (gana local − gana visitante)', pct(S.loc) - pct(S.vis), .08, .18, '%']
   ];
