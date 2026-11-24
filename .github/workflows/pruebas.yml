@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
           sleep 2
       - name: Motor v2 · validación masiva (miles de partidos)
         run: node tests/motor.mjs 1000
-      - name: Motor v3 · etapas 1-3 (1000 partidos, determinismo, forma, táctica, reglas y pelota parada)
+      - name: Motor v3 · etapas 1-4 (1000 partidos de liga calibrados, fuerza, local, determinismo, forma, táctica, reglas)
         run: node tests/motor-v3.mjs 1000
       - name: Jugar temporadas con semilla fija
         run: node tests/regresion.mjs http://localhost:8080/index.html ${{ github.ref_name }}
@@ -47,3 +47,16 @@ jobs:
           cd /tmp/cap && git init -q && git checkout -q -b capturas-ci
           git -c user.name=ci -c user.email=ci@local add -A && git -c user.name=ci -c user.email=ci@local commit -q -m "capturas ${{ github.ref_name }} ${{ github.sha }}" || exit 0
           git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" capturas-ci
+  calibracion-v3:
+    # Calibración del motor v3: 10.000 partidos de liga + pares por fuerza, en paralelo (un hilo por núcleo).
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Motor v3 · calibración (10.000 partidos, tabla contra rangos de ligas reales)
+        run: node tests/calibrar-v3.mjs 10000 150
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: calibracion-v3, path: tests/out/calibracion-v3.json }

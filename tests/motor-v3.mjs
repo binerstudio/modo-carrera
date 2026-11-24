@@ -6,12 +6,15 @@
    - Determinismo: misma semilla = mismo resultado (eventos y cinta); otra semilla = otro partido.
    - Sin Math.random: el contexto del motor tiene Math.random reemplazado por una trampa que hace fallar.
    - Tiempo por partido.
-   - Estadísticas iniciales (goles, remates, pases, posesión…) SOLO INFORMADAS: todavía no están calibradas
-     (eso es la etapa 4), así que no hacen fallar la prueba.
-   Uso: node tests/motor-v3.mjs [partidos] [partidosPorSerieTactica]                                                         */
+   - Etapa 4 (calibración): los N partidos son de liga (temporadas de 7 países, ida y vuelta, como tests/motor.mjs) y sus
+     estadísticas tienen que quedar en los rangos de ligas reales (los de tests/motor.mjs para v2 cuando existen); además
+     fuerza (el mejor gana más, pero no siempre) y ventaja de local moderada. Se suman 150 partidos entre clubes de todo
+     el mundo solo para probar que ningún plantel hace fallar al motor.
+   Uso: node tests/motor-v3.mjs [partidosDeLiga] [partidosPorSerieTactica] [paresPorCategoriaDeFuerza]                                                         */
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { createHash } from 'node:crypto';
+import { armar } from './v3-ligas.mjs';
 const N = +(process.argv[2] || 1000);
 const ctx = { window: {} }; vm.createContext(ctx);
 for (const f of ['data/jugadores.js', 'data/mundo.js', 'js/motor/atributos.js']) vm.runInContext(readFileSync(f, 'utf8'), ctx);
@@ -56,19 +59,25 @@ function banco(name, rows, used) {
   return b.map(r => ({ name: r[0], pos: r[1], grl: r[2], age: r[3] }));
 }
 const clubs = [...byClub.entries()].filter(([, v]) => v.rows.length >= 11).map(([k]) => k).sort();
+/* partidos de liga (mismo armado que la calibración) + 150 entre clubes de todo el mundo (solo robustez) */
+const LG = armar(ctx.window);
+const PARTIDOS = [];
+for (let i = 0; i < N; i++) { const [p, h, a] = LG.fixture[i % LG.fixture.length]; PARTIDOS.push({ h, a, liga: true, semilla: 1000 + i }); }
+for (let i = 0; i < 150; i++) { const a = clubs[(i * 7) % clubs.length], b = clubs[(i * 13 + 5) % clubs.length]; if (a !== b) PARTIDOS.push({ h: a, a: b, liga: false, semilla: 500000 + i }); }
+const g2 = new Map();
 
-const out = { N, version: M.VERSION, fallas: [], errores: [], tiempo: {}, estadisticas: {}, determinismo: {}, nota: 'Estadísticas informativas: el motor v3 todavía no está calibrado (etapa 4).' };
+const out = { N, version: M.VERSION, fallas: [], errores: [], tiempo: {}, estadisticas: {}, determinismo: {}, nota: 'Estadísticas de los partidos de liga (etapa 4: calibradas y verificadas contra rangos reales).' };
 const sum = { goles: 0, rem: 0, arco: 0, pases: 0, pasesOk: 0, altos: 0, corners: 0, lat: 0, quites: 0, inter: 0, gamb: 0, gambOk: 0, xg: 0, pos: [], loc: 0, emp: 0, vis: 0, enJuego: 0, dist: 0, nDist: 0, cab: 0, atajadas: 0, palos: 0, max: 0, marc: {} };
 const tiempos = [];
 const REG = { faltas: 0, amarillas: 0, rojas: 0, penales: 0, penalesGol: 0, offsides: 0, corners: 0, lesiones: 0, cambios: 0, tirosLibres: 0, tirosLibresDirectos: 0, ventajas: 0, descuento1: 0, descuento2: 0, suspendidos: 0, maxCambios: 0, maxVentanas: 0, minEnCancha: 11 };
 const FORMA = { con: { n: 0, largo: 0, ancho: 0, dm: 0, ma: 0, alin: 0 }, sin: { n: 0, largo: 0, ancho: 0, dm: 0, ma: 0, alin: 0 } };
 const fuera = (x, y) => !(x >= -5 && x <= 110 && y >= -5 && y <= 73);
-for (let i = 0; i < N; i++) {
-  const a = clubs[(i * 7) % clubs.length], b = clubs[(i * 13 + 5) % clubs.length];
-  if (a === b) continue;
+let nLiga = 0;
+for (let i = 0; i < PARTIDOS.length; i++) {
+  const { h: a, a: b, liga, semilla } = PARTIDOS[i];
   const t0 = performance.now();
   let r;
-  try { r = M.simular(equipo(a), equipo(b), { semilla: 1000 + i, cintaCada: 5 }); }
+  try { r = M.simular(equipo(a), equipo(b), { semilla, cintaCada: 5 }); }
   catch (e) { out.errores.push(`partido ${i} (${a} vs ${b}): ${e.message}`); continue; }
   tiempos.push(performance.now() - t0);
   /* coherencia */
@@ -81,8 +90,12 @@ for (let i = 0; i < N; i++) {
   if (d.length !== c.frames * n) out.errores.push(`partido ${i}: cinta de tamaño incorrecto`);
   for (let f = 0; f < c.frames; f += 7) { const o = f * n; if (fuera(d[o] / 10, d[o + 1] / 10)) { out.errores.push(`partido ${i}: pelota fuera de lugar en cuadro ${f}`); break; } let mal = false; for (let k = 5; k < n; k += 2) if (fuera(d[o + k] / 10, d[o + k + 1] / 10)) mal = true; if (mal) { out.errores.push(`partido ${i}: jugador fuera de lugar en cuadro ${f}`); break; } }
   if (r.jugadores.some(j => !Number.isFinite(j.distancia) || !Number.isFinite(j.energiaFinal))) out.errores.push(`partido ${i}: NaN en jugadores`);
-  /* estadísticas */
+  /* estadísticas (solo de los partidos de liga) */
   const s = r.stats, g = r.h + r.a;
+  if (liga) {
+  nLiga++;
+  if (!g2.has(a)) g2.set(a, LG.grlXI(a)); if (!g2.has(b)) g2.set(b, LG.grlXI(b));
+  if (Math.abs(g2.get(a) - g2.get(b)) >= 2) { sum.posMejor = (sum.posMejor || 0) + (g2.get(a) > g2.get(b) ? s.posesion[0] : s.posesion[1]); sum.nPosMejor = (sum.nPosMejor || 0) + 1; }
   sum.goles += g; sum.max = Math.max(sum.max, g); sum.rem += s.remates[0] + s.remates[1]; sum.arco += s.alArco[0] + s.alArco[1]; sum.pases += s.pases[0] + s.pases[1]; sum.pasesOk += s.pasesOk[0] + s.pasesOk[1];
   sum.altos += s.pasesAltos[0] + s.pasesAltos[1]; sum.corners += s.corners[0] + s.corners[1]; sum.lat += s.laterales[0] + s.laterales[1]; sum.quites += s.quites[0] + s.quites[1]; sum.inter += s.intercepciones[0] + s.intercepciones[1];
   sum.gamb += s.gambetas[0] + s.gambetas[1]; sum.gambOk += s.gambetasOk[0] + s.gambetasOk[1]; sum.xg += s.xg[0] + s.xg[1]; sum.pos.push(s.posesion[0]); sum.enJuego += s.minutosEnJuego;
@@ -92,7 +105,9 @@ for (let i = 0; i < N; i++) {
   if (!r.forma.every(t => Number.isFinite(t.con.largo) && Number.isFinite(t.sin.largo))) out.errores.push(`partido ${i}: medición de forma inválida`);
   /* reglas (etapa 3) */
   for (const k of ['faltas', 'amarillas', 'rojas', 'penales', 'penalesGol', 'offsides', 'corners', 'lesiones', 'cambios', 'tirosLibres', 'tirosLibresDirectos', 'ventajas']) REG[k] += s[k][0] + s[k][1];
-  REG.descuento1 += s.descuento[0]; REG.descuento2 += s.descuento[1]; if (r.suspendido) REG.suspendidos++;
+  REG.descuento1 += s.descuento[0]; REG.descuento2 += s.descuento[1];
+  }
+  if (r.suspendido) REG.suspendidos++;
   REG.maxCambios = Math.max(REG.maxCambios, ...s.cambios); REG.maxVentanas = Math.max(REG.maxVentanas, ...s.ventanas); REG.minEnCancha = Math.min(REG.minEnCancha, ...s.minimoEnCancha);
   if (s.cambios.some(x => x > 5)) out.errores.push(`partido ${i}: más de 5 cambios (${s.cambios})`);
   if (s.ventanas.some(x => x > 3)) out.errores.push(`partido ${i}: más de 3 ventanas de cambios (${s.ventanas})`);
@@ -103,13 +118,13 @@ for (let i = 0; i < N; i++) {
   if (rr.join() !== s.rojas.join()) out.errores.push(`partido ${i}: rojas en eventos ${rr} distintas de las estadísticas ${s.rojas}`);
   if (!r.suspendido && pe.join() !== pp.join()) out.errores.push(`partido ${i}: penales cobrados ${pp} y pateados ${pe} no coinciden`);
   for (const e of [0, 1]) { const enCancha = r.jugadores.filter(j => j.equipo === e && j.enCanchaAlFinal).length; if (enCancha !== s.enCancha[e]) out.errores.push(`partido ${i}: jugadores en cancha ${enCancha} vs ${s.enCancha[e]}`); }
-  if (r.h > r.a) sum.loc++; else if (r.h === r.a) sum.emp++; else sum.vis++;
-  const k = r.h + '-' + r.a; sum.marc[k] = (sum.marc[k] || 0) + 1;
+  if (liga) { if (r.h > r.a) sum.loc++; else if (r.h === r.a) sum.emp++; else sum.vis++;
+   const mk = r.h === r.a ? r.h + '-' + r.a : Math.max(r.h, r.a) + '-' + Math.min(r.h, r.a); sum.marc[mk] = (sum.marc[mk] || 0) + 1; if (Math.abs(r.h - r.a) >= 4) sum.goleadas = (sum.goleadas || 0) + 1; if (r.h + r.a >= 10) sum.diez = (sum.diez || 0) + 1; }
 }
-const n = tiempos.length || 1, f2 = x => +x.toFixed(2);
+const nT = tiempos.length || 1, n = nLiga || 1, f2 = x => +x.toFixed(2);
 tiempos.sort((a, b) => a - b);
-out.partidos = tiempos.length;
-out.tiempo = { promedioMs: f2(tiempos.reduce((a, b) => a + b, 0) / n), medianaMs: f2(tiempos[Math.floor(n / 2)] || 0), maxMs: f2(tiempos[n - 1] || 0), totalSeg: f2(tiempos.reduce((a, b) => a + b, 0) / 1000) };
+out.partidos = tiempos.length; out.partidosLiga = nLiga;
+out.tiempo = { promedioMs: f2(tiempos.reduce((a, b) => a + b, 0) / nT), medianaMs: f2(tiempos[Math.floor(nT / 2)] || 0), maxMs: f2(tiempos[nT - 1] || 0), totalSeg: f2(tiempos.reduce((a, b) => a + b, 0) / 1000) };
 const posDesvio = Math.sqrt(sum.pos.reduce((a, p) => a + (p - 50) ** 2, 0) / n);
 out.estadisticas = {
   golesPorPartido: f2(sum.goles / n), maxGoles: sum.max, local: f2(sum.loc / n), empate: f2(sum.emp / n), visitante: f2(sum.vis / n),
@@ -150,13 +165,13 @@ if (!(out.forma.sin.alineacionLinea < 4)) out.fallas.push(`Forma: la línea defe
 const NT = +(process.argv[3] || 24);
 const CA = byClub.has('Arsenal') ? 'Arsenal' : clubs[3], CB = byClub.has('Chelsea') ? 'Chelsea' : clubs[11];
 function serieTac(tac) {
-  const S = { n: 0, alturaLinea: 0, alturaBloque: 0, recupCampoRival: 0, alturaRecuperacion: 0, pasesPorPosesion: 0, pelotazos: 0, ancho: 0, contrapresiones: 0, repliegues: 0, pases: 0, goles: 0 };
+  const S = { n: 0, alturaLinea: 0, alturaBloque: 0, recupCampoRival: 0, alturaRecuperacion: 0, pasesPorPosesion: 0, pelotazos: 0, ancho: 0, contrapresiones: 0, repliegues: 0, pases: 0, goles: 0, contrasRival: 0, golesRecibidos: 0 };
   for (let i = 0; i < NT; i++) {
     const loc = i % 2 === 0, yo = equipo(CA, tac), el = equipo(CB);
     let r; try { r = M.simular(loc ? yo : el, loc ? el : yo, { semilla: 50000 + i, cinta: false }); } catch (e) { out.errores.push(`táctica ${JSON.stringify(tac)}: ${e.message}`); continue; }
     const e = loc ? 0 : 1, s = r.stats, F = r.forma[e];
     S.n++; S.alturaLinea += F.sin.alturaLinea; S.alturaBloque += F.sin.alturaBloque; S.recupCampoRival += s.recupCampoRival[e]; S.alturaRecuperacion += s.alturaRecuperacion[e];
-    S.pasesPorPosesion += s.pasesPorPosesion[e]; S.pelotazos += s.pelotazos[e]; S.ancho += F.con.ancho; S.contrapresiones += s.contrapresiones[e]; S.repliegues += s.repliegues[e]; S.pases += s.pases[e]; S.goles += loc ? r.h : r.a;
+    S.pasesPorPosesion += s.pasesPorPosesion[e]; S.pelotazos += s.pelotazos[e]; S.ancho += F.con.ancho; S.contrapresiones += s.contrapresiones[e]; S.repliegues += s.repliegues[e]; S.pases += s.pases[e]; S.goles += loc ? r.h : r.a; S.contrasRival += s.contras[1 - e]; S.golesRecibidos += loc ? r.a : r.h;
   }
   const o = {}; for (const k in S) if (k !== 'n') o[k] = f2(S[k] / (S.n || 1)); o.partidos = S.n; return o;
 }
@@ -177,6 +192,7 @@ causa('Presión alta vs baja: altura media de recuperación', 'presionAlta', 'pr
 causa('Posesión vs directo: pases por posesión', 'posesion', 'directo', 'pasesPorPosesion', (x, y) => x >= y * 1.3, 'al menos 30 % más');
 causa('Directo vs posesión: pelotazos', 'directo', 'posesion', 'pelotazos', (x, y) => x >= y * 1.5, 'al menos 50 % más');
 causa('Ancho alto vs bajo: ancho del equipo con pelota', 'abierto', 'cerrado', 'ancho', (x, y) => x >= y + 4, 'al menos 4 m más ancho');
+causa('Bloque alto vs bajo: recibe más contraataques', 'bloqueAlto', 'bloqueBajo', 'contrasRival', (x, y) => x >= y * 1.15, 'al menos 15 % más contras del rival');
 causa('Presión alta (estilo): al perder presiona en vez de replegarse', 'presionAltaEstilo', 'defensivo', 'contrapresiones', (x, y) => x > 0 && y === 0, 'contrapresión solo con presión alta');
 /* todas las formaciones del juego juegan sin errores y respetan sus líneas */
 out.formaciones = {};
@@ -193,7 +209,7 @@ for (const f of M.FORMACIONES) {
    Promedios por partido (los dos equipos) contra rangos aproximados de ligas profesionales. Son referencias amplias:
    faltas ~20-28, amarillas ~3-5, rojas ~0,1-0,3, penales ~0,2-0,35, offsides ~3-5, córners ~8-11, lesiones ~0,2-0,8, cambios ~7-9 (con 5 cambios). */
 const RANGO_REGLAS = { faltas: [18, 30], amarillas: [2.5, 5.5], rojas: [0.05, 0.4], penales: [0.12, 0.5], offsides: [1.5, 6], corners: [6, 13], lesiones: [0.1, 1], cambios: [5, 10] };
-const nP = out.partidos || 1;
+const nP = out.partidosLiga || 1;
 out.reglas = { porPartido: {}, limites: { maxCambiosEquipo: REG.maxCambios, maxVentanasEquipo: REG.maxVentanas, minimoJugadoresEnCancha: REG.minEnCancha, suspendidos: REG.suspendidos } };
 for (const k of ['faltas', 'amarillas', 'rojas', 'penales', 'penalesGol', 'offsides', 'corners', 'lesiones', 'cambios', 'tirosLibres', 'tirosLibresDirectos', 'ventajas', 'descuento1', 'descuento2']) out.reglas.porPartido[k] = +(REG[k] / nP).toFixed(3);
 out.reglas.porPartido.conversionPenales = +(REG.penalesGol / (REG.penales || 1)).toFixed(3);
@@ -216,6 +232,46 @@ const conRoja = serieRoja(true), sinRoja = serieRoja(false);
 out.reglas.expulsion = { conRoja, sinRoja };
 if (!(conRoja.dif < sinRoja.dif)) out.fallas.push(`Expulsión: la diferencia de gol no bajó (${conRoja.dif} vs ${sinRoja.dif})`);
 if (!(conRoja.xgPropio / (conRoja.xgPropio + conRoja.xgRival) < sinRoja.xgPropio / (sinRoja.xgPropio + sinRoja.xgRival))) out.fallas.push('Expulsión: la proporción de xG no bajó');
+
+/* ===== ETAPA 4 · calibración: las estadísticas de liga se parecen al fútbol real =====
+   Rangos de ligas reales (los mismos de tests/motor.mjs para el motor v2 cuando existen; si no, los de la consigna).
+   La tabla más fina (10.000 partidos, rangos más estrechos) la da tests/calibrar-v3.mjs. */
+const pe = x => x / n / 2;
+const CALI = [
+  ['Goles por partido', sum.goles / n, 2.2, 3.0], ['Local gana', sum.loc / n, .38, .52], ['Empate', sum.emp / n, .20, .32], ['Visitante gana', sum.vis / n, .24, .38],
+  ['Remates por equipo', pe(sum.rem), 9, 15], ['Remates al arco', sum.arco / sum.rem, .28, .42], ['Conversión', sum.goles / sum.rem, .08, .14],
+  ['Pases por equipo', pe(sum.pases), 400, 500], ['Acierto de pases', sum.pasesOk / sum.pases, .75, .85], ['Posesión del mejor equipo', (sum.posMejor || 0) / (sum.nPosMejor || 1) / 100, .50, .65],
+  ['Córners por equipo', pe(REG.corners), 3.5, 6.5], ['Faltas por equipo', pe(REG.faltas), 9, 15], ['Amarillas por equipo', pe(REG.amarillas), 1.3, 2.8], ['Rojas por partido', REG.rojas / n, .04, .3],
+  ['Penales por partido', REG.penales / n, .15, .45], ['Offsides por equipo', pe(REG.offsides), 1, 3.2],
+  ['Partidos con 4+ de diferencia', (sum.goleadas || 0) / n, 0, .06], ['Partidos con 10+ goles', (sum.diez || 0) / n, 0, .002]
+];
+out.calibracion = CALI.map(([k, v, lo, hi]) => ({ estadistica: k, valor: +v.toFixed(4), rango: [lo, hi], ok: v >= lo && v <= hi }));
+for (const c of out.calibracion) if (!c.ok) out.fallas.push(`Calibración: ${c.estadistica} = ${c.valor} fuera del rango real [${c.rango[0]}, ${c.rango[1]}]`);
+/* ventaja de local: medible pero moderada */
+const vLocal = (sum.loc - sum.vis) / n;
+out.local = { gana: +(sum.loc / n).toFixed(3), visitante: +(sum.vis / n).toFixed(3), diferencia: +vLocal.toFixed(3) };
+if (!(vLocal >= .05 && vLocal <= .2)) out.fallas.push(`Local: la ventaja (gana local − gana visitante) = ${vLocal.toFixed(3)} fuera de [0,05, 0,20]`);
+/* fuerza: pares de equipos de liga por diferencia de GRL del XI, ida y vuelta */
+const NF = +(process.argv[4] || 60);
+const clubesLiga = [...new Set(Object.values(LG.ligas).flat())].sort();
+for (const c of clubesLiga) if (!g2.has(c)) g2.set(c, LG.grlXI(c));
+const CAT = { muySuperior: d => d >= 7, superior: d => d >= 3 && d < 6, parejo: d => d >= 0 && d < 1 };
+out.fuerza = {};
+for (const [cat, f] of Object.entries(CAT)) {
+  let pares = 0, gana = 0, emp = 0, jug = 0;
+  for (let i = 0; i < clubesLiga.length && pares < NF; i++) for (let j = 0; j < clubesLiga.length && pares < NF; j++) {
+    const A = clubesLiga[(i * 7) % clubesLiga.length], B = clubesLiga[(j * 13 + i) % clubesLiga.length];
+    if (A === B || !f(g2.get(A) - g2.get(B))) continue; pares++;
+    for (const local of [true, false]) {
+      let r; try { r = M.simular(equipo(local ? A : B), equipo(local ? B : A), { semilla: 800000 + pares * 2 + (local ? 0 : 1), cinta: false }); } catch (e) { out.errores.push(`fuerza: ${e.message}`); continue; }
+      const gf = local ? r.h : r.a, gc = local ? r.a : r.h; jug++; if (gf > gc) gana++; else if (gf === gc) emp++;
+    }
+  }
+  out.fuerza[cat] = { partidos: jug, gana: +(gana / (jug || 1)).toFixed(3), empata: +(emp / (jug || 1)).toFixed(3) };
+}
+const F = out.fuerza;
+if (!(F.muySuperior.gana > F.superior.gana && F.superior.gana > F.parejo.gana)) out.fallas.push(`Fuerza: el % de victorias no crece con la diferencia (${F.muySuperior.gana} / ${F.superior.gana} / ${F.parejo.gana})`);
+if (!(F.muySuperior.gana >= .60 && F.muySuperior.gana <= .80)) out.fallas.push(`Fuerza: el muy superior gana ${F.muySuperior.gana} (se espera ~0,65-0,75; tolerancia de la prueba 0,60-0,80 por la muestra)`);
 
 /* física de la pelota (sin jugadores) */
 {
@@ -249,11 +305,11 @@ if (!(conRoja.xgPropio / (conRoja.xgPropio + conRoja.xgRival) < sinRoja.xgPropio
 const ej = M.simular(A, B, { semilla: 2026 });
 out.ejemplo = { partido: `${ej.local} ${ej.h}-${ej.a} ${ej.visitante}`, stats: ej.stats, goles: ej.eventos.filter(e => e.tipo === 'gol'), remates: ej.eventos.filter(e => e.tipo === 'remate').slice(0, 10), cuadros: ej.cinta.frames, hz: ej.cinta.hz, cuadro100: M.cuadro(ej.cinta, 100) };
 if (out.errores.length) out.fallas.push(`${out.errores.length} partidos con errores`);
-if (out.partidos < N * 0.95) out.fallas.push(`se jugaron solo ${out.partidos} de ${N}`);
+if (out.partidosLiga < N * 0.95) out.fallas.push(`se jugaron solo ${out.partidos} de ${N}`);
 if (usoRandom) out.fallas.push('se usó Math.random');
 
 mkdirSync('tests/out', { recursive: true }); writeFileSync('tests/out/motor-v3.json', JSON.stringify(out, null, 1));
-console.log(`MOTOR v3 (etapas 1-3) · ${out.fallas.length ? 'FALLÓ' : 'OK'} · ${out.partidos} partidos sin errores: ${out.errores.length === 0 ? 'sí' : 'no'}`);
+console.log(`MOTOR v3 (etapas 1-4) · ${out.fallas.length ? 'FALLÓ' : 'OK'} · ${out.partidos} partidos sin errores: ${out.errores.length === 0 ? 'sí' : 'no'}`);
 console.log('tiempo por partido', JSON.stringify(out.tiempo));
 console.log('determinismo', out.determinismo.mismaSemilla ? 'OK' : 'FALLÓ', '· semillas distintas →', out.determinismo.semillasDistintasDistinto ? 'partidos distintos' : 'IGUALES', '· huellas', h1.join(' '));
 console.log('estadísticas (solo informativas, sin calibrar):');
@@ -265,6 +321,9 @@ console.log('formaciones', JSON.stringify(out.formaciones));
 console.log('reglas por partido:', JSON.stringify(out.reglas.porPartido));
 console.log('límites:', JSON.stringify(out.reglas.limites));
 console.log('expulsión (roja forzada al 20\'):', JSON.stringify(out.reglas.expulsion));
+console.log('calibración (' + out.partidosLiga + ' partidos de liga):');
+for (const c of out.calibracion) console.log(c.ok ? '  ✔' : '  ✘', c.estadistica.padEnd(32), String(c.valor).padStart(8), '  rango', c.rango.join(' – '));
+console.log('local:', JSON.stringify(out.local), '· fuerza:', JSON.stringify(out.fuerza));
 console.log('física', JSON.stringify(out.fisica));
 console.log('atributos', JSON.stringify(out.atributos));
 console.log('ejemplo:', out.ejemplo.partido);
