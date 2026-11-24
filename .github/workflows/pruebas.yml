@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
-        with: { ref: main, path: _base }
+        with: { ref: ae7fc5f089be687cc4aba9797a7064f49fe42927, path: _base }  # 12.2.2: la versión que tenían los usuarios
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - run: npm install --no-save playwright@1.48.2 && npx playwright install --with-deps chromium
@@ -31,7 +31,7 @@ jobs:
         run: node tests/partido2d.mjs http://localhost:8080/index.html
       - name: Tres temporadas sin intervención (IA y mercado)
         run: node tests/temporadas.mjs http://localhost:8080/index.html 3
-      - name: Carrera guardada con la versión publicada (main) se abre con esta versión
+      - name: Carrera guardada con la 12.2.2 se abre con esta versión
         run: node tests/actualizacion.mjs http://localhost:8081/app/index.html /tmp/srvroot/app "$PWD/_base" "$PWD"
       - uses: actions/upload-artifact@v4
         if: always()
