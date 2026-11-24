@@ -50,15 +50,15 @@ jobs:
           git -c user.name=ci -c user.email=ci@local add -A && git -c user.name=ci -c user.email=ci@local commit -q -m "capturas ${{ github.ref_name }} ${{ github.sha }}" || exit 0
           git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" capturas-ci
   calibracion-v3:
-    # Calibración del motor v3: 10.000 partidos de liga + pares por fuerza, en paralelo (un hilo por núcleo).
+    # Calibración del motor v3: 3.000 partidos de liga + pares por fuerza, en paralelo (un hilo por núcleo). Con 10.000 el runner pasaba los 90 minutos.
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
-      - name: Motor v3 · calibración (10.000 partidos, tabla contra rangos de ligas reales)
-        run: node tests/calibrar-v3.mjs 10000 150
+      - name: Motor v3 · calibración (3.000 partidos de liga + 900 por fuerza; 10.000 no entran en el tiempo del CI)
+        run: node tests/calibrar-v3.mjs 3000 150
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: calibracion-v3, path: tests/out/calibracion-v3.json }
