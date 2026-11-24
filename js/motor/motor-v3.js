@@ -43,13 +43,14 @@ function atributos(info){
 /* ---------- calibración (etapa 4): perillas del motor, todas en un solo lugar ---------- */
 const CAL={
  nivel:70,atributos:.82,   // atributos comprimidos alrededor de 70 (1 = sin comprimir)
- satura:10,                // y saturados: las diferencias enormes pesan menos que en línea recta (tanh)
+ satura:9,                 // y saturados: las diferencias enormes pesan menos que en línea recta (tanh)
  punteria:.118,           // error base de los remates (radianes)
  alcanceArquero:1.25,
  atajadaBorde:.62,         // cuánto le cuesta al arquero llegar al límite de su alcance      // alcance del arquero parado (m)
  remate:.6,               // ganas de patear (multiplica el xG al decidir)
  cuidado:2.1,              // cuánto pesa perder la pelota al elegir un pase o una conducción
- faltaArea:.019,            // el defensor se cuida en su área (multiplica la chance de falta)
+ faltaArea:.019,
+ mano:.075,                 // remate bloqueado en el área que pega en la mano (penal)            // el defensor se cuida en su área (multiplica la chance de falta)
  desfase:3.4,              // cuánto se pasa de la línea el delantero que espera (offsides)
  rebotaAfuera:.85,          // atajadas que se van por el costado del arco (córners)
  despejeCorner:.7,
@@ -330,7 +331,7 @@ P.chequeoTiro=function(){
  /* bloqueo de un jugador de campo */
  if(!T.bloqueado&&B.z<(T.libre?2.15:1.7)){for(const o of this.eq[1-e]){if(o.gk||T.vistos.has(o.id))continue;const d=hyp(o.x-B.x,o.y-B.y);
   if(d<.75){T.vistos.add(o.id);if(this.R()<.6){T.bloqueado=true;
-   if(this.enArea(o)&&this.R()<.09*this.arb.severidad&&this.R()<this.arb.precision){this.mano(o,T.j);return true}
+   if(this.enArea(o)&&this.R()<CAL.mano*this.arb.severidad&&this.R()<this.arb.precision){this.mano(o,T.j);return true}
    const vx0=B.vx,vy0=B.vy;this.desviar(o,3,9,0,3);
    if(this.R()<.7){const sp=hyp(B.vx,B.vy),k=sp/(hyp(vx0,vy0)||1);B.vx=vx0*k*(.8+this.R()*.4);B.vy=vy0*k+(this.R()-.5)*8}this.st.bloqueos[1-e]++;this.ev('bloqueo',1-e,o,{rematador:T.j.nombre});return false}}}}
  /* arquero: cuando la pelota llega a su altura */
