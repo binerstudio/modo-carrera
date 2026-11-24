@@ -31,7 +31,7 @@ ok(prep.v3 && prep.tv, 'el partido no quedó con la cinta v3');
 ok(prep.texto === 'En cancha (v3)', `texto de la opción: ${prep.texto}`);
 ok(prep.largo === 'quick', 'la duración no quedó en Corto');
 await page.evaluate(() => mcMainAction());
-const t0 = Date.now(); let muestras = [], verif = [], cap = { tv: false, estadio: false, rep: false, full: false }, maxDif = 0, ht = null;
+const t0 = Date.now(); let muestras = [], verif = [], cap = { tv: false, estadio: false, rep: false, full: false, fest: false }, maxDif = 0, ht = null;
 for (let i = 0; i < 400; i++) {
   await page.waitForTimeout(1000);
   const e = await page.evaluate(() => ({ est: MC2D.estado(), ver: MC2D.verificarV3(), fase: match.phase, done: match.done, min: MC2D.minuto(match) }));
@@ -44,6 +44,7 @@ for (let i = 0; i < 400; i++) {
     const fs = await page.evaluate(() => { const w = document.querySelector('.m2d-wrap').getBoundingClientRect(); return { full: document.body.classList.contains('m2d-full'), w: w.width, h: w.height, ctl: !!document.querySelector('.m2d-ctl button[data-a="cambios"]') && getComputedStyle(document.querySelector('.m2d-ctl')).display !== 'none' } });
     ok(fs.full && fs.w >= 880 && fs.h >= 880 && fs.ctl, `pantalla completa: ${JSON.stringify(fs)}`);
     await page.screenshot({ path: 'tests/out/v3tv-pantalla-completa.png' }); await page.evaluate(() => MC2D.pantallaCompleta(false)); cap.full = true }
+  if (!cap.fest && v && v.festejoActivo && !v.enRepeticion) { await page.locator('#m2dHost').screenshot({ path: 'tests/out/v3tv-festejo.png' }).catch(() => {}); cap.fest = true }
   if (!cap.rep && v && v.enRepeticion) { await page.locator('#m2dHost').screenshot({ path: 'tests/out/v3tv-repeticion.png' }).catch(() => {}); cap.rep = true }
   if (e.fase === 'ht' && v && v.tp >= (await page.evaluate(() => (MCV3TV.de(match).fin[1] || 0) - 5)) && !ht) { ht = Math.round((Date.now() - t0) / 1000); await page.evaluate(() => mcMainAction()) }
   if (e.done && v && v.tp >= v.tMotor - 1) break;

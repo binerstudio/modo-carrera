@@ -375,7 +375,7 @@ function proj(x,y,z){const r=projBase(x,y,z),T=S.camT;if(!T)return r;
 function camara(real){const c=S.cam;if(c==='cen'||c==='tac'){S.camT=null;return}
  const b=S.rep&&S.rep.b?S.rep.b:(Q.on&&Q.rep?Q.rep.R.ball:S.ball),o=(S.rep||(Q.on&&Q.rep))?null:S.owner,f=b.fly;
  /* anticipación: hacia donde va la pelota (destino del pase/remate o un poco adelante del que conduce) */
- let ax=b.x,ay=b.y;if(Q.on){if(!Q.rep&&Q.fut){ax=lerp(b.x,Q.fut[0],.6);ay=lerp(b.y,Q.fut[1],.6)}}else if(f){ax=lerp(b.x,f.x1,.55);ay=lerp(b.y,f.y1,.55)}else if(o){ax=o.x+dirOf(o.team)*4+o.vx*.4;ay=o.y+o.vy*.4}
+ let ax=b.x,ay=b.y;if(Q.on){if(!Q.rep&&Q.foco){ax=Q.foco[0];ay=Q.foco[1]}else if(!Q.rep&&Q.fut){ax=lerp(b.x,Q.fut[0],.6);ay=lerp(b.y,Q.fut[1],.6)}}else if(f){ax=lerp(b.x,f.x1,.55);ay=lerp(b.y,f.y1,.55)}else if(o){ax=o.x+dirOf(o.team)*4+o.vx*.4;ay=o.y+o.vy*.4}
  const half=(c==='seg'?28:(Q.on?50:42))/2/(S.zoom||1);S.camX+=(clamp(ax,half-4,PW-half+4)-S.camX)*Math.min(1,real*(c==='seg'?2.6:1.5));
  S.camY+=(clamp(ay,4,64)-S.camY)*Math.min(1,real*1.3);
  /* zoom: abre en pelotas largas, cierra cerca del arco en jugadas y en la repetición */
@@ -559,7 +559,9 @@ function frame(ts){S.raf=0;if(!S.cv||!S.cv.isConnected){return}
  const now=ts/1000,crudo=S.last?now-S.last:.016,real=Math.min(.05,crudo);S.last=now;const tf0=performance.now();if(S.perf){S.perf.real+=crudo;if(crudo>.05)S.perf.lentos++}const dt=real*speed()*(Q.on?1:ritmoV2());S.t+=dt;
  resize();const m=S.m;
  if(m&&Q.on){try{frameV3(real,crudo)}catch(e){console.warn('MC2D v3',e)}if(S.banner){S.banner.t-=real;if(S.banner.t<=0)S.banner=null}if(S.big){S.big.t-=real;if(S.big.t<=0)S.big=null}
-  const R=Q.live,Z=R?cuadroEn(Q.tv.cuadros,R.tp+12):null;Q.fut=Z?[Z.A.d[0]/10,Z.A.d[1]/10]:null}
+  const R=Q.live,Z=R?cuadroEn(Q.tv.cuadros,R.tp+12):null;Q.fut=Z?[Z.A.d[0]/10,Z.A.d[1]/10]:null;
+  /* festejo: la cámara sigue al goleador */
+  const F=R&&R.fest&&R.tp>=R.fest.t0+10&&R.tp<=R.fest.hasta?R.sp.get(R.fest.clave):null;Q.foco=F&&F.alpha>0?[F.x,F.y]:null}
  else if(m&&!S.rep){/* v1/v2: con la duración corta el 2D va más rápido; se divide en sub-pasos chicos para que nada salte */
   const n=Math.max(1,Math.ceil(dt/.2));for(let q=0;q<n;q++)pasoV2(m,dt/n,q===n-1?real:0)}
  if(m&&!S.rep&&!Q.on)grabar();
@@ -603,7 +605,7 @@ function dibujarRepeticion(){const R=S.rep,L=R.L;let i=0;while(i<L.length-2&&L[i
 function ritmoV2(){return{quick:4,normal:2.4,long:1.2}[largoPartido()]||2.4}
 function dibujarRepV3(){const R=Q.rep.R,g={sp:S.sp,ball:S.ball,ref:S.ref,owner:S.owner,banner:S.banner,big:S.big};
  S.sp=R.list;S.ball=R.ball;S.ref=R.ref;S.owner=null;S.banner=null;S.big=null;
- try{draw();const ctx=S.cx;ctx.save();ctx.font='900 italic 13px "Barlow Semi Condensed",Arial';const t='REPETICIÓN',tw=ctx.measureText(t).width+22,x=(S.w-tw)/2,y=S.h-34;
+ try{draw();const ctx=S.cx;ctx.save();ctx.font='900 italic 13px "Barlow Semi Condensed",Arial';const t='REPETICIÓN',tw=ctx.measureText(t).width+22,x=(S.w-tw)/2,y=42;
   ctx.fillStyle='rgba(4,8,20,.88)';ctx.fillRect(x,y,tw,22);ctx.fillStyle='#e2bd70';ctx.fillRect(x,y,4,22);ctx.fillStyle='#fff';ctx.textBaseline='middle';ctx.textAlign='left';ctx.fillText(t,x+12,y+11.5);
   const c=R.c,k=c.length?clamp((R.tp-c[0].t)/Math.max(1,Q.rep.fin-c[0].t),0,1):0;ctx.fillStyle='rgba(255,255,255,.75)';ctx.fillRect(x,y+23,tw*k,2);ctx.restore()}
  finally{S.sp=g.sp;S.ball=g.ball;S.ref=g.ref;S.owner=g.owner;S.banner=g.banner;S.big=g.big}}
@@ -677,7 +679,7 @@ function aplicarEvento(R,ev){
   case 'descuento':if(vivo){Q.desc[ev.parte]=ev.minutos;banner(`⏱ +${ev.minutos} de descuento`,'#e2bd70',2.2)}break;
   case 'gol':{R.fest=ev.festejo?{t0:ev.t,hasta:ev.t+ev.festejo,clave:R.slot[ev.jid],eq:ev.equipo,team:j?j.team:null}:null;
    if(vivo){bigTxt('¡GOL!','#e2bd70',1.8);banner(`⚽ ${nom}${ev.enContra?' (en contra)':''}`,'#e2bd70',3);
-    if(!Q.repPend)Q.repPend={tg:ev.t,at:ev.t+(ev.festejo?70:25),origen:ev.origen||'',der:ev.x>52.5}}break}
+    if(!Q.repPend)Q.repPend={tg:ev.t,at:ev.t+(ev.festejo?ev.festejo+20:25),origen:ev.origen||'',der:ev.x>52.5}}break}
   case 'entretiempo':if(vivo)bigTxt('ENTRETIEMPO','#e2bd70',1.8);break;
   case 'final':if(vivo)bigTxt('FINAL','#e2bd70',2);break;
  }
@@ -831,8 +833,9 @@ function drawStadium(ctx){const w=S.w,h=S.h,top=S.cam==='cen'||S.cam==='tac';
  const TX=['MODO CARRERA','FÚTBOL','TEMPORADA 2026','MODO CARRERA','EL CLÁSICO','HINCHADA'];
  const cartel=(x0,x1,y,z0,z1,horiz,i)=>{const A=horiz?proj(x0,y,z1):proj(y,x0,z1),B=horiz?proj(x1,y,z0):proj(y,x1,z0);
   poly(ctx,horiz?[[x0,y,z0],[x1,y,z0],[x1,y,z1],[x0,y,z1]]:[[y,x0,z0],[y,x1,z0],[y,x1,z1],[y,x0,z1]],i%2?'#0d2b55':'#13324f');
-  const hh=Math.abs(B[1]-A[1]);if(hh>5&&!top){ctx.save();ctx.fillStyle=i%3?'#e2bd70':'#ffffff';ctx.font=`800 ${Math.round(hh*.62)}px "Barlow Semi Condensed",Arial`;ctx.textAlign='center';ctx.textBaseline='middle';
-   ctx.fillText(TX[i%TX.length],(A[0]+B[0])/2,(A[1]+B[1])/2);ctx.restore()}};
+  const hh=Math.abs(B[1]-A[1]),ww=Math.abs(B[0]-A[0]);if(hh>5&&!top){ctx.save();ctx.fillStyle=i%3?'#e2bd70':'#ffffff';const t=TX[i%TX.length];let fs=Math.round(hh*.62);ctx.font=`800 ${fs}px "Barlow Semi Condensed",Arial`;
+   const tw=ctx.measureText(t).width;if(tw>ww*.86){fs=Math.max(6,Math.floor(fs*ww*.86/tw));ctx.font=`800 ${fs}px "Barlow Semi Condensed",Arial`}
+   ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,(A[0]+B[0])/2,(A[1]+B[1])/2);ctx.restore()}};
  for(let i=0;i<10;i++){const x0=-4+i*11.3;cartel(x0,x0+11,-3.6,0,.95,true,i)}
  if(top)for(let i=0;i<10;i++){const x0=-4+i*11.3;cartel(x0,x0+11,PH+3.6,0,.95,true,i+3)}}
 /* marcador de TV (v3): equipos con sus colores, resultado y reloj del partido (con el descuento) */
@@ -871,7 +874,7 @@ const API={
     else if(a==='salir')pantallaCompleta(false)}catch(e){console.warn('MC2D',e)}});
    S.wrap.appendChild(ctl);
    const gir=document.createElement('div');gir.className='m2d-girar';gir.textContent='Girá el teléfono para verlo más grande';S.wrap.appendChild(gir)}
-  host.innerHTML='';host.appendChild(S.wrap);S.cam=S.cam||camPref;S.w=0;resize();if(!S.raf)S.raf=requestAnimationFrame(frame)},
+  S.host=host;if(document.body.classList.contains('m2d-full')){host.innerHTML=''}else{host.innerHTML='';host.appendChild(S.wrap)}S.cam=S.cam||camPref;S.w=0;resize();if(!S.raf)S.raf=requestAnimationFrame(frame)},
  /* el reloj del motor espera mientras se muestra una jugada (o hay eventos sin mostrar) */
  retener(m){if(!m||m!==S.m||m.done||!visible())return false;
   if(Q.on)return Q.tv.tMotor-Q.live.tp>900;   // v3: el motor va hasta 90 s adelante de lo que se ve
@@ -912,11 +915,13 @@ const API={
   const rend=S.perf&&S.perf.n?{msPromedio:+(S.perf.tot/S.perf.n).toFixed(2),msMax:+S.perf.max.toFixed(1),cuadros:S.perf.n,msCuadroTotal:+(S.perf.frame/S.perf.n).toFixed(2),fps:+(S.perf.n/Math.max(1,S.perf.real)).toFixed(0),cuadrosLentos:S.perf.lentos,tiempoJuego:+S.t.toFixed(0),tiempoReal:+S.perf.real.toFixed(0)}:null;
   const v3=Q.on?{tp:Q.live?+Q.live.tp.toFixed(1):null,tMotor:Q.tv.tMotor,ritmo:+Q.rate.toFixed(1),saltosCinta:Q.saltos.cinta,saltosPelota:Q.saltos.pelota,saltosDibujo:Q.saltos.dibujo,saltoLog:Q.saltos.log,
    festejos:Q.festVisto,abrazos:Q.abrazoVisto,lamentos:Q.lamentoVisto,repeticiones:Q.repStats,enRepeticion:!!Q.rep,tiempoReal:{viendo:+Q.realT.toFixed(1),peligro:+Q.peligroReal.toFixed(1),calma:+Q.calmaReal.toFixed(1),repeticion:+Q.repReal.toFixed(1),esperando:+Q.esperaReal.toFixed(1)},
-   minuto:minutoV3().txt,duracion:largoPartido(),pred:Q.pred,cuadrosEnMemoria:Q.tv.cuadros.length,arbitro:S.ref?[+S.ref.x.toFixed(1),+S.ref.y.toFixed(1)]:null}:null;
+   minuto:minutoV3().txt,duracion:largoPartido(),pred:Q.pred,cartel:S.banner?S.banner.txt:null,grande:S.big?S.big.txt:null,festejoActivo:!!(Q.live&&Q.live.fest&&Q.live.tp>=Q.live.fest.t0&&Q.live.tp<=Q.live.fest.hasta),cuadrosEnMemoria:Q.tv.cuadros.length,arbitro:S.ref?[+S.ref.x.toFixed(1),+S.ref.y.toFixed(1)]:null}:null;
   return{v3,rend,repeticiones:S.repN||0,enRepeticion:!!S.rep,zoom:+(S.zoom||1).toFixed(2),med,saltosJugadores:S.ptele||0,saltoLog:S.pteleLog||null,jugada:S.play?S.play.label:null,mostrados:S.shown,eventos:S.m?(S.m.events||[]).length:0,camara:S.cam,jugadores:S.sp.filter(s=>!s.out).length,goles:S.goles.slice(),cuadros:S.t,teletransportes:S.tele,teleLog:S.teleLog||null,estados:est,tacticos:tac,acciones:acc,posesionId:S.posId}}
 };
 /* pantalla completa: Fullscreen API cuando existe; en iPhone (Safari no la permite para esto) una capa fija que ocupa toda la pantalla */
 function pantallaCompleta(on){const b=document.body;b.classList.toggle('m2d-full',!!on);
+ /* en pantalla completa el visor cuelga del <body> (si no, un contenedor del partido lo deja debajo de la barra de navegación) */
+ if(S.wrap){if(on){if(S.wrap.parentNode!==b)b.appendChild(S.wrap)}else if(S.host&&S.host.isConnected){S.host.innerHTML='';S.host.appendChild(S.wrap)}else if(S.wrap.parentNode===b)b.removeChild(S.wrap)}
  try{const d=document,el=d.documentElement;
   if(on){const f=el.requestFullscreen||el.webkitRequestFullscreen;if(f&&!(d.fullscreenElement||d.webkitFullscreenElement)){const p=f.call(el);if(p&&p.then)p.then(()=>{try{screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape').catch(()=>{})}catch(e){}}).catch(()=>{})}}
   else{const x=d.exitFullscreen||d.webkitExitFullscreen;if(x&&(d.fullscreenElement||d.webkitFullscreenElement))x.call(d)}}catch(e){}
