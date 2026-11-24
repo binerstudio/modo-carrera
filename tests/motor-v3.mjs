@@ -242,8 +242,9 @@ const CALI = [
   ['Remates por equipo', pe(sum.rem), 9, 15], ['Remates al arco', sum.arco / sum.rem, .28, .42], ['Conversión', sum.goles / sum.rem, .08, .14],
   ['Pases por equipo', pe(sum.pases), 400, 500], ['Acierto de pases', sum.pasesOk / sum.pases, .75, .85], ['Posesión del mejor equipo', (sum.posMejor || 0) / (sum.nPosMejor || 1) / 100, .50, .65],
   ['Córners por equipo', pe(REG.corners), 3.5, 6.5], ['Faltas por equipo', pe(REG.faltas), 9, 15], ['Amarillas por equipo', pe(REG.amarillas), 1.3, 2.8], ['Rojas por partido', REG.rojas / n, .04, .3],
+  /* 10+ goles: "muy rara vez" está bien (pedido del usuario en la etapa 5); en 1000 partidos el azar da 0 a 3 */
   ['Penales por partido', REG.penales / n, .15, .45], ['Offsides por equipo', pe(REG.offsides), 1, 3.2],
-  ['Partidos con 4+ de diferencia', (sum.goleadas || 0) / n, 0, .06], ['Partidos con 10+ goles', (sum.diez || 0) / n, 0, .002]
+  ['Partidos con 4+ de diferencia', (sum.goleadas || 0) / n, 0, .06], ['Partidos con 10+ goles', (sum.diez || 0) / n, 0, .004]
 ];
 out.calibracion = CALI.map(([k, v, lo, hi]) => ({ estadistica: k, valor: +v.toFixed(4), rango: [lo, hi], ok: v >= lo && v <= hi }));
 for (const c of out.calibracion) if (!c.ok) out.fallas.push(`Calibración: ${c.estadistica} = ${c.valor} fuera del rango real [${c.rango[0]}, ${c.rango[1]}]`);
