@@ -18,7 +18,7 @@
 'use strict';
 /* referencia local: dentro de un contexto vm el acceso a globales es lento */
 const MATH=Math;
-const VERSION='3.0.0-e5';
+const VERSION='3.0.0-e6';
 const PW=105,PH=68,TPS=10,DT=1/TPS,G=9.81,SUB=4,H=DT/SUB;
 const GY0=34-3.66,GY1=34+3.66,GH=2.44,BR=0.11;            // arco y radio de la pelota
 const AREA_X=16.5,AREA_Y0=34-20.16,AREA_Y1=34+20.16;
@@ -1586,7 +1586,11 @@ function enVivo(loc,vis,opt){
   retirar(e,clave){const j=porClave(e,clave);if(!j)return false;p.retirar(j);return true},
   tactica(e,tac){p.cambiarTactica(e,tac)},
   st:()=>p.st,goles:()=>p.goles.slice(),posesion(){const t=p.st.posTicks[0]+p.st.posTicks[1]||1;return MATH.round(100*p.st.posTicks[0]/t)},
-  resultado(){return p.resultado()}
+  resultado(){return p.resultado()},
+  /* para dibujar la cinta en vivo (opt.alCuadro): quién ocupa cada puesto, y dónde está cada cosa en el cuadro */
+  puestos:()=>p.J.map(j=>({id:j.id,eq:j.eq,clave:j.clave,nombre:j.nombre,gk:!!j.gk,pos:j.pos,rol:j.rol})),
+  formato:()=>({porCuadro:5+p.J.length*2+2+6,jugadores:p.J.length,arbitro:5+p.J.length*2,salientes:7+p.J.length*2,nSalientes:3}),
+  t:()=>p.t
  };
 }
 function simular(loc,vis,opt){
@@ -1595,9 +1599,11 @@ function simular(loc,vis,opt){
  const p=new Partido(loc,vis,R,opt);p.jugar();return p.resultado();
 }
 /* leer un cuadro de la cinta: devuelve {t, pelota:{x,y,z,dueno,enJuego}, jugadores:[[x,y]...]} en metros */
-function cuadro(cinta,k){const n=cinta.porCuadro,o=k*n,d=cinta.datos,J=[];
- for(let i=5;i<n;i+=2)J.push([d[o+i]/10,d[o+i+1]/10]);
- return{t:cinta.t[k],pelota:{x:d[o]/10,y:d[o+1]/10,z:d[o+2]/10,dueno:d[o+3],enJuego:d[o+4]===1},jugadores:J}}
+function cuadro(cinta,k){const n=cinta.porCuadro,o=k*n,d=cinta.datos,J=[],fin=cinta.arbitro||n,S=[];
+ for(let i=5;i<fin;i+=2)J.push([d[o+i]/10,d[o+i+1]/10]);
+ if(cinta.salientes)for(let i=cinta.salientes;i<n;i+=2)S.push(d[o+i]===-32768?null:[d[o+i]/10,d[o+i+1]/10]);
+ return{t:cinta.t[k],pelota:{x:d[o]/10,y:d[o+1]/10,z:d[o+2]/10,dueno:d[o+3],enJuego:d[o+4]===1},jugadores:J,
+  arbitro:cinta.arbitro?[d[o+fin]/10,d[o+fin+1]/10]:null,salientes:S}}
 
 /* roles de cada puesto de una formación (el 0 es el arquero), y la línea de cada rol */
 function rolesDe(f){const pl=plantilla(f,10),nDef=pl.filter(q=>q[1]>=64).length;return['POR'].concat(pl.map(q=>rolDe(q[0],q[1],nDef)))}

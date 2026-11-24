@@ -25,9 +25,12 @@ function preparar(m){
  const own={name:m.home,tac:tacO,players:m.own.map(e=>crudoPropio(e.p)).concat((m.ownBench||[]).map(crudoPropio))};
  const riv={name:m.away,tac:m.tacR,players:m.riv.map(crudoRival).concat((m.rivBench||[]).map(crudoRival))};
  const arb=m.v2&&m.v2.arbitro;
- const vivo=V3.enVivo(eOwn===0?own:riv,eOwn===0?riv:own,{semilla:(m.v2&&m.v2.semilla?m.v2.semilla:'mc')+'|v3',cinta:false,neutral:m.venue==='n',
-  arbitro:arb?{severidad:arb.severidad,precision:arb.precision}:undefined,dtExterno:[true,true]});
- const S={vivo,eOwn,parte:0,finParte1:false,tac:JSON.stringify(tacO)};
+ /* la cinta de la cancha (10 cuadros por segundo) queda solo en memoria para que el 2D la dibuje: no se guarda en la partida */
+ const TV={cuadros:[],eventos:[],puestos:null,formato:null,partes:{},fin:{},tMotor:0,eOwn,terminado:false};
+ const vivo=V3.enVivo(eOwn===0?own:riv,eOwn===0?riv:own,{semilla:(m.v2&&m.v2.semilla?m.v2.semilla:'mc')+'|v3',cinta:false,cintaCada:1,neutral:m.venue==='n',
+  arbitro:arb?{severidad:arb.severidad,precision:arb.precision}:undefined,dtExterno:[true,true],alCuadro:(t,f)=>{TV.cuadros.push({t,d:Int16Array.from(f)})}});
+ TV.puestos=vivo.puestos();TV.formato=vivo.formato();
+ const S={vivo,eOwn,parte:0,finParte1:false,tac:JSON.stringify(tacO),tv:TV};
  ESTADO.set(m,S);m.v3={version:V3.VERSION,local:eOwn===0?'propio':'rival'};
  return S;
 }
@@ -77,14 +80,16 @@ function minuto(m,API,S){
  const c=m.clock,half=c.half,V=S.vivo;
  if(V.terminado)return true;
  if(S.parte!==half){
-  if(half===1&&S.parte===0){V.empezar(1);S.parte=1}
-  else if(half===2&&S.parte===1){if(!V.empezar(2)){traducir(m,API,S,V.eventosNuevos());return true}S.parte=2}
+  if(half===1&&S.parte===0){V.empezar(1);S.parte=1;S.tv.partes[1]=V.t()}
+  else if(half===2&&S.parte===1){if(!V.empezar(2)){traducir(m,API,S,V.eventosNuevos());S.tv.terminado=true;return true}S.parte=2;S.tv.partes[2]=V.t()}
  }
  sincronizar(m,S);
  const fin=V.minuto();
  const rj=V.reloj();c.base=rj.base;c.x=rj.extra;m.minute=c.base+c.x;m.moments++;m.tick++;if(API.label)m.lbl=API.label(m);
  if(rj.descuento!=null)m.extra[half]=rj.descuento;
  traducir(m,API,S,V.eventosNuevos());
+ S.tv.tMotor=V.t();if(fin){S.tv.fin[half]=V.t();if(V.terminado)S.tv.terminado=true}
+ if(S.tv.cuadros.length>6000)S.tv.cuadros.splice(0,S.tv.cuadros.length-3000);   // en memoria solo los últimos minutos
  actualizarStats(m,S);
  /* minutos jugados */
  for(const side of ['o','r'])for(const e of listaDe(m,side)){const st=API.ps(m,e,side);if(st)st.on++}
@@ -108,7 +113,13 @@ function actualizarStats(m,S){
 
 function traducir(m,API,S,evs){
  for(const x of evs){
-  if(x.equipo==null)continue;
+  S.tv.eventos.push(x);
+  const n0=m.events.length;try{traducir1(m,API,S,x)}finally{for(let k=n0;k<m.events.length;k++)if(m.events[k].t3==null)m.events[k].t3=x.t}   // t3: cuándo pasó en la cancha (el 2D lo muestra recién ahí)
+ }
+}
+function traducir1(m,API,S,x){
+ {
+  if(x.equipo==null)return;
   const side=x.equipo>=0?ladoDe(S,x.equipo):'',otro=side==='o'?'r':'o';
   switch(x.tipo){
    case 'gol':{
@@ -138,11 +149,13 @@ function traducir(m,API,S,evs){
   }
  }
 }
+/* para el 2D: la cinta en vivo del partido v3 (o null si el partido no es v3) */
+window.MCV3TV={de:m=>{const S=m&&m.v3?ESTADO.get(m):null;return S?S.tv:null}};
 
 /* ---------- Configuración: agregar el v3 a "Motor de partidos" ---------- */
 try{
  if(typeof OP!=='undefined'&&Array.isArray(OP.motor)&&!OP.motor.some(x=>x[0]==='v3')){
-  OP.motor.push(['v3','Simulado en cancha (v3, experimental)']);
+  OP.motor.push(['v3','En cancha (v3)']);
   const oLoad=window.sLoad,oSave=window.sSave;
   if(typeof oLoad==='function')window.sLoad=function(){const r=oLoad.apply(this,arguments);try{if(typeof career!=='undefined'&&esV3(career))draft.motor='v3'}catch(e){}return r};
   if(typeof oSave==='function')window.sSave=function(){

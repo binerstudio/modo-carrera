@@ -63,7 +63,7 @@ window.renderMarket=function(){if(!career)return;ensureMarketData();const T=mark
  const nt=$('negotiations');if(nt)nt.innerHTML='';ico()};
 /* ---------- CONFIGURACIÓN ---------- */
 const SD={name:'Carrera',diff:'Normal',speed:'Normal',seasons:1,sanc:1,clima:1,desg:1,real:1,ofert:1,dura:1,inv:1,vib:1,ayuda:1,fx:1,sombras:1,fps:1,mus:1,sfx:1,comm:1,notif:1,notipart:1,notimerc:1,auto:1},
-OP={diff:['Normal','Difícil','Experto'],speed:['Lenta','Normal','Rápida'],matchLength:[['quick','5 minutos'],['normal','10 minutos'],['long','15 minutos']],currency:[['USD','Dólares (USD)'],['EUR','Euros (EUR)'],['ARS','Pesos (ARS)']],injuries:['Baja','Normal','Alta'],language:[['es','Español'],['en','English'],['he','עברית']]},
+OP={diff:['Normal','Difícil','Experto'],speed:['Lenta','Normal','Rápida'],matchLength:[['quick','Corto (~3 min)'],['normal','Normal (~5 min)'],['long','Largo (~10 min)']],currency:[['USD','Dólares (USD)'],['EUR','Euros (EUR)'],['ARS','Pesos (ARS)']],injuries:['Baja','Normal','Alta'],language:[['es','Español'],['en','English'],['he','עברית']]},
 SS={General:['gear','General',[['t','list','Nombre de la Partida','name'],['s','bars','Dificultad','diff'],['s','clock','Duración del Partido','matchLength'],['s','play','Velocidad de Juego','speed'],['s','dot','Moneda del Juego','currency'],['g','pitch','Temporadas','seasons']]],
 Partido:['ball','Partido',[['s','dot','Frecuencia de lesiones','injuries'],['g','flag','Sanciones','sanc'],['g','globe','Clima Dinámico','clima'],['g','bars','Desgaste de Jugadores','desg']]],
 Experiencia:['star','Experiencia',[['g','pitch','Modo Realista','real'],['g','hand','Ofertas de otros clubes','ofert'],['g','tag','Negociaciones más difíciles','dura'],['g','dot','Mercado de Invierno','inv']]],
@@ -79,7 +79,7 @@ function sRender(){const c=$('xsPanel');c.innerHTML=CAT[sc].map(n=>{const s=SS[n
  $('xsCats').innerHTML=Object.keys(CAT).map(k=>`<button class="${k===sc?'on':''}" onclick="sc='${k}';sRender()">${ic(CI[k])}${k}</button>`).join('');ico()}
 function sStep(k,d){const o=OP[k].map(x=>Array.isArray(x)?x[0]:x),i=(o.indexOf(draft[k])+d+o.length)%o.length;draft[k]=o[i];sRender()}
 function sSave(){$('matchLength').value=draft.matchLength;$('currency').value=draft.currency;$('injuries').value=draft.injuries;saveSettings();const u={...draft};['matchLength','currency','injuries','language','name','diff'].forEach(k=>delete u[k]);localStorage.setItem('mc_settings_ui',JSON.stringify(u));if(career){career.difficulty=draft.diff;career.saveName=draft.name;save()}if(draft.language!==currentLang())setLanguage(draft.language);xTop();xToast('Cambios guardados')}
-function sReset(){draft={...SD,matchLength:'normal',currency:'USD',injuries:'Normal',language:currentLang(),diff:career?career.difficulty:'Normal',name:draft.name};sRender();xToast('Valores restablecidos (tocá Guardar)')}
+function sReset(){draft={...SD,matchLength:'quick',currency:'USD',injuries:'Normal',language:currentLang(),diff:career?career.difficulty:'Normal',name:draft.name};sRender();xToast('Valores restablecidos (tocá Guardar)')}
 function sCancel(){sLoad();sRender();go(career?'dashboard':'home')}
 (function(){const o=window.go;window.go=function(id){o(id);if(id==='more'){sLoad();sRender()}}})();
 document.querySelectorAll('.x-lg')[0]&&0;

@@ -633,13 +633,13 @@ function matchBuild(){const s=$('match'),m=curMatch(),c=C();if(!s||!c)return;let
  const own=m.venue==='h',fH=own?(c.formation||'4-3-3'):(m.tacR&&m.tacR.formation)||'4-4-2',fA=own?(m.tacR&&m.tacR.formation)||'4-4-2':(c.formation||'4-3-3');
  const sH=own?(c.style||'Equilibrado'):(m.tacR&&m.tacR.style)||'Equilibrado',sA=own?(m.tacR&&m.tacR.style)||'Equilibrado':(c.style||'Equilibrado');
  const isL=/^LIGA/i.test(String(m.compLabel||''));const comp=isL?`${lgName(c.country)} - ${String(m.compLabel).replace(/^LIGA\s*·\s*/i,'').replace(/^FECHA/i,'Fecha')}`:(m.compLabel||'Partido');
- const ph=m.done?'Final':(PH[m.phase]||'');const mn=m.phase==='pre'?"0'":(m.lbl||m.minute||0)+"'";
+ const ph=m.done?'Final':(PH[m.phase]||'');const mv=window.MC2D&&MC2D.minuto?MC2D.minuto(m):null,mn=m.phase==='pre'?"0'":(mv||m.lbl||m.minute||0)+"'";
  const R=rows(m),hot=(m.scorers||[]).slice(-1)[0];
  /* 12.6 · con el simulador 2D se muestra solo lo que ya se vio en la animación */
  const CUT=window.MC2D?MC2D.corte(m):(m.events||[]).length,SC=window.MC2D?MC2D.marcador(m):[m.h,m.a];
  const le=lastEv({events:(m.events||[]).slice(0,CUT)});let leH='';if(le){const g=isGoal(le.title);const team=/LOCAL/i.test(le.title)?m.home:/VISIT/i.test(le.title)?m.away:'';
   leH=`<div class="le">${evIcon(le.title)}<b>${esc(le.lbl!=null?le.lbl+"'":'')}</b><strong>${g&&team?'¡GOL DE '+esc(team.toUpperCase())+'!':esc(clean(le.title))}</strong></div><p class="lm">${esc(evTxt(le))}</p>`}
- const prog=Math.max(0,Math.min(100,(m.done?90:(m.minute||0))/90*100));
+ const prog=Math.max(0,Math.min(100,(mv?parseInt(mv,10):m.done?90:(m.minute||0))/90*100));
  const running=!m.done&&(m.phase==='first'||m.phase==='second');let paused=false;try{paused=matchPaused}catch(e){}
  let sp=2;try{sp=matchSpeed}catch(e){}
  const act=m.done?['mcMainAction()',(($('matchAction')||{}).textContent||'SIGUIENTE FECHA').replace(/→/,'').trim()]:m.phase==='pre'?['mcMainAction()','COMENZAR PARTIDO']:m.phase==='ht'?['mcMainAction()','JUGAR EL 2º TIEMPO']:['mcSimEnd()','SIMULAR HASTA<br>EL FINAL'];
