@@ -42,8 +42,8 @@ function atributos(info){
 
 /* ---------- calibración (etapa 4): perillas del motor, todas en un solo lugar ---------- */
 const CAL={
- nivel:70,atributos:.67,   // atributos comprimidos alrededor de 70 (1 = sin comprimir)
- satura:17,                // y saturados: las diferencias enormes pesan menos que en línea recta (tanh)
+ nivel:70,atributos:.70,   // atributos comprimidos alrededor de 70 (1 = sin comprimir)
+ satura:16,                // y saturados: las diferencias enormes pesan menos que en línea recta (tanh)
  punteria:.11,            // error base de los remates (radianes)
  alcanceArquero:1.7,      // alcance del arquero parado (m)
  remate:.6,               // ganas de patear (multiplica el xG al decidir)
@@ -239,6 +239,7 @@ P.ajustarPorResultado=function(){
  for(const e of [0,1]){
   const dif=this.goles[e]-this.goles[1-e],min=this.minAbs();let dM=0,dP=0,dD=0;
   if(dif>=3){dM=-.85;dP=-.7;dD=-.5}else if(dif===2){dM=-.35;dP=-.3;dD=-.2}else if(dif===1&&min>70){dM=-.2;dP=-.1;dD=-.1}
+  else if(dif<=-3){dM=0;dP=0}   // perdiendo por 3 o más ya no se regala atrás
   else if(dif<=-2){dM=.3;dP=.15}else if(dif===-1&&min>70){dM=.3;dP=.2;dD=.1}
   else if(dif===0&&min>75&&e===1&&!this.opt.neutral){dM=-.2;dP=-.1}   // de visitante, empatando al final, se conforma
   const T=tactica(this.tacBase[e]);T.M=clamp(T.M+dM,-1,1);T.Pz=clamp(T.Pz+dP,-1,1);T.D=clamp(T.D+dD,-1,1);
@@ -473,7 +474,7 @@ P.decidir=function(j){
  const T=this.tac[e],tr=this.trans[e],contra=tr&&tr.tipo==='contra'&&tr.hasta>this.t;
  /* posesión: perder la pelota pesa más; directo: avanzar pesa más */
  /* perder la pelota cerca del arco propio pesa mucho más */
- const dif=this.goles[e]-this.goles[1-e],relajo=dif>=4?.12:dif>=3?.25:dif===2?.75:1;
+ const dif=this.goles[e]-this.goles[1-e],relajo=dif>=5?.04:dif>=4?.12:dif>=3?.25:dif===2?.75:1;
  const pesoPerder=(CAL.cuidado+(T.posesion?.6:0)+(1-T.directo)*.4)*(1+.5*MATH.max(0,(40-ax)/40)),avance=contra?.03:T.directo*.012;
  const salida=(j.gk||j.linea==='def')&&ax<35;
  const opts=[];
