@@ -1,4 +1,5 @@
-/* MODO CARRERA · prueba del motor v3 · Etapa 1 (sin navegador)
+/* MODO CARRERA · prueba del motor v3 · Etapas 1 y 2 (sin navegador)
+   Etapa 2: forma de equipo dentro de rangos reales y causa-efecto de la táctica (ver más abajo).
    - N partidos (1000 por defecto) con planteles de la base, alineación 4-3-3 por GRL: ninguno debe fallar.
    - Coherencia: goles del marcador = eventos de gol, posiciones finitas y dentro de la cancha, posesión = 100 %.
    - Determinismo: misma semilla = mismo resultado (eventos y cinta); otra semilla = otro partido.
@@ -6,7 +7,7 @@
    - Tiempo por partido.
    - Estadísticas iniciales (goles, remates, pases, posesión…) SOLO INFORMADAS: todavía no están calibradas
      (eso es la etapa 4), así que no hacen fallar la prueba.
-   Uso: node tests/motor-v3.mjs [partidos]                                                         */
+   Uso: node tests/motor-v3.mjs [partidos] [partidosPorSerieTactica]                                                         */
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { createHash } from 'node:crypto';
@@ -28,19 +29,28 @@ const pRows = new Map();
 for (const r of P.rows) { const k = P.clubs[r[6]]; if (!pRows.has(k)) pRows.set(k, []); pRows.get(k).push(r); }
 for (const [k, rows] of pRows) byClub.set(k, { country: (byClub.get(k) || {}).country || '?', rows });
 const ROLES = ['POR', 'LI', 'DFC', 'DFC', 'LD', 'MCD', 'MC', 'MC', 'EI', 'DC', 'ED'], GRP = ['POR', 'DEF', 'DEF', 'DEF', 'DEF', 'MED', 'MED', 'MED', 'DEL', 'DEL', 'DEL'];
-function equipo(name) {
+const GRUPO_LINEA = { arq: 'POR', def: 'DEF', med: 'MED', atq: 'DEL' };
+function equipo(name, tac) {
   const rows = byClub.get(name).rows.slice().sort((a, b) => b[2] - a[2]);
+  if (tac && tac.formation && tac.formation !== '4-3-3') {
+    /* otra formación: cada puesto con un jugador de su línea, según los roles que da el motor */
+    const roles = M.rolesDe(tac.formation), used = new Set(), xi = []; let k = 0;
+    const avg = rows.reduce((a, r) => a + r[2], 0) / rows.length;
+    for (const rol of roles) { const g = rol === 'POR' ? 'POR' : GRUPO_LINEA[M.LINEA_ROL[rol]]; const r = rows.find(x => !used.has(x) && x[1] === g) || rows.find(x => !used.has(x) && x[1] !== 'POR') || [name + ' (relleno ' + (++k) + ')', g, Math.round(avg - 6), 25]; used.add(r); xi.push({ name: r[0], pos: r[1], grl: r[2], age: r[3], role: rol }); }
+    return { name, players: xi, tac };
+  }
   const used = new Set(), xi = [];
   const avg = rows.length ? rows.reduce((a, r) => a + r[2], 0) / rows.length : 60; let k = 0;
   const filler = g => [name + ' (relleno ' + (++k) + ')', g, Math.round(avg - 6), 25];
   GRP.forEach((g, i) => { const r = rows.find(x => !used.has(x) && x[1] === g) || filler(g); used.add(r); xi.push({ name: r[0], pos: r[1], grl: r[2], age: r[3], role: ROLES[i] }); });
-  return { name, players: xi, tac: { formation: '4-3-3' } };
+  return { name, players: xi, tac: Object.assign({ formation: '4-3-3' }, tac || {}) };
 }
 const clubs = [...byClub.entries()].filter(([, v]) => v.rows.length >= 11).map(([k]) => k).sort();
 
 const out = { N, version: M.VERSION, fallas: [], errores: [], tiempo: {}, estadisticas: {}, determinismo: {}, nota: 'Estadísticas informativas: el motor v3 todavía no está calibrado (etapa 4).' };
 const sum = { goles: 0, rem: 0, arco: 0, pases: 0, pasesOk: 0, altos: 0, corners: 0, lat: 0, quites: 0, inter: 0, gamb: 0, gambOk: 0, xg: 0, pos: [], loc: 0, emp: 0, vis: 0, enJuego: 0, dist: 0, nDist: 0, cab: 0, atajadas: 0, palos: 0, max: 0, marc: {} };
 const tiempos = [];
+const FORMA = { con: { n: 0, largo: 0, ancho: 0, dm: 0, ma: 0, alin: 0 }, sin: { n: 0, largo: 0, ancho: 0, dm: 0, ma: 0, alin: 0 } };
 const fuera = (x, y) => !(x >= -5 && x <= 110 && y >= -5 && y <= 73);
 for (let i = 0; i < N; i++) {
   const a = clubs[(i * 7) % clubs.length], b = clubs[(i * 13 + 5) % clubs.length];
@@ -67,6 +77,8 @@ for (let i = 0; i < N; i++) {
   sum.gamb += s.gambetas[0] + s.gambetas[1]; sum.gambOk += s.gambetasOk[0] + s.gambetasOk[1]; sum.xg += s.xg[0] + s.xg[1]; sum.pos.push(s.posesion[0]); sum.enJuego += s.minutosEnJuego;
   sum.cab += s.cabezazos[0] + s.cabezazos[1]; sum.atajadas += s.atajadas[0] + s.atajadas[1]; sum.palos += s.palos[0] + s.palos[1];
   for (const j of r.jugadores) if (j.pos !== 'POR') { sum.dist += j.distancia; sum.nDist++; }
+  for (const e of [0, 1]) for (const f of ['con', 'sin']) { const F = r.forma[e][f], A = FORMA[f]; if (!F.muestras) continue; A.n++; A.largo += F.largo; A.ancho += F.ancho; A.dm += F.entreLineas[0]; A.ma += F.entreLineas[1]; A.alin += F.alineacionLinea; }
+  if (!r.forma.every(t => Number.isFinite(t.con.largo) && Number.isFinite(t.sin.largo))) out.errores.push(`partido ${i}: medición de forma inválida`);
   if (r.h > r.a) sum.loc++; else if (r.h === r.a) sum.emp++; else sum.vis++;
   const k = r.h + '-' + r.a; sum.marc[k] = (sum.marc[k] || 0) + 1;
 }
@@ -94,6 +106,65 @@ const hTxt = [huella(M.simular(A, B, { semilla: 'texto-77' })), huella(M.simular
 out.determinismo = { mismaSemilla: h1.join(',') === h2.join(',') && hTxt[0] === hTxt[1], semillasDistintasDistinto: new Set(h1).size === 3, huellas: h1, huellaTexto: hTxt[0] };
 if (!out.determinismo.mismaSemilla) out.fallas.push('No es determinista: misma semilla dio resultados distintos');
 if (!out.determinismo.semillasDistintasDistinto) out.fallas.push('Semillas distintas dieron el mismo partido');
+/* ===== ETAPA 2 · forma de equipo ===== */
+/* rangos aproximados de partidos profesionales con datos de seguimiento (jugadores de campo, en metros):
+   con pelota el equipo se estira y se abre; sin pelota se junta. Son referencias amplias, no datos de un partido real. */
+const RANGO_FORMA = { con: { largo: [35, 55], ancho: [40, 62], dm: [6, 24], ma: [6, 24] }, sin: { largo: [25, 40], ancho: [28, 45], dm: [6, 20], ma: [6, 20] } };
+out.forma = {};
+for (const f of ['con', 'sin']) {
+  const A = FORMA[f], k = A.n || 1;
+  out.forma[f] = { equipos: A.n, largo: f2(A.largo / k), ancho: f2(A.ancho / k), entreLineas: [f2(A.dm / k), f2(A.ma / k)], alineacionLinea: f2(A.alin / k) };
+  const v = { largo: A.largo / k, ancho: A.ancho / k, dm: A.dm / k, ma: A.ma / k };
+  for (const [m, [lo, hi]] of Object.entries(RANGO_FORMA[f])) if (!(v[m] >= lo && v[m] <= hi)) out.fallas.push(`Forma ${f} pelota: ${m} = ${v[m].toFixed(1)} m fuera del rango real [${lo}, ${hi}]`);
+}
+if (!(out.forma.con.largo > out.forma.sin.largo + 5)) out.fallas.push('Forma: el equipo no se estira con la pelota');
+if (!(out.forma.con.ancho > out.forma.sin.ancho + 5)) out.fallas.push('Forma: el equipo no se abre con la pelota');
+if (!(out.forma.sin.alineacionLinea < 4)) out.fallas.push(`Forma: la línea defensiva sin pelota no está alineada (desvío ${out.forma.sin.alineacionLinea} m)`);
+
+/* ===== ETAPA 2 · la táctica cambia lo que pasa en la cancha =====
+   El mismo equipo contra el mismo rival, con una sola cosa distinta en su táctica (local y visitante alternados). */
+const NT = +(process.argv[3] || 24);
+const CA = byClub.has('Arsenal') ? 'Arsenal' : clubs[3], CB = byClub.has('Chelsea') ? 'Chelsea' : clubs[11];
+function serieTac(tac) {
+  const S = { n: 0, alturaLinea: 0, alturaBloque: 0, recupCampoRival: 0, alturaRecuperacion: 0, pasesPorPosesion: 0, pelotazos: 0, ancho: 0, contrapresiones: 0, repliegues: 0, pases: 0, goles: 0 };
+  for (let i = 0; i < NT; i++) {
+    const loc = i % 2 === 0, yo = equipo(CA, tac), el = equipo(CB);
+    let r; try { r = M.simular(loc ? yo : el, loc ? el : yo, { semilla: 50000 + i, cinta: false }); } catch (e) { out.errores.push(`táctica ${JSON.stringify(tac)}: ${e.message}`); continue; }
+    const e = loc ? 0 : 1, s = r.stats, F = r.forma[e];
+    S.n++; S.alturaLinea += F.sin.alturaLinea; S.alturaBloque += F.sin.alturaBloque; S.recupCampoRival += s.recupCampoRival[e]; S.alturaRecuperacion += s.alturaRecuperacion[e];
+    S.pasesPorPosesion += s.pasesPorPosesion[e]; S.pelotazos += s.pelotazos[e]; S.ancho += F.con.ancho; S.contrapresiones += s.contrapresiones[e]; S.repliegues += s.repliegues[e]; S.pases += s.pases[e]; S.goles += loc ? r.h : r.a;
+  }
+  const o = {}; for (const k in S) if (k !== 'n') o[k] = f2(S[k] / (S.n || 1)); o.partidos = S.n; return o;
+}
+const TAC = {
+  bloqueAlto: { style: 'Equilibrado', depth: 85 }, bloqueBajo: { style: 'Equilibrado', depth: 15 },
+  presionAlta: { style: 'Equilibrado', pressing: 85 }, presionBaja: { style: 'Equilibrado', pressing: 15 },
+  directo: { style: 'Contraataque', rhythm: 80 }, posesion: { style: 'Posesión', rhythm: 30 },
+  abierto: { style: 'Equilibrado', width: 85 }, cerrado: { style: 'Equilibrado', width: 15 },
+  presionAltaEstilo: { style: 'Presión alta' }, defensivo: { style: 'Defensivo' }
+};
+const ST = {}; for (const [k, t] of Object.entries(TAC)) ST[k] = serieTac(t);
+out.tacticas = { partidosPorSerie: NT, equipo: CA, rival: CB, series: ST, pruebas: [] };
+function causa(nombre, a, b, campo, cond, texto) { const ok = cond(ST[a][campo], ST[b][campo]); out.tacticas.pruebas.push({ prueba: nombre, campo, [a]: ST[a][campo], [b]: ST[b][campo], ok, criterio: texto }); if (!ok) out.fallas.push(`Táctica: ${nombre} (${campo}: ${ST[a][campo]} vs ${ST[b][campo]}; se esperaba ${texto})`); }
+causa('Bloque alto vs bajo: altura de la línea sin pelota', 'bloqueAlto', 'bloqueBajo', 'alturaLinea', (x, y) => x >= y + 4, 'al menos 4 m más alta');
+causa('Bloque alto vs bajo: altura del bloque sin pelota', 'bloqueAlto', 'bloqueBajo', 'alturaBloque', (x, y) => x >= y + 4, 'al menos 4 m más alto');
+causa('Presión alta vs baja: recuperaciones en campo rival', 'presionAlta', 'presionBaja', 'recupCampoRival', (x, y) => x >= y * 1.15, 'al menos 15 % más');
+causa('Presión alta vs baja: altura media de recuperación', 'presionAlta', 'presionBaja', 'alturaRecuperacion', (x, y) => x >= y + 2, 'al menos 2 m más arriba');
+causa('Posesión vs directo: pases por posesión', 'posesion', 'directo', 'pasesPorPosesion', (x, y) => x >= y * 1.3, 'al menos 30 % más');
+causa('Directo vs posesión: pelotazos', 'directo', 'posesion', 'pelotazos', (x, y) => x >= y * 1.5, 'al menos 50 % más');
+causa('Ancho alto vs bajo: ancho del equipo con pelota', 'abierto', 'cerrado', 'ancho', (x, y) => x >= y + 4, 'al menos 4 m más ancho');
+causa('Presión alta (estilo): al perder presiona en vez de replegarse', 'presionAltaEstilo', 'defensivo', 'contrapresiones', (x, y) => x > 0 && y === 0, 'contrapresión solo con presión alta');
+/* todas las formaciones del juego juegan sin errores y respetan sus líneas */
+out.formaciones = {};
+for (const f of M.FORMACIONES) {
+  try {
+    const r = M.simular(equipo(CA, { formation: f }), equipo(CB, { formation: f }), { semilla: 7, cinta: false });
+    const roles = r.jugadores.filter(j => j.equipo === 0).map(j => j.rol), def = roles.filter(x => M.LINEA_ROL[x] === 'def').length;
+    out.formaciones[f] = { marcador: `${r.h}-${r.a}`, defensores: def, largoSin: r.forma[0].sin.largo, anchoCon: r.forma[0].con.ancho };
+    if (def !== +f.split('-')[0]) out.fallas.push(`Formación ${f}: ${def} defensores en la línea`);
+  } catch (e) { out.errores.push(`formación ${f}: ${e.message}`); }
+}
+
 /* física de la pelota (sin jugadores) */
 {
   const T = M._trayectoria;
@@ -130,11 +201,15 @@ if (out.partidos < N * 0.95) out.fallas.push(`se jugaron solo ${out.partidos} de
 if (usoRandom) out.fallas.push('se usó Math.random');
 
 mkdirSync('tests/out', { recursive: true }); writeFileSync('tests/out/motor-v3.json', JSON.stringify(out, null, 1));
-console.log(`MOTOR v3 (etapa 1) · ${out.fallas.length ? 'FALLÓ' : 'OK'} · ${out.partidos} partidos sin errores: ${out.errores.length === 0 ? 'sí' : 'no'}`);
+console.log(`MOTOR v3 (etapas 1-2) · ${out.fallas.length ? 'FALLÓ' : 'OK'} · ${out.partidos} partidos sin errores: ${out.errores.length === 0 ? 'sí' : 'no'}`);
 console.log('tiempo por partido', JSON.stringify(out.tiempo));
 console.log('determinismo', out.determinismo.mismaSemilla ? 'OK' : 'FALLÓ', '· semillas distintas →', out.determinismo.semillasDistintasDistinto ? 'partidos distintos' : 'IGUALES', '· huellas', h1.join(' '));
 console.log('estadísticas (solo informativas, sin calibrar):');
 for (const [k, v] of Object.entries(out.estadisticas)) console.log('  ', k, Array.isArray(v) ? v.join(' · ') : v);
+console.log('forma (promedio de todos los equipos):', JSON.stringify(out.forma));
+console.log('tácticas (' + NT + ' partidos por serie, ' + CA + ' vs ' + CB + '):');
+for (const p of out.tacticas.pruebas) console.log(p.ok ? '  ✔' : '  ✘', p.prueba, JSON.stringify(Object.fromEntries(Object.entries(p).filter(([k]) => !['prueba', 'ok', 'campo', 'criterio'].includes(k)))));
+console.log('formaciones', JSON.stringify(out.formaciones));
 console.log('física', JSON.stringify(out.fisica));
 console.log('atributos', JSON.stringify(out.atributos));
 console.log('ejemplo:', out.ejemplo.partido);

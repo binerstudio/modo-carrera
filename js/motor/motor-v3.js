@@ -18,7 +18,7 @@
 'use strict';
 /* referencia local: dentro de un contexto vm el acceso a globales es lento */
 const MATH=Math;
-const VERSION='3.0.0-e1';
+const VERSION='3.0.0-e2';
 const PW=105,PH=68,TPS=10,DT=1/TPS,G=9.81,SUB=4,H=DT/SUB;
 const GY0=34-3.66,GY1=34+3.66,GH=2.44,BR=0.11;            // arco y radio de la pelota
 const AREA_X=16.5,AREA_Y0=34-20.16,AREA_Y1=34+20.16;
@@ -40,39 +40,76 @@ function atributos(info){
  const v={};for(const k of CLAVES)v[k]=clamp(+info.grl||60,15,99);return{v,origen:'grl',perfil:''};
 }
 
-/* ---------- formación ---------- */
-function lineas(formacion,n){
- let f=String(formacion||'4-3-3').split('-').map(Number).filter(x=>x>0);
- if(f.reduce((a,b)=>a+b,0)!==n){f=n>=10?[4,3,3]:[MATH.ceil(n*.4),MATH.ceil(n*.3),0];f[2]=n-f[0]-f[1];f=f.filter(x=>x>0)}
- return f;
+/* ---------- táctica y formación ---------- */
+/* mismos valores que usa el juego (js/core/07-mc7-match.js: ownTac / rivalTac) */
+const TAC_BASE={style:'Equilibrado',mentality:50,width:50,depth:50,pressing:50,rhythm:50,formation:'4-3-3'};
+/* pizarra del juego (js/core/01-base-v4.js: positions): x 0-100 de izquierda a derecha, y 0-100 con el arco propio abajo (88) */
+const PLANTILLAS={'4-3-3':[[17,68],[39,73],[61,73],[83,68],[34,49],[50,55],[66,49],[18,25],[50,15],[82,25]],
+ '4-2-3-1':[[17,68],[39,73],[61,73],[83,68],[39,57],[61,57],[20,35],[50,38],[80,35],[50,15]],
+ '4-4-2':[[17,68],[39,73],[61,73],[83,68],[18,48],[39,51],[61,51],[82,48],[38,19],[62,19]],
+ '3-5-2':[[27,72],[50,75],[73,72],[12,49],[32,51],[50,55],[68,51],[88,49],[38,20],[62,20]],
+ '5-3-2':[[12,68],[31,72],[50,74],[69,72],[88,68],[32,49],[50,54],[68,49],[38,20],[62,20]],
+ '4-1-4-1':[[17,68],[39,73],[61,73],[83,68],[50,61],[18,43],[39,46],[61,46],[82,43],[50,17]],
+ '3-4-3':[[27,72],[50,75],[73,72],[15,48],[39,52],[61,52],[85,48],[18,22],[50,17],[82,22]]};
+const LINEA_ROL={LI:'def',LD:'def',DFC:'def',MCD:'med',MC:'med',MI:'med',MD:'med',MCO:'med',EI:'atq',ED:'atq',DC:'atq'};
+function plantilla(formacion,n){
+ let P=PLANTILLAS[formacion];
+ if(!P||P.length!==n){ /* formación desconocida o equipo incompleto: líneas parejas */
+  let f=String(formacion||'4-3-3').split('-').map(Number).filter(x=>x>0);
+  if(f.reduce((a,b)=>a+b,0)!==n){f=n>=10?[4,3,3]:[MATH.ceil(n*.4),MATH.ceil(n*.3),0];f[2]=n-f[0]-f[1];f=f.filter(x=>x>0)}
+  P=[];f.forEach((k,l)=>{const y=f.length===1?50:73-l*(58/(f.length-1));for(let j=0;j<k;j++)P.push([k===1?50:15+j*(70/(k-1)),y])});
+ }
+ return P;
 }
-/* posiciones base en coordenadas de ataque (x=0 arco propio, x=105 arco rival; y igual que la cancha) */
-function posicionesBase(f){
- const out=[],L=f.length;
- f.forEach((n,k)=>{const x=L===1?40:28+k*(30/(L-1));const sp=n<=1?0:MATH.min(17,52/(n-1));
-  for(let j=0;j<n;j++)out.push([x,34+(j-(n-1)/2)*sp])});
- return out;
+function rolDe(x,y,nDef){
+ if(y>=64)return nDef===3?'DFC':(x<25?'LI':x>75?'LD':'DFC');
+ const central=x>=30&&x<=70;
+ if(y>=52)return central?'MCD':(x<50?'MI':'MD');
+ if(y>=40)return central?'MC':(x<50?'MI':'MD');
+ if(y>=30)return central?'MCO':(x<50?'EI':'ED');
+ return central?'DC':(x<50?'EI':'ED');
 }
-
+/* táctica → parámetros de la cancha. M mentalidad, W ancho, D profundidad (línea), Pz presión, Q ritmo, en -1..1 */
+function tactica(t0){
+ const t=Object.assign({},TAC_BASE,t0||{}),n=v=>clamp(((v==null||isNaN(+v)?50:+v)-50)/50,-1,1);
+ let M=n(t.mentality),W=n(t.width),D=n(t.depth),Pz=n(t.pressing),Q=n(t.rhythm),dir=.45+Q*.2,contra=false,posesion=false;
+ switch(t.style){
+  case 'Ofensivo':M+=.25;break;
+  case 'Defensivo':M-=.35;D-=.3;break;
+  case 'Posesión':dir-=.32;posesion=true;break;
+  case 'Contraataque':dir+=.35;contra=true;D-=.25;break;
+  case 'Presión alta':Pz+=.45;D+=.25;break;
+ }
+ M=clamp(M,-1,1);D=clamp(D,-1,1);Pz=clamp(Pz,-1,1);
+ return{style:t.style,formation:t.formation,M,W,D,Pz,Q,directo:clamp(dir,0,1),contra,posesion,
+  contrapresion:Pz+M*.5>.25,                     // al perder: presión inmediata (si no, repliegue)
+  umbralPresion:62-Pz*30,                        // presiona cuando la pelota pasa esta altura (coordenadas propias)
+  bloque:D>.33?'alto':D<-.33?'bajo':'medio'};
+}
 /* ---------- partido ---------- */
 function Partido(loc,vis,R,opt){
  this.R=R;this.opt=opt;this.t=0;this.parte=1;this.tParte=0;this.estado='parado';
  this.eventos=[];this.equipos=[loc,vis];this.goles=[0,0];
  const z=()=>[0,0];
  this.st={pases:z(),pasesOk:z(),pasesAltos:z(),remates:z(),alArco:z(),atajadas:z(),bloqueos:z(),palos:z(),corners:z(),laterales:z(),saquesArco:z(),
-  quites:z(),intercepciones:z(),gambetas:z(),gambetasOk:z(),cabezazos:z(),xg:z(),posTicks:z(),ticksJuego:0};
+  quites:z(),intercepciones:z(),gambetas:z(),gambetasOk:z(),cabezazos:z(),xg:z(),posTicks:z(),ticksJuego:0,
+  posesiones:z(),recuperaciones:z(),recupCampoRival:z(),alturaRecup:z(),pelotazos:z(),desmarques:z(),paredes:z(),cambiosFrente:z(),contras:z(),contrapresiones:z(),repliegues:z()};
+ this.trans=[null,null];this.lin=[30,30];this.ctrlEq=-1;
+ const mf=()=>({n:0,largo:0,ancho:0,dDM:0,dMA:0,linea:0,bloque:0,alin:0});this.md=[[mf(),mf()],[mf(),mf()]];
  this.J=[];this.eq=[[],[]];
  [loc,vis].forEach((T,e)=>{
   const lista=(T.players||[]).slice(0,11);
   if(lista.length<7)throw new Error('motor v3: '+(T.name||'equipo')+' tiene menos de 7 jugadores');
   let gk=lista.findIndex(p=>GRUPO((p.p||p).pos)==='POR');if(gk<0)gk=0;
   const orden=[lista[gk]].concat(lista.filter((_,i)=>i!==gk));
-  const f=lineas((T.tac||{}).formation,orden.length-1),base=posicionesBase(f);
+  const tac=tactica(T.tac);this.tac=this.tac||[];this.tac[e]=tac;
+  const pl=plantilla(tac.formation,orden.length-1),nDef=pl.filter(q=>q[1]>=64).length,umax=MATH.max(...pl.map(q=>MATH.abs(q[0]-50)/50))||1;
   orden.forEach((raw,i)=>{
+   const sl=i>0?pl[i-1]:[50,88],rol=i===0?'POR':rolDe(sl[0],sl[1],nDef),rel=i===0?0:clamp((73-sl[1])/58,0,1),uy=i===0?0:(sl[0]-50)/50/umax;
    const p0=raw.p||raw,info={name:p0.name,pos:p0.pos,grl:+(p0.rating||p0.grl||raw.r)||60,age:+p0.age||26,atributos:p0.atributos};
    const A=atributos(info),a=A.v;
-   const j={id:this.J.length,eq:e,i,nombre:String(info.name||('Jugador '+(i+1))),pos:GRUPO(info.pos),rol:raw.role||'',grl:info.grl,a,origenAtributos:A.origen,
-    gk:i===0,bx:i===0?3:base[i-1][0],by:i===0?34:base[i-1][1],
+   const j={id:this.J.length,eq:e,i,nombre:String(info.name||('Jugador '+(i+1))),pos:GRUPO(info.pos),rol,linea:i===0?'arq':LINEA_ROL[rol],rel,uy,grl:info.grl,a,origenAtributos:A.origen,
+    gk:i===0,bx:i===0?3:30+rel*36,by:i===0?34:34+uy*23,apoyo:null,corrida:null,pared:null,
     vmax:6.6+(a.velocidad-50)*.05,acc:3+(a.aceleracion-50)*.04,energia:1,
     x:0,y:0,vx:0,vy:0,tx:0,ty:0,urg:.6,cdToque:0,cdEntrada:0,superado:0,ctrl:0,prox:0,accion:null,manos:false,conPelota:0,recibioDe:null,recibir:null,saque:null,tiroTarget:false,_marca:-1,
     s:{pases:0,pasesOk:0,remates:0,goles:0,asist:0,quites:0,intercepciones:0,gambetas:0,distancia:0}};
@@ -139,6 +176,7 @@ P.ejecutarReanudacion=function(){
  const r=this.rean,B=this.B;if(r.tipo==='saque_centro')this.colocarSaqueCentro(r.e);
  const ej=r.ej;
  if(r.tipo!=='saque_centro'){const d=this.dir(r.e);ej.x=clamp(r.x-d*.5,-.5,PW+.5);ej.y=r.y;ej.vx=ej.vy=0}
+ this.cambioPosesion(r.e,r.x,false);
  B.x=r.x;B.y=r.y;B.dueno=ej;B.ultimo=ej;B.tipo='control';ej.ctrl=0;ej.prox=this.t;ej.conPelota=0;ej.saque=r.tipo;
  if(r.tipo==='saque_centro')this.ev('saque_centro',r.e,ej);
  this.estado='juego';this.rean=null;
@@ -176,7 +214,7 @@ function integrar(B){
  if(B.z>0||B.vz>0){
   B.vz-=G*H;const sp=hyp(B.vx,B.vy),k=1-.012*sp*H;B.vx*=k;B.vy*=k;
   B.x+=B.vx*H;B.y+=B.vy*H;B.z+=B.vz*H;
-  if(B.z<=0){B.z=0;if(B.vz<-1.2){B.vz=-B.vz*.45;B.vx*=.7;B.vy*=.7;return 'pique'}else B.vz=0}
+  if(B.z<=0){B.z=0;if(B.vz<-1.2){B.vz=-B.vz*.45;B.vx*=.6;B.vy*=.6;return 'pique'}else B.vz=0}
  }else{
   const sp=hyp(B.vx,B.vy);
   if(sp>0){const ns=MATH.max(0,sp-(1+.06*sp)*H);B.vx*=ns/sp;B.vy*=ns/sp;B.x+=B.vx*H;B.y+=B.vy*H}
@@ -243,8 +281,24 @@ P.desviar=function(j,v0,v1,z0,z1){const B=this.B,R=this.R,ang=R()*MATH.PI*2,sp=v
  B.vx=MATH.cos(ang)*sp;B.vy=MATH.sin(ang)*sp;B.vz=z0+R()*(z1-z0);if(B.vz>0)B.z=MATH.max(B.z,.05);B.ultimo=j;B.tiro=null;B.tipo='suelta';B.destino=null;j.cdToque=5};
 
 /* ---------- control de la pelota suelta ---------- */
+/* cambia el equipo que controla la pelota: posesiones, recuperaciones y transiciones */
+P.cambioPosesion=function(e,x,enJuego){
+ const prev=this.ctrlEq;if(prev===e)return;this.ctrlEq=e;this.st.posesiones[e]++;
+ if(prev<0||!enJuego)return;
+ const ax=this.ax(e,x);this.st.recuperaciones[e]++;this.st.alturaRecup[e]+=ax;if(ax>52.5)this.st.recupCampoRival[e]++;
+ const Tp=this.tac[prev];
+ this.trans[prev]={tipo:Tp.contrapresion?'presion':'repliegue',hasta:this.t+50};
+ if(Tp.contrapresion)this.st.contrapresiones[prev]++;else this.st.repliegues[prev]++;
+ /* al recuperar: contraataque si hay espacio (pocos rivales entre la pelota y el arco) */
+ const T=this.tac[e];let detras=0;for(const o of this.eq[prev])if(!o.gk&&this.ax(e,o.x)>ax)detras++;
+ if(ax<80&&(detras<=4||(T.contra&&detras<=6)||(T.directo>.6&&detras<=5))){this.trans[e]={tipo:'contra',hasta:this.t+60};this.st.contras[e]++}
+ else this.trans[e]=null;
+};
 P.tomar=function(j,manos){
  const B=this.B,prev=B.tipo,desde=B.desde;
+ this.cambioPosesion(j.eq,j.x,this.estado==='juego');
+ /* pared: devolución al que había pasado y picó */
+ if(prev==='pase'&&desde&&desde.eq===j.eq&&desde.recibioDe===j&&j.pared&&this.t-j.pared.t0<45){this.st.paredes[j.eq]++;j.pared=null}
  if(prev==='pase'&&desde){
   if(desde.eq===j.eq){if(j!==desde){this.st.pasesOk[j.eq]++;desde.s.pasesOk++;j.recibioDe=desde}}
   else{this.st.intercepciones[j.eq]++;j.s.intercepciones++;this.ev('intercepcion',j.eq,j,{pasador:desde.nombre});j.recibioDe=null}
@@ -296,7 +350,7 @@ P.riesgoPase=function(j,tx,ty,vavg,alto,q){
   if(!alto){
    let s=((o.x-bx)*dx+(o.y-by)*dy)/L2;s=clamp(s,0,1);
    const cx=bx+s*dx,cy=by+s*dy,l=hyp(o.x-cx,o.y-cy),tb=s*L/vavg,to=reac+MATH.max(0,l-1)/ve;
-   const p=1/(1+MATH.exp(-(tb-to-.1)*4))*.9;libre*=1-p;
+   const p=1/(1+MATH.exp(-(tb-to-.15)*6))*.9;libre*=1-p;
   }else{
    /* por arriba: solo se disputa donde cae */
    const l=hyp(o.x-tx,o.y-ty),to=reac+MATH.max(0,l-1.2)/ve,tm=MATH.max(tLlega,tr);
@@ -304,6 +358,8 @@ P.riesgoPase=function(j,tx,ty,vavg,alto,q){
    if(hyp(o.x-bx,o.y-by)<1.6)libre*=.8;
   }
  }
+ /* por arriba cerca de una línea: se puede ir afuera con el pique */
+ if(alto){const ax=this.ax(e,tx),ay=this.ay(e,ty);if(ax>PW-14)libre*=.55+.03*(PW-ax);if(ay<6||ay>PH-6)libre*=.75}
  /* el receptor también tiene que llegar */
  const llega=tr<=tLlega+.4?1:MATH.max(.2,1-(tr-tLlega-.4)*.5);
  return 1-libre*llega;
@@ -314,6 +370,10 @@ P.decidir=function(j){
  const ax=this.ax(e,j.x),ay=this.ay(e,j.y),pr=this.presion(e,j.x,j.y);
  const vOpp=V(PW-ax,PH-ay);
  const ruido=.006+(100-a.vision)*.0002,saque=j.saque;
+ const T=this.tac[e],tr=this.trans[e],contra=tr&&tr.tipo==='contra'&&tr.hasta>this.t;
+ /* posesión: perder la pelota pesa más; directo: avanzar pesa más */
+ const pesoPerder=1.25+(T.posesion?.6:0)+(1-T.directo)*.4,avance=contra?.03:T.directo*.012;
+ const salida=(j.gk||j.linea==='def')&&ax<35;
  const opts=[];
  /* 1) remate */
  if(!saque&&!j.manos){const dg=hyp(PW-ax,34-ay);if(dg<34){
@@ -322,7 +382,7 @@ P.decidir=function(j){
   let bloq=0;for(const o of this.eq[1-e]){if(o.gk)continue;const oax=this.ax(e,o.x),oay=this.ay(e,o.y);if(oax<=ax)continue;
    const tt=(oax-ax)/(PW-ax),yl=ay+(34-ay)*tt;if(MATH.abs(oay-yl)<1.2+3.66*tt)bloq++}
   xg*=MATH.pow(.8,bloq);
-  opts.push({u:xg*.95,tipo:'tiro',xg})}}
+  opts.push({u:xg*(.95+.15*T.M),tipo:'tiro',xg})}}
  /* 3) conducir */
  if(!saque&&!j.manos){
   const vel=this.energiaVmax(j);
@@ -335,7 +395,7 @@ P.decidir=function(j){
    for(const o of this.eq[1-e]){const d=hyp(o.x-px,o.y-py);if(d>12)continue;const to=.25+MATH.max(0,d-1)/this.energiaVmax(o);
     libre*=1-.5/(1+MATH.exp(-(tc-to)*3))}
    const rt=clamp((1-libre)*(1.3-a.regate/100)*(1.2-a.control/200),.02,.9);
-   const u=(1-rt)*V(pax,pay)*(1+(a.regate-60)*.002)*.98-rt*vOpp;
+   const u=(1-rt)*V(pax,pay)*(1+(a.regate-60)*.002)*.98-rt*vOpp*pesoPerder+avance*MATH.max(0,dxA)/5*(1-rt);
    opts.push({u,tipo:'conducir',dx:this.dir(e)*MATH.cos(an),dy:this.dir(e)*MATH.sin(an),vel:vel*(pr.dmin<2?.5:pr.dmin<3.5?.65:.82)})
   }
  }
@@ -362,15 +422,24 @@ P.decidir=function(j){
    if(alto&&saque!=='lateral'&&saque!=='corner'&&rRaso<.35&&d0<32)continue;
    if(!alto&&saque==='lateral')continue;
    const vz=alto?1:0,vh=alto?clamp(d0/1.9,7,18):this.velPaseRaso(d0),vavg=alto?vh:vh*.85,tEst=d0/vavg;
-   let tx=clamp(q.x+q.vx*tEst*.7,2,PW-2),ty=clamp(q.y+q.vy*tEst*.7,2.5,PH-2.5);
+   const ad=q.corrida&&q.corrida.hasta>this.t?1:.7;let tx=clamp(q.x+q.vx*tEst*ad,2,PW-2),ty=clamp(q.y+q.vy*tEst*ad,2.5,PH-2.5);
    const tax=this.ax(e,tx),tay=this.ay(e,ty);
    if(V(tax,tay)*(alto?.8:1)<cota-.01)continue;            // poda: ni sin riesgo superaría lo mejor
    const r=this.riesgoPase(j,tx,ty,vavg,alto,q),pq=this.presion(e,tx,ty);if(!alto)rRaso=r;
    const mx=this.ax(e,(j.x+tx)/2),my=this.ay(e,(j.y+ty)/2);
    const habil=alto?(a.paseLargo+(tax>PW-AREA_X?a.centros:a.paseLargo))/2:(d0<25?a.paseCorto:a.paseLargo);
-   const fallo=clamp(.02+(100-habil)*.0025+(alto?.12:0)+d0*.0015,0,.6);
+   const fallo=clamp(.01+(100-habil)*.0012+(alto?.14:0)+d0*.001,0,.6);
    const exito=(1-r)*(1-fallo);
-   let u=exito*V(tax,tay)*(1-.25*pq.p)*(alto?.8:1)-(1-exito)*V(PW-mx,PH-my);
+   let u=exito*V(tax,tay)*(1-.25*pq.p)*(alto?.72:1)-(1-exito)*V(PW-mx,PH-my)*pesoPerder;
+   const prog=tax-ax;
+   u+=avance*MATH.max(0,prog)/20*exito;
+   if(T.posesion&&d0<22&&!alto)u+=.008*exito;                                       // posesión: pase corto seguro
+   if(salida){if(pr.dmin>6&&T.directo<.6){if(!alto&&d0<30)u+=.006*exito;else if(alto)u-=.012}  // salida desde el fondo
+    else if(alto&&prog>15)u+=.014*(.5+T.directo)}                                   // presionado o directo: pelotazo
+   if(alto&&prog>20)u+=T.directo*.012;
+   if(MATH.abs(ty-j.y)>28&&pr.p>.4&&pq.p<.3)u+=.006*(1+T.W*.5)*exito;                       // cambio de frente
+   if(q.pared&&q.pared.hasta>this.t&&j.recibioDe===q)u+=.012*exito;                // pared: devolverla al que picó
+   if(q.corrida&&q.corrida.hasta>this.t)u+=.006*exito;                             // pase al que pica al espacio
    opts.push({u,tipo:'pase',q,tx,ty,alto,vh,vz,d:d0,r});if(u>cota)cota=u
   }
  }
@@ -389,7 +458,7 @@ P.actuar=function(j){
  if(!op){ // nada razonable: pelotazo hacia adelante
   const d=this.dir(e);op={tipo:'pase',q:null,tx:clamp(j.x+d*35,1,PW-1),ty:clamp(j.y+(R()-.5)*20,1,PH-1),alto:true,vh:20,d:35}}
  j.saque=null;
- const reac=clamp(MATH.round(3-(j.a.reacciones-50)/30),1,4);
+ const Q=this.tac[e].Q,reac=clamp(MATH.round(3-(j.a.reacciones-50)/30-Q),1,5);
  if(op.tipo==='conducir'){j.accion={tipo:'conducir',dx:op.dx,dy:op.dy,vel:op.vel};const pr=this.presion(e,j.x,j.y);j.prox=this.t+reac+(pr.dmin>5?3:pr.dmin>3?1:0);return}
  if(op.tipo==='gambeta'){
   this.st.gambetas[e]++;j.s.gambetas++;const D=op.D,ok=R()<op.ps;
@@ -417,6 +486,12 @@ P.pasar=function(j,op){
  B.x=j.x+MATH.cos(an)*.4;B.y=j.y+MATH.sin(an)*.4;
  j.cdToque=4;j.accion=null;j.manos=false;
  this.st.pases[e]++;j.s.pases++;if(op.alto)this.st.pasesAltos[e]++;
+ const prog=this.ax(e,op.tx)-this.ax(e,j.x);
+ if(op.alto&&d>30&&prog>15)this.st.pelotazos[e]++;
+ if(MATH.abs(op.ty-j.y)>30&&MATH.abs(op.ty-j.y)>MATH.abs(prog))this.st.cambiosFrente[e]++;
+ /* pared: después de un pase corto, el que pasó pica al espacio para recibirla de vuelta */
+ if(op.q&&!op.alto&&d<18&&prog>-3&&pr.dmin<5&&!j.gk&&this.R()<.5){const g=this.dir(e);
+  j.pared={x:clamp(j.x+g*10,1,PW-1),y:clamp(j.y+(op.ty-j.y)*.3,2,PH-2),hasta:this.t+25,t0:this.t}}
  if(op.q){op.q.recibir={x:op.tx,y:op.ty,hasta:this.t+40}}
  this.ev('pase',e,j,{receptor:op.q?op.q.nombre:null,rid:op.q?op.q.id:null,alto:!!op.alto,dist:+d.toFixed(1)});
 };
@@ -451,70 +526,31 @@ P.entradas=function(){
   if(o.gk&&!this.enArea(o))continue;
   if(o.cdEntrada>0||o.superado>0)continue;
   const d=hyp(o.x-c.x,o.y-c.y);if(d>1.4)continue;
-  if(R()>(d<1?.32:.15))continue;
+  if(R()>(d<1?.16:.07))continue;
   o.cdEntrada=8;
   const g=this.dir(c.eq),frente=(o.x-c.x)*g>0;
   const p=clamp(.36+(o.a.entradas-(c.a.regate+c.a.equilibrio)/2)*.008+(c.conPelota<4?.08:0)+(frente?.1:0)-(c.accion&&c.accion.tipo==='gambeta'?.1:0),.08,.85);
   if(R()<p){this.st.quites[o.eq]++;o.s.quites++;this.ev('quite',o.eq,o,{a:c.nombre});
    if(R()<.6)this.tomar(o,o.gk);else{B.dueno=null;this.desviar(o,3,7,0,.5);o.cdToque=2;c.cdToque=6}
    c.cdEntrada=10;return}
-  o.cdEntrada=o.gk?6:10;return;
+  o.cdEntrada=o.gk?6:14;return;
  }
 };
 
-/* ---------- movimiento sin pelota ---------- */
+/* ---------- movimiento sin pelota: forma de equipo, roles, presión y transiciones ---------- */
+/* equipo con la pelota (o que la jugó último con un pase); -1 si nadie la controla */
+P.posEqActual=function(){const B=this.B;if(B.dueno)return B.dueno.eq;if(this.estado==='parado'&&this.rean)return this.rean.e;
+ if(B.tipo==='pase'&&B.desde)return B.desde.eq;return -1};
+/* los dos rivales más retrasados (los centrales que tiene que fijar el 9), en coordenadas de e */
+P.centralesRivales=function(e){let a=null,b=null,xa=1e9,xb=1e9;
+ for(const o of this.eq[1-e]){if(o.gk)continue;const x=this.ax(e,o.x),d=PW-x;if(d<xa){b=a;xb=xa;a=o;xa=d}else if(d<xb){b=o;xb=d}}
+ return a&&b?(this.ay(e,a.y)+this.ay(e,b.y))/2:34};
 P.objetivos=function(){
- const B=this.B,c=B.dueno,posEq=c?c.eq:(this.estado==='parado'&&this.rean?this.rean.e:(B.ultimo&&B.tipo==='pase'?B.ultimo.eq:-1));
- /* adónde va la pelota suelta (estimación medio segundo adelante) */
- const px=B.x+B.vx*.6,py=B.y+B.vy*.6;
- for(let e=0;e<2;e++){
-  const L=this.eq[e],bax=this.ax(e,B.x),bay=this.ay(e,B.y),pos=posEq===e,neutro=posEq===-1;
-  const offs=this.lineaOffside(e);
-  const shift=(bax-52.5)*.5+(pos?7:neutro?0:-5);
-  for(const j of L){
-   if(j===c)continue;
-   let ax,ay,urg=.42;
-   if(j.gk){
-    const dgo=hyp(bax,bay-34)||1,dd=clamp(dgo*.1,.8,5.5);ax=bax/dgo*dd;ay=clamp(34+(bay-34)/dgo*dd,GY0-.3,GY1+.3);
-   }else{
-    ax=j.bx+shift;ay=34+(j.by-34)*(pos?1.05:.8)+(bay-34)*(pos?.25:.4);
-    if(pos){ax=MATH.min(ax,offs-.7);if(j.pos==='DEL'&&bax>45)ax=MATH.max(ax,offs-1.5)}
-    if(!pos&&!neutro&&j.pos==='DEF')ax=MATH.min(ax,MATH.max(bax-3,12));
-    ax=clamp(ax,4,PW-2);ay=clamp(ay,1.5,PH-1.5);
-   }
-   j.tx=this.wx(e,ax);j.ty=this.wy(e,ay);
-   const dd=hyp(j.tx-j.x,j.ty-j.y);j.urg=dd>10?.7:urg;
-  }
-  if(this.estado!=='juego')continue;
-  /* presión: el más cercano al que tiene la pelota va encima, el segundo cubre */
-  if(c&&c.eq!==e){
-   const o=L.filter(j=>!j.gk).map(j=>[hyp(j.x-c.x,j.y-c.y)/this.energiaVmax(j),j]).sort((a,b)=>a[0]-b[0]||a[1].id-b[1].id);
-   const g=this.dir(e);   // hacia dónde ataca e; su arco está del otro lado
-   if(o[0]){const j=o[0][1];j.tx=c.x-g*.7;j.ty=c.y;j.urg=1}
-   if(o[1]){const j=o[1][1];j.tx=c.x-g*4;j.ty=c.y+(34-c.y)*.15;j.urg=.9}
-   /* cerca del área, un tercero cierra el camino al arco */
-   let p3=null;
-   if(this.ax(c.eq,c.x)>68&&o[2]){p3=o[2][1];const gx=g>0?0:PW,dx=gx-c.x,dy=34-c.y,d=hyp(dx,dy)||1;p3.tx=c.x+dx/d*2.5;p3.ty=c.y+dy/d*2.5;p3.urg=.95}
-   this.marcar(e,c,o[0]&&o[0][1],o[1]&&o[1][1],p3);
-   /* el arquero achica si el rival entra al área de frente */
-   const gk=L[0],cax=this.ax(c.eq,c.x),cay=this.ay(c.eq,c.y),dg=hyp(PW-cax,34-cay);
-   if(dg<14&&cay>AREA_Y0+4&&cay<AREA_Y1-4){const gx=g>0?0:PW,dx=c.x-gx,dy=c.y-34,d=hyp(dx,dy)||1,k=MATH.max(1,d-2.2);gk.tx=gx+dx/d*k;gk.ty=34+dy/d*k;gk.urg=1}
-  }
-  if(!c){
-   /* pelota suelta: el más cercano de cada equipo va a buscarla; el destinatario del pase, al punto */
-   let best=null,bt=1e9;
-   for(const j of L){if(j.gk&&!(this.enArea(j)&&hyp(j.x-B.x,j.y-B.y)<12))continue;const t=hyp(j.x-px,j.y-py)/this.energiaVmax(j);if(t<bt){bt=t;best=j}}
-   const dest=B.tipo==='pase'&&B.destino&&B.destino.eq===e?B.destino:null;
-   if(dest&&dest.recibir&&dest.recibir.hasta>this.t){
-    /* llegar a la línea de la pelota */
-    const sp=hyp(B.vx,B.vy);if(sp>1){const ux=B.vx/sp,uy=B.vy/sp,s=MATH.max(0,(dest.x-B.x)*ux+(dest.y-B.y)*uy);dest.tx=B.x+ux*s;dest.ty=B.y+uy*s;
-     if(B.z>1.2){dest.tx=dest.recibir.x;dest.ty=dest.recibir.y}}
-    else{dest.tx=B.x;dest.ty=B.y}
-    dest.urg=1;
-    if(best&&best!==dest&&bt>.6){/* el compañero no persigue si el destinatario llega */}
-    else if(best&&best!==dest){best.tx=px;best.ty=py;best.urg=1}
-   }else if(best){best.tx=px;best.ty=py;best.urg=1}
-  }
+ const B=this.B,c=B.dueno,pe=this.posEqActual();
+ for(let e=0;e<2;e++)this.forma(e,pe);
+ if(this.estado==='juego'){
+  for(let e=0;e<2;e++){if(c&&c.eq!==e)this.defensa(e,c);else if(c&&c.eq===e)this.ataque(e,c)}
+  if(!c)this.pelotaSuelta();
  }
  /* arquero ante un remate: se tira hacia la trayectoria */
  if(B.tiro){const e=1-B.tiro.j.eq,gk=this.eq[e][0],sp=hyp(B.vx,B.vy);
@@ -525,17 +561,166 @@ P.objetivos=function(){
   else if(r.tipo==='corner'){for(const j of this.eq[1-r.e])if(hyp(j.tx-r.x,j.ty-r.y)<9.15){const a=MATH.atan2(j.ty-r.y,j.tx-r.x);j.tx=r.x+MATH.cos(a)*9.2;j.ty=r.y+MATH.sin(a)*9.2}}
   r.ej.tx=r.x-this.dir(r.e)*.5;r.ej.ty=r.y;r.ej.urg=1}
 };
-/* marca: los defensores y volantes toman al rival que entra en su zona, del lado de su arco */
-P.marcar=function(e,c,p1,p2,p3){
- const libres=this.eq[e].filter(j=>!j.gk&&j!==p1&&j!==p2&&j!==p3&&j.pos!=='DEL');
- const atac=this.eq[1-e].filter(o=>!o.gk&&o!==c).map(o=>[this.ax(e,o.x),o]).filter(x=>x[0]<62).sort((a,b)=>a[0]-b[0]||a[1].id-b[1].id);
- const gx=this.dir(e)>0?0:PW;
- for(const [,o] of atac){
-  let best=null,bd=12;
-  for(const j of libres){if(j._marca===this.t)continue;const d=hyp(j.tx-o.x,j.ty-o.y);if(d<bd){bd=d;best=j}}
-  if(!best)continue;
-  best._marca=this.t;const dx=gx-o.x,dy=34-o.y,d=hyp(dx,dy)||1;
-  best.tx=o.x+dx/d*1.6;best.ty=o.y+dy/d*1.6;best.urg=.8;
+/* forma del equipo: tres líneas a distancia real, corta y angosta sin pelota, larga y ancha con pelota,
+   corrida hacia el lado de la pelota sin abandonar el otro */
+P.forma=function(e,pe){
+ const B=this.B,T=this.tac[e],L=this.eq[e],c=B.dueno,con=pe===e,sin=pe===1-e;
+ let bax=this.ax(e,B.x),bay=this.ay(e,B.y);
+ /* pelota en una esquina o contra la raya (córner, lateral): la forma toma un punto más adentro (las pelotas paradas son de la etapa 3) */
+ if(this.estado==='parado'&&this.rean&&this.rean.tipo!=='saque_centro'){bax=clamp(bax,12,88);bay=34+(bay-34)*.45}
+ const tr=this.trans[e],enTrans=tr&&tr.hasta>this.t?tr.tipo:null,offs=this.lineaOffside(e);
+ let linea,largo,ancho,s;
+ if(con){linea=clamp(bax-30+T.M*4,17+T.D*3,50+T.M*8);largo=42+T.M*5;ancho=52+T.W*8;s=.2}
+ else{
+  linea=clamp(bax-(24-T.D*4),16+T.D*6,42+T.D*12);largo=27+T.D*3;ancho=38+T.W*3;s=.38;
+  /* si el rival tiene la pelota libre y de frente, la línea retrocede unos metros */
+  if(sin&&c){const pr=this.presion(c.eq,c.x,c.y);if(pr.dmin>4&&this.ax(c.eq,c.x)>35)linea-=4}
+  linea=MATH.max(3,MATH.min(linea,bax-1.5));                 // nunca delante de la pelota
+ }
+ this.lin[e]=linea;
+ /* laterales que pasan al ataque: el del lado de la pelota (los dos si la mentalidad es alta) */
+ const lado=bay>34?1:-1,sube={'-1':false,'1':false};
+ if(con&&T.M>-.4&&T.style!=='Defensivo'&&bax>30)for(const j of L)if(j.rol==='LI'||j.rol==='LD'){const sd=j.uy<0?-1:1;if(sd===lado||T.M>.4)sube[sd]=true}
+ const subio=sube['-1']?-1:sube['1']?1:0,ambos=sube['-1']&&sube['1'];
+ const yc=con?this.centralesRivales(e):34;
+ for(const j of L){
+  if(j===c)continue;
+  let ax,ay,urg=.42;
+  if(j.gk){
+   if(con&&bax<45){ax=clamp(bax*.22,4,11);ay=34+(bay-34)*.15}                       // arquero que juega con los pies: se ofrece atrás
+   else if(con){ax=clamp(linea*.4,5,20);ay=34+(bay-34)*.1}                            // arquero adelantado, detrás de su línea
+   else{const dgo=hyp(bax,bay-34)||1,dd=clamp(dgo*.1,.8,5.5);ax=bax/dgo*dd;ay=clamp(34+(bay-34)/dgo*dd,GY0-.3,GY1+.3)}
+  }else{
+   const sd=j.uy<0?-1:1;
+   ax=linea+(con&&j.rel<.5?j.rel*(j.rol==='MCD'?1.15:1.4):j.rel)*largo;ay=34+j.uy*(ancho/2)+(bay-34)*s;   // con pelota los volantes se adelantan
+   if(con){
+    switch(j.rol){
+     case 'LI':case 'LD':
+      if(sube[sd]){ax=linea+largo*(.55+.15*T.M);ay=34+sd*(ancho/2+2)}
+      else if(subio){ay=34+j.uy*(ancho/2)*.55+(bay-34)*s;ax=linea}                   // el otro lateral se cierra
+      break;
+     case 'MCD':
+      if(subio&&!ambos){ax=linea+3;ay=34+subio*9}                                     // cubre la espalda del lateral
+      else if(ambos){ax=linea+1;ay=34}                                                // baja entre los centrales
+      else{ax=MATH.min(linea+largo*.22,bax-5);ay=34+(bay-34)*.25}
+      break;
+     case 'EI':case 'ED':
+      if(T.W>=-.2&&!sube[sd])ay=34+sd*(ancho/2);else ay=34+sd*ancho*.26;            // abierto o por dentro
+      if(bax>40)ax=offs-2;
+      break;
+     case 'DC':ax=offs-.8;ay=yc+(bay-34)*.1;break;                                   // el 9 fija a los centrales
+     case 'MCO':{ax=offs-9;let mejor=34,md=-1;                                       // enganche entre líneas, donde hay espacio
+      for(const dy of [-9,0,9]){const y=34+dy+(bay-34)*.3,wx=this.wx(e,ax),wy=this.wy(e,y);const d=this.presion(e,wx,wy).dmin;if(d>md){md=d;mejor=y}}
+      ay=mejor;break}
+    }
+    ax=MATH.min(ax,offs-.7);
+    if(enTrans==='contra'&&j.linea==='atq'){ax=offs-.7;urg=.95}
+   }else if(sin){
+    if(j.rol==='MCD'){ax=linea+7;ay=34+(bay-34)*.5}                                   // el volante central protege a la defensa
+    if(enTrans==='repliegue')urg=.9;
+   }
+   ax=clamp(ax,3,PW-2);ay=clamp(ay,2,PH-2);
+  }
+  if(j.corrida&&j.corrida.hasta>this.t&&con){j.tx=j.corrida.x;j.ty=j.corrida.y;j.urg=.95;continue}
+  if(j.pared&&j.pared.hasta>this.t&&con){j.tx=j.pared.x;j.ty=j.pared.y;j.urg=.9;continue}
+  j.tx=this.wx(e,ax);j.ty=this.wy(e,ay);
+  const dd=hyp(j.tx-j.x,j.ty-j.y);j.urg=MATH.max(urg,dd>10?.7:urg);
+ }
+};
+/* con la pelota: apoyos cerca del que la tiene y desmarques al espacio */
+P.ataque=function(e,c){
+ const T=this.tac[e],L=this.eq[e],offs=this.lineaOffside(e),cax=this.ax(e,c.x),pr=this.presion(e,c.x,c.y),tr=this.trans[e];
+ const contra=tr&&tr.tipo==='contra'&&tr.hasta>this.t;
+ /* apoyos: los dos compañeros más cercanos se ofrecen en un ángulo libre a 9-13 m */
+ const cerca=L.filter(j=>!j.gk&&j!==c&&!(j.corrida&&j.corrida.hasta>this.t)&&j.rol!=='DC').map(j=>[hyp(j.x-c.x,j.y-c.y),j]).sort((a,b)=>a[0]-b[0]||a[1].id-b[1].id);
+ for(let k=0;k<2&&k<cerca.length;k++){
+  const j=cerca[k][1];
+  if(!j.apoyo||j.apoyo.c!==c||this.t-j.apoyo.t>=5){
+   let best=null,bv=-1e9;
+   for(const an of [0,.7,-.7,1.4,-1.4,2.3,-2.3]){
+    const r=k===0?9:13,pax=cax+MATH.cos(an)*r,pay=this.ay(e,c.y)+MATH.sin(an)*r;
+    if(pax<3||pax>MATH.min(PW-3,offs-.5)||pay<2||pay>PH-2)continue;
+    const wx=this.wx(e,pax),wy=this.wy(e,pay);let dmin=99,lin=99;
+    for(const o of this.eq[1-e]){const d=hyp(o.x-wx,o.y-wy);if(d<dmin)dmin=d;
+     const dx=wx-c.x,dy=wy-c.y,L2=dx*dx+dy*dy,s=clamp(((o.x-c.x)*dx+(o.y-c.y)*dy)/L2,0,1),l=hyp(o.x-(c.x+s*dx),o.y-(c.y+s*dy));if(l<lin)lin=l}
+    const v=MATH.min(dmin,8)+MATH.min(lin,4)*1.5+MATH.cos(an)*1.2-hyp(wx-j.x,wy-j.y)*.08;
+    if(v>bv){bv=v;best=[wx,wy]}
+   }
+   j.apoyo=best?{c,t:this.t,x:best[0],y:best[1]}:null;
+  }
+  if(j.apoyo){j.tx=j.apoyo.x;j.ty=j.apoyo.y;j.urg=.7}
+ }
+ /* desmarque al espacio: si el que la tiene está libre, un atacante pica a la espalda de la defensa */
+ if(pr.dmin>3&&cax>28&&!c.manos){
+  let activo=false;for(const j of L)if(j.corrida&&j.corrida.hasta>this.t)activo=true;
+  if(!activo){
+   const pp=.012*(1+T.M*.5)*(contra?2.5:1)*(1+T.directo*.5);
+   for(const j of L){
+    if(j.gk||j===c||!(j.linea==='atq'||j.rol==='MCO'||j.rol==='MC'))continue;
+    const jax=this.ax(e,j.x);if(jax<cax||offs-jax>5||offs>PW-8)continue;
+    if(this.R()<pp){const tax=MATH.min(PW-6,offs+10+this.R()*6),tay=34+(this.ay(e,j.y)-34)*.6;
+     j.corrida={x:this.wx(e,tax),y:this.wy(e,tay),hasta:this.t+30};this.st.desmarques[e]++;break}
+   }
+  }
+ }
+};
+/* sin la pelota: uno presiona, otro cubre, el resto cierra líneas de pase; la línea queda alineada */
+P.defensa=function(e,c){
+ const T=this.tac[e],L=this.eq[e],g=this.dir(e),gx=g>0?0:PW,cax=this.ax(e,c.x),tr=this.trans[e];
+ const contrap=tr&&tr.tipo==='presion'&&tr.hasta>this.t,repl=tr&&tr.tipo==='repliegue'&&tr.hasta>this.t;
+ const presiona=contrap||cax>T.umbralPresion||cax<33;
+ const o=L.filter(j=>!j.gk).map(j=>[hyp(j.x-c.x,j.y-c.y)/this.energiaVmax(j),j]).sort((a,b)=>a[0]-b[0]||a[1].id-b[1].id);
+ const usados=new Set();
+ const p1=o[0]&&o[0][1],p2=o[1]&&o[1][1];
+ const hacia=(j,k,d)=>{const dx=gx-c.x,dy=34-c.y,n=hyp(dx,dy)||1;j.tx=c.x+dx/n*d;j.ty=c.y+dy/n*d+(34-c.y)*k};
+ if(p1){usados.add(p1);if(presiona){hacia(p1,0,.7);p1.urg=.9+.1*MATH.max(0,T.Pz)}else{hacia(p1,0,4);p1.urg=.75}}
+ if(p2){usados.add(p2);if(contrap){p2.tx=c.x+(c.y<34?1:-1)*.0;p2.ty=c.y+(c.y<34?1.5:-1.5);p2.urg=1}else{hacia(p2,.15,5);p2.urg=.85}}
+ if(contrap&&o[2]){const j=o[2][1];usados.add(j);hacia(j,.1,5);j.urg=.95}
+ /* cerca del área, un tercero cierra el camino al arco */
+ if(this.ax(c.eq,c.x)>68){const j=o.find(x=>!usados.has(x[1]));if(j){usados.add(j[1]);hacia(j[1],0,2.5);j[1].urg=.95}}
+ /* cerrar líneas de pase hacia los receptores más cercanos */
+ if(presiona){
+  const recep=this.eq[1-e].filter(r=>!r.gk&&r!==c).map(r=>[hyp(r.x-c.x,r.y-c.y),r]).filter(x=>x[0]<28).sort((a,b)=>a[0]-b[0]||a[1].id-b[1].id).slice(0,3);
+  for(const [,r] of recep){
+   const lx=r.x+(c.x-r.x)*.3,ly=r.y+(c.y-r.y)*.3;let best=null,bd=14;
+   for(const j of L){if(j.gk||usados.has(j)||j.linea==='def')continue;const d=hyp(j.tx-lx,j.ty-ly);if(d<bd){bd=d;best=j}}
+   if(best){usados.add(best);best.tx=lx;best.ty=ly;best.urg=.8}
+  }
+ }
+ /* defensores: línea alineada (trampa de offside), corridos hacia el rival de su zona */
+ const lin=this.lin[e];
+ for(const j of L){
+  if(j.gk||usados.has(j)||j.linea!=='def')continue;
+  let ax=lin-(j.rol==='DFC'?0:.5),ay=this.ay(e,j.ty);
+  let near=null,nd=11;for(const r of this.eq[1-e]){if(r.gk)continue;const ry=this.ay(e,r.y),rx=this.ax(e,r.x);const d=MATH.abs(ry-ay);if(d<nd&&rx<lin+18){nd=d;near=r}}
+  if(near){const rx=this.ax(e,near.x),ry=this.ay(e,near.y);ay=ay+(ry-ay)*.5;
+   if(rx<lin-1&&rx<AREA_X+8){ax=rx-1.5;ay=ry+(34-ry)*.15}}                                          // ya entró al área: lo toma
+  j.tx=this.wx(e,clamp(ax,2,PW-2));j.ty=this.wy(e,clamp(ay,2,PH-2));if(repl)j.urg=.9;
+ }
+ /* volantes libres: marcan al rival que entra en su zona */
+ for(const r of this.eq[1-e]){
+  if(r.gk||r===c)continue;const rax=this.ax(e,r.x);if(rax>lin+22||rax<lin)continue;
+  let best=null,bd=10;for(const j of L){if(j.gk||usados.has(j)||j.linea==='def'||j._marca===this.t)continue;const d=hyp(j.tx-r.x,j.ty-r.y);if(d<bd){bd=d;best=j}}
+  if(!best)continue;best._marca=this.t;const dx=gx-r.x,dy=34-r.y,d=hyp(dx,dy)||1;best.tx=r.x+dx/d*1.8;best.ty=r.y+dy/d*1.8;best.urg=MATH.max(best.urg,.75);
+ }
+ /* el arquero achica si el rival entra al área de frente */
+ const gk=L[0],cax2=this.ax(c.eq,c.x),cay=this.ay(c.eq,c.y),dg=hyp(PW-cax2,34-cay);
+ if(dg<14&&cay>AREA_Y0+4&&cay<AREA_Y1-4){const dx=c.x-gx,dy=c.y-34,d=hyp(dx,dy)||1,k=MATH.max(1,d-2.2);gk.tx=gx+dx/d*k;gk.ty=34+dy/d*k;gk.urg=1}
+};
+/* pelota suelta: el más cercano de cada equipo va a buscarla; el destinatario del pase, al punto */
+P.pelotaSuelta=function(){
+ const B=this.B,px=B.x+B.vx*.6,py=B.y+B.vy*.6;
+ for(let e=0;e<2;e++){
+  const L=this.eq[e];let best=null,bt=1e9;
+  for(const j of L){if(j.gk&&!(this.enArea(j)&&hyp(j.x-B.x,j.y-B.y)<12))continue;const t=hyp(j.x-px,j.y-py)/this.energiaVmax(j);if(t<bt){bt=t;best=j}}
+  const dest=B.tipo==='pase'&&B.destino&&B.destino.eq===e?B.destino:null;
+  if(dest&&dest.recibir&&dest.recibir.hasta>this.t){
+   const sp=hyp(B.vx,B.vy);if(sp>1){const ux=B.vx/sp,uy=B.vy/sp,s=MATH.max(0,(dest.x-B.x)*ux+(dest.y-B.y)*uy);dest.tx=B.x+ux*s;dest.ty=B.y+uy*s;
+    if(B.z>1.2){dest.tx=dest.recibir.x;dest.ty=dest.recibir.y}}
+   else{dest.tx=B.x;dest.ty=B.y}
+   dest.urg=1;
+   if(best&&best!==dest&&bt<=.6){best.tx=px;best.ty=py;best.urg=1}
+  }else if(best){best.tx=px;best.ty=py;best.urg=1}
  }
 };
 P.mover=function(){
@@ -600,8 +785,22 @@ P.tick=function(){
    const pe=B.dueno?B.dueno.eq:(B.ultimo?B.ultimo.eq:-1);if(pe>=0)this.st.posTicks[pe]++;
   }
  }
+ if(this.estado==='juego'&&this.t%5===0)this.medir();
  if(this.cinta&&this.t%this.cada===0)this.muestrear();
  this.t++;this.tParte++;
+};
+/* forma de cada equipo con y sin pelota (largo, ancho, distancia entre líneas, altura y alineación de la línea) */
+P.medir=function(){
+ const pe=this.posEqActual();if(pe<0)return;
+ for(let e=0;e<2;e++){
+  const A=this.md[e][pe===e?0:1];let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;const sum={def:0,med:0,atq:0},n={def:0,med:0,atq:0},xd=[];
+  for(const j of this.eq[e]){if(j.gk)continue;const x=this.ax(e,j.x),y=this.ay(e,j.y);
+   if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;sum[j.linea]+=x;n[j.linea]++;if(j.linea==='def')xd.push(x)}
+  if(!n.def||!n.med||!n.atq)continue;
+  const md=sum.def/n.def,mm=sum.med/n.med,ma=sum.atq/n.atq;
+  let v=0;for(const x of xd)v+=(x-md)*(x-md);
+  A.n++;A.largo+=x1-x0;A.ancho+=y1-y0;A.dDM+=mm-md;A.dMA+=ma-mm;A.linea+=md;A.bloque+=(sum.def+sum.med+sum.atq)/(n.def+n.med+n.atq);A.alin+=sqrt(v/xd.length);
+ }
 };
 P.muestrear=function(){
  const B=this.B,f=[MATH.round(B.x*10),MATH.round(B.y*10),MATH.round(B.z*10),B.dueno?B.dueno.id:-1,this.estado==='juego'?1:0];
@@ -633,8 +832,13 @@ P.resultado=function(){
   stats:{posesion:[MATH.round(100*st.posTicks[0]/tp),100-MATH.round(100*st.posTicks[0]/tp)],pases:st.pases,pasesOk:st.pasesOk,pasesAltos:st.pasesAltos,
    remates:st.remates,alArco:st.alArco,atajadas:st.atajadas,bloqueos:st.bloqueos,palos:st.palos,corners:st.corners,laterales:st.laterales,saquesArco:st.saquesArco,
    quites:st.quites,intercepciones:st.intercepciones,gambetas:st.gambetas,gambetasOk:st.gambetasOk,cabezazos:st.cabezazos,xg:st.xg.map(r2),
-   minutosEnJuego:+(st.ticksJuego/TPS/60).toFixed(1)},
-  jugadores:this.J.map(j=>({id:j.id,equipo:j.eq,nombre:j.nombre,pos:j.pos,rol:j.rol,grl:j.grl,origenAtributos:j.origenAtributos,
+   minutosEnJuego:+(st.ticksJuego/TPS/60).toFixed(1),
+   posesiones:st.posesiones,pasesPorPosesion:st.pases.map((p,e)=>r2(p/(st.posesiones[e]||1))),recuperaciones:st.recuperaciones,recupCampoRival:st.recupCampoRival,
+   alturaRecuperacion:st.alturaRecup.map((h,e)=>r2(h/(st.recuperaciones[e]||1))),pelotazos:st.pelotazos,desmarques:st.desmarques,paredes:st.paredes,cambiosFrente:st.cambiosFrente,
+   contras:st.contras,contrapresiones:st.contrapresiones,repliegues:st.repliegues},
+  tactica:this.tac.map(T=>({estilo:T.style,formacion:T.formation,bloque:T.bloque,directo:r2(T.directo),contrapresion:T.contrapresion,umbralPresion:r2(T.umbralPresion)})),
+  forma:this.md.map(f=>{const o=A=>{const k=A.n||1;return{muestras:A.n,largo:r2(A.largo/k),ancho:r2(A.ancho/k),entreLineas:[r2(A.dDM/k),r2(A.dMA/k)],alturaLinea:r2(A.linea/k),alturaBloque:r2(A.bloque/k),alineacionLinea:r2(A.alin/k)}};return{con:o(f[0]),sin:o(f[1])}}),
+  jugadores:this.J.map(j=>({id:j.id,equipo:j.eq,nombre:j.nombre,pos:j.pos,rol:j.rol,linea:j.linea,grl:j.grl,origenAtributos:j.origenAtributos,
    vmax:r2(j.vmax),acc:r2(j.acc),energiaFinal:r2(j.energia),...j.s,distancia:MATH.round(j.s.distancia)})),
   eventos:this.eventos,cinta};
 };
@@ -651,5 +855,7 @@ function cuadro(cinta,k){const n=cinta.porCuadro,o=k*n,d=cinta.datos,J=[];
  for(let i=5;i<n;i+=2)J.push([d[o+i]/10,d[o+i+1]/10]);
  return{t:cinta.t[k],pelota:{x:d[o]/10,y:d[o+1]/10,z:d[o+2]/10,dueno:d[o+3],enJuego:d[o+4]===1},jugadores:J}}
 
-root.MCMotorV3={VERSION,TPS,CANCHA:{largo:PW,ancho:PH,arco:[GY0,GY1],alturaArco:GH},simular,cuadro,_xg:xgDe,_trayectoria:trayectoria,_vAire:vAire,_velPaseRaso:d=>P.velPaseRaso(d)};
+/* roles de cada puesto de una formación (el 0 es el arquero), y la línea de cada rol */
+function rolesDe(f){const pl=plantilla(f,10),nDef=pl.filter(q=>q[1]>=64).length;return['POR'].concat(pl.map(q=>rolDe(q[0],q[1],nDef)))}
+root.MCMotorV3={VERSION,TPS,TAC_BASE,FORMACIONES:Object.keys(PLANTILLAS),LINEA_ROL,rolesDe,_tactica:tactica,CANCHA:{largo:PW,ancho:PH,arco:[GY0,GY1],alturaArco:GH},simular,cuadro,_xg:xgDe,_trayectoria:trayectoria,_vAire:vAire,_velPaseRaso:d=>P.velPaseRaso(d)};
 })(typeof window!=='undefined'?window:globalThis);

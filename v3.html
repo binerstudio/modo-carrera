@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Motor v3 · prueba visual</title>
+<!-- MODO CARRERA · página de PRUEBA del motor v3 (no enlazada desde el juego).
+     Simula un partido con MCMotorV3 y lo dibuja desde arriba a partir de la cinta (cintaCada:1, 10 cuadros por segundo).
+     No guarda nada ni toca las partidas: es solo para mirar si parece un partido real. -->
+<style>
+:root{--fondo:#08111e;--panel:#111d31;--borde:#22324f;--texto:#e7edf7;--suave:#93a3bd;--oro:#e2bd70}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--texto);font:14px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:980px;margin:0 auto;padding:12px 16px 40px}
+h1{font-size:18px;margin:4px 0 2px;color:var(--oro);letter-spacing:.03em}
+.nota{color:var(--suave);font-size:12px;margin:0 0 10px}
+.cfg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.eq{background:var(--panel);border:1px solid var(--borde);border-radius:10px;padding:8px 10px}
+.eq b{display:block;margin-bottom:6px;font-size:12px;color:var(--suave);text-transform:uppercase;letter-spacing:.06em}
+label{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;margin:3px 0;color:var(--suave)}
+select,input{background:#0b1626;color:var(--texto);border:1px solid var(--borde);border-radius:6px;padding:4px 6px;font:inherit;font-size:13px;min-width:0;max-width:62%}
+.barra{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0}
+button{background:#1a2b47;color:var(--texto);border:1px solid #2d4470;border-radius:8px;padding:7px 12px;font:inherit;font-weight:600;cursor:pointer}
+button.on{background:var(--oro);color:#1a1206;border-color:var(--oro)}
+button:disabled{opacity:.5}
+#marcador{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--borde);border-radius:10px;padding:6px 12px;font-weight:700;font-size:16px}
+#marcador .reloj{color:var(--oro);font-variant-numeric:tabular-nums}
+.cancha{position:relative;margin-top:8px}
+canvas{display:block;width:100%;height:auto;border-radius:10px;background:#2f7d3a}
+#linea{width:100%;max-width:none;margin:8px 0 2px}
+#eventos{background:var(--panel);border:1px solid var(--borde);border-radius:10px;padding:6px 10px;min-height:66px;font-size:13px}
+#eventos div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#stats{display:grid;grid-template-columns:1fr auto 1fr;gap:2px 10px;margin-top:10px;font-size:13px;background:var(--panel);border:1px solid var(--borde);border-radius:10px;padding:8px 12px}
+#stats span:nth-child(3n+1){text-align:right}#stats span:nth-child(3n+2){text-align:center;color:var(--suave)}
+#estado{color:var(--suave);font-size:12px}
+@media (max-width:560px){.cfg{grid-template-columns:1fr}}
+</style></head>
+<body><main>
+<h1>Motor v3 · prueba visual</h1>
+<p class="nota">Página de prueba, no enlazada desde el juego. El partido se simula con el motor v3 (etapa 2: táctica y orden) y se dibuja desde arriba exactamente con las posiciones de la cinta (10 por segundo). Los atributos de los jugadores son estimados.</p>
+<div class="cfg">
+ <div class="eq"><b>Local</b>
+  <label>Club <select id="cL"></select></label>
+  <label>Formación <select id="fL"></select></label>
+  <label>Estilo <select id="sL"></select></label>
+  <label>Línea (profundidad) <select id="dL"></select></label>
+  <label>Presión <select id="pL"></select></label>
+  <label>Ancho <select id="wL"></select></label>
+  <label>Ritmo <select id="rL"></select></label>
+ </div>
+ <div class="eq"><b>Visitante</b>
+  <label>Club <select id="cV"></select></label>
+  <label>Formación <select id="fV"></select></label>
+  <label>Estilo <select id="sV"></select></label>
+  <label>Línea (profundidad) <select id="dV"></select></label>
+  <label>Presión <select id="pV"></select></label>
+  <label>Ancho <select id="wV"></select></label>
+  <label>Ritmo <select id="rV"></select></label>
+ </div>
+</div>
+<div class="barra">
+ <label style="margin:0">Semilla <input id="semilla" value="1" size="8" style="max-width:110px"></label>
+ <button id="simular">Simular partido</button>
+ <span id="estado"></span>
+</div>
+<div id="marcador"><span id="nL">—</span><span><span id="gol">0 - 0</span> · <span class="reloj" id="reloj">00:00</span></span><span id="nV">—</span></div>
+<div class="cancha"><canvas id="cv" width="1050" height="680"></canvas></div>
+<input type="range" id="linea" min="0" max="0" value="0">
+<div class="barra">
+ <button id="play" disabled>▶ Play</button>
+ <button class="vel on" data-v="1">x1</button><button class="vel" data-v="4">x4</button><button class="vel" data-v="16">x16</button>
+ <button id="nombres">Nombres</button>
+</div>
+<div id="eventos"></div>
+<div id="stats"></div>
+</main>
+<script src="data/jugadores.js"></script>
+<script src="js/motor/atributos.js"></script>
+<script src="js/partido2d/camisetas.js"></script>
+<script src="js/motor/motor-v3.js"></script>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id),M=window.MCMotorV3,P=window.MC_PLAYERS;
+const PW=105,PH=68,cv=$('cv'),cx=cv.getContext('2d');
+/* clubes con plantel completo */
+const porClub=new Map();for(const r of P.rows){const k=P.clubs[r[6]];if(!porClub.has(k))porClub.set(k,[]);porClub.get(k).push(r)}
+const clubs=[...porClub.keys()].filter(k=>porClub.get(k).length>=11).sort((a,b)=>a.localeCompare(b,'es'));
+const LIN={arq:'POR',def:'DEF',med:'MED',atq:'DEL'};
+function equipo(name,tac){
+ const rows=porClub.get(name).slice().sort((a,b)=>b[2]-a[2]),used=new Set(),roles=M.rolesDe(tac.formation);
+ return{name,tac,players:roles.map(rol=>{const g=rol==='POR'?'POR':LIN[M.LINEA_ROL[rol]];
+  const r=rows.find(x=>!used.has(x)&&x[1]===g)||rows.find(x=>!used.has(x)&&x[1]!=='POR')||rows.find(x=>!used.has(x));used.add(r);
+  return{name:r[0],pos:r[1],grl:r[2],age:r[3],role:rol}})};
+}
+const op=(sel,arr,val)=>{sel.innerHTML=arr.map(([v,t])=>`<option value="${v}">${t}</option>`).join('');sel.value=val};
+const ESTILOS=['Equilibrado','Ofensivo','Defensivo','Posesión','Contraataque','Presión alta'].map(x=>[x,x]);
+const NIV=[['20','Baja'],['50','Media'],['80','Alta']],ANCHO=[['20','Cerrado'],['50','Normal'],['80','Abierto']],RITMO=[['20','Bajo'],['50','Normal'],['80','Alto']];
+for(const s of ['L','V']){
+ op($('c'+s),clubs.map(c=>[c,c]),s==='L'?(clubs.includes('River Plate')?'River Plate':clubs[0]):(clubs.includes('Boca Juniors')?'Boca Juniors':clubs[1]));
+ op($('f'+s),M.FORMACIONES.map(f=>[f,f]),'4-3-3');op($('s'+s),ESTILOS,'Equilibrado');
+ op($('d'+s),NIV,'50');op($('p'+s),NIV,'50');op($('w'+s),ANCHO,'50');op($('r'+s),RITMO,'50');
+}
+const tacDe=s=>({formation:$('f'+s).value,style:$('s'+s).value,depth:+$('d'+s).value,pressing:+$('p'+s).value,width:+$('w'+s).value,rhythm:+$('r'+s).value,mentality:50});
+
+/* ---------- estado de la reproducción ---------- */
+const S={r:null,k:0,frac:0,play:false,vel:1,last:0,kits:null,t2:0,nombres:false};
+function simular(){
+ $('estado').textContent='Simulando…';$('simular').disabled=true;
+ setTimeout(()=>{
+  const t0=performance.now();
+  const cL=$('cL').value,cV=$('cV').value,sem=$('semilla').value.trim();
+  const r=M.simular(equipo(cL,tacDe('L')),equipo(cV,tacDe('V')),{semilla:/^\d+$/.test(sem)?+sem:sem||1,cintaCada:1});
+  S.r=r;S.k=0;S.frac=0;S.play=false;
+  try{S.kits=window.MCCamisetas?MCCamisetas.partido(cL,cV):null}catch(e){S.kits=null}
+  const e2=r.eventos.find(e=>e.tipo==='segundo_tiempo');S.t2=e2?e2.t:Infinity;
+  $('linea').max=r.cinta.frames-1;$('linea').value=0;$('play').disabled=false;$('play').textContent='▶ Play';
+  $('nL').textContent=cL;$('nV').textContent=cV;
+  $('estado').textContent=`Listo en ${Math.round(performance.now()-t0)} ms · ${r.h}-${r.a} · ${r.cinta.frames} cuadros`;
+  $('simular').disabled=false;stats();dibujar();
+ },30);
+}
+function stats(){
+ const s=S.r.stats,f=S.r.forma,row=(n,a,b)=>`<span>${a}</span><span>${n}</span><span>${b}</span>`;
+ $('stats').innerHTML=row('Posesión',s.posesion[0]+'%',s.posesion[1]+'%')+row('Remates (al arco)',`${s.remates[0]} (${s.alArco[0]})`,`${s.remates[1]} (${s.alArco[1]})`)+
+  row('Pases (completos)',`${s.pases[0]} (${s.pasesOk[0]})`,`${s.pases[1]} (${s.pasesOk[1]})`)+row('Pases por posesión',s.pasesPorPosesion[0],s.pasesPorPosesion[1])+
+  row('Pelotazos',s.pelotazos[0],s.pelotazos[1])+row('Recuperaciones en campo rival',s.recupCampoRival[0],s.recupCampoRival[1])+
+  row('Contraataques',s.contras[0],s.contras[1])+row('Desmarques · paredes',`${s.desmarques[0]} · ${s.paredes[0]}`,`${s.desmarques[1]} · ${s.paredes[1]}`)+
+  row('Largo × ancho con pelota (m)',`${f[0].con.largo} × ${f[0].con.ancho}`,`${f[1].con.largo} × ${f[1].con.ancho}`)+
+  row('Largo × ancho sin pelota (m)',`${f[0].sin.largo} × ${f[0].sin.ancho}`,`${f[1].sin.largo} × ${f[1].sin.ancho}`)+
+  row('Altura de la línea sin pelota (m)',f[0].sin.alturaLinea,f[1].sin.alturaLinea)+row('xG',s.xg[0],s.xg[1]);
+}
+/* ---------- dibujo ---------- */
+const E=10; // píxeles por metro
+function cancha(){
+ cx.fillStyle='#2f7d3a';cx.fillRect(0,0,cv.width,cv.height);
+ for(let i=0;i<14;i++){if(i%2){cx.fillStyle='#33863f';cx.fillRect(i*75,0,75,cv.height)}}
+ cx.strokeStyle='rgba(255,255,255,.85)';cx.lineWidth=2;
+ const L=(x0,y0,x1,y1)=>{cx.beginPath();cx.moveTo(x0*E,y0*E);cx.lineTo(x1*E,y1*E);cx.stroke()},Rk=(x,y,w,h)=>cx.strokeRect(x*E,y*E,w*E,h*E);
+ Rk(.1,.1,PW-.2,PH-.2);L(52.5,0,52.5,68);cx.beginPath();cx.arc(52.5*E,34*E,9.15*E,0,7);cx.stroke();
+ for(const s of [0,1]){const x=s?PW-16.5:0,x6=s?PW-5.5:0;Rk(x,34-20.16,16.5,40.32);Rk(x6,34-9.16,5.5,18.32);
+  cx.beginPath();cx.arc((s?PW-11:11)*E,34*E,2,0,7);cx.fillStyle='#fff';cx.fill();
+  cx.fillStyle='rgba(255,255,255,.35)';cx.fillRect((s?PW:-1.2)*E,(34-3.66)*E,1.2*E,7.32*E)}
+}
+function col(eq,gk){const k=S.kits;if(!k)return eq?(gk?'#ff8a1a':'#1e5fd6'):(gk?'#2fd06a':'#d62828');
+ return eq?(gk?k.arqV.c1:k.visita.c1):(gk?k.arqL.c1:k.local.c1)}
+function col2(eq){const k=S.kits;if(!k)return '#fff';const t=eq?k.visita:k.local;return t.c2}
+function luz(h){const n=parseInt(h.slice(1),16);return((n>>16&255)*.299+(n>>8&255)*.587+(n&255)*.114)/255}
+function dibujar(){
+ cancha();const r=S.r;if(!r)return;
+ const c=r.cinta,n=c.porCuadro,d=c.datos,k=S.k,k2=Math.min(k+1,c.frames-1),f=S.frac,o=k*n,o2=k2*n;
+ const lp=(i)=>(d[o+i]+(d[o2+i]-d[o+i])*f)/10;
+ const dueno=d[o+3];
+ /* jugadores */
+ for(let j=0;j<22;j++){
+  const x=lp(5+j*2),y=lp(6+j*2),J=r.jugadores[j],eq=J.equipo,gk=J.rol==='POR';
+  cx.beginPath();cx.arc(x*E,y*E,8,0,7);cx.fillStyle=col(eq,gk);cx.fill();
+  cx.lineWidth=dueno===j?3:1.5;cx.strokeStyle=dueno===j?'#ffe066':col2(eq);cx.stroke();
+  const num=String(J.id-(eq?11:0)+1);cx.fillStyle=luz(col(eq,gk))>.55?'#111':'#fff';cx.font='bold 9px system-ui';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(num,x*E,y*E+.5);
+  if(S.nombres){const nm=J.nombre.split(' ').slice(-1)[0];cx.font='10px system-ui';cx.fillStyle='rgba(255,255,255,.9)';cx.fillText(nm,x*E,y*E-14)}
+ }
+ /* pelota: sombra en el piso y la pelota más grande cuanto más alta */
+ const bx=lp(0),by=lp(1),bz=lp(2);
+ cx.beginPath();cx.ellipse(bx*E+bz*3,by*E+bz*2,4,3,0,0,7);cx.fillStyle='rgba(0,0,0,.35)';cx.fill();
+ cx.beginPath();cx.arc(bx*E,by*E-bz*2,4+bz*.6,0,7);cx.fillStyle='#fff';cx.fill();cx.lineWidth=1;cx.strokeStyle='#222';cx.stroke();
+ /* reloj, marcador y eventos hasta el tick actual */
+ const t=c.t[k];let g=[0,0];const vistos=[];
+ for(const e of r.eventos){if(e.t>t)break;if(e.tipo==='gol')g[e.equipo]++;if(/gol|remate|atajada|palo|corner|entretiempo|segundo_tiempo|final|bloqueo/.test(e.tipo))vistos.push(e)}
+ $('gol').textContent=g[0]+' - '+g[1];
+ const seg=t<S.t2?t/10:2700+(t-S.t2)/10;$('reloj').textContent=String(Math.floor(seg/60)).padStart(2,'0')+':'+String(Math.floor(seg%60)).padStart(2,'0');
+ const N={gol:'⚽ GOL',remate:'Remate',atajada:'Atajada',palo:'Palo',corner:'Córner',entretiempo:'Entretiempo',segundo_tiempo:'Segundo tiempo',final:'Final',bloqueo:'Bloqueo'};
+ $('eventos').innerHTML=vistos.slice(-4).reverse().map(e=>`<div>${e.min}' · ${N[e.tipo]||e.tipo}${e.jugador?' · '+e.jugador:''}${e.tipo==='remate'?(e.aPuerta?' (al arco)':' (afuera)'):''}${e.asistencia?' · asist. '+e.asistencia:''}</div>`).join('')||'<div style="color:var(--suave)">Sin jugadas todavía</div>';
+ if(!S.play)$('linea').value=k;
+}
+function bucle(ts){
+ if(S.play&&S.r){const dt=Math.min(.25,(ts-(S.last||ts))/1000);S.frac+=dt*10*S.vel;
+  while(S.frac>=1){S.frac-=1;S.k++}
+  if(S.k>=S.r.cinta.frames-1){S.k=S.r.cinta.frames-1;S.frac=0;S.play=false;$('play').textContent='▶ Play'}
+  $('linea').value=S.k;dibujar()}
+ S.last=ts;requestAnimationFrame(bucle);
+}
+$('simular').onclick=simular;
+$('play').onclick=()=>{if(!S.r)return;S.play=!S.play;$('play').textContent=S.play?'❚❚ Pausa':'▶ Play'};
+for(const b of document.querySelectorAll('.vel'))b.onclick=()=>{S.vel=+b.dataset.v;document.querySelectorAll('.vel').forEach(x=>x.classList.toggle('on',x===b))};
+$('linea').oninput=()=>{S.k=+$('linea').value;S.frac=0;dibujar()};
+$('nombres').onclick=()=>{S.nombres=!S.nombres;$('nombres').classList.toggle('on',S.nombres);dibujar()};
+window.V3={estado:()=>({k:S.k,play:S.play,vel:S.vel,frames:S.r?S.r.cinta.frames:0,marcador:S.r?[S.r.h,S.r.a]:null,reloj:$('reloj').textContent,gol:$('gol').textContent}),simular,ir:k=>{S.k=k;S.frac=0;dibujar()}};
+cancha();requestAnimationFrame(bucle);
+})();
+</script>
+</body></html>
