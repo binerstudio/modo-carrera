@@ -616,7 +616,7 @@ function prims(o){const r={};for(const k in o){const v=o[k];if(v===null||typeof 
 let recT=0;function grabar(){if(S.t-recT<.05)return;recT=S.t;S.rec.push({t:S.t,sp:S.sp.map(prims),ref:S.ref?prims(S.ref):null,b:prims(S.ball),cx:S.camX,cy:S.camY});
  while(S.rec.length&&S.t-S.rec[0].t>10)S.rec.shift()}
 function iniciarRepeticion(){const fin=S.golT||S.t;const largo=speed()>=4?3.2:4.8;const L=S.rec.filter(r=>r.t>=fin-largo&&r.t<=fin+.8);
- if(L.length<10){S.golT=null;return false}S.rep={L,t:L[0].t,fin:L[L.length-1].t,v:.55};S.golT=null;S.repN=(S.repN||0)+1;return true}
+ if(L.length<10){S.golT=null;return false}S.rep={L,t:L[0].t,fin:L[L.length-1].t,v:.55*ritmoV2()}/* v1/v2: la repetición va al mismo ritmo que el resto del 2D (si no, con la duración corta pesaba 4 veces más) */;S.golT=null;S.repN=(S.repN||0)+1;return true}
 function dibujarRepeticion(){const R=S.rep,L=R.L;let i=0;while(i<L.length-2&&L[i+1].t<R.t)i++;const A=L[i],B=L[i+1]||A,k=B.t>A.t?clamp((R.t-A.t)/(B.t-A.t),0,1):0;
  const guard=S.sp.map(prims),gref=S.ref?prims(S.ref):null,gb=prims(S.ball),go=S.owner,gcx=S.camX,gcy=S.camY,gbn=S.banner,gbig=S.big;
  S.sp.forEach((s,j)=>{const a=A.sp[j],c=B.sp[j];if(!a)return;Object.assign(s,a);if(c){s.x=lerp(a.x,c.x,k);s.y=lerp(a.y,c.y,k)}});
