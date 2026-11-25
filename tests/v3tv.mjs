@@ -83,6 +83,10 @@ const c3 = await completo(3, 1, true);
   { const T = v.tiempoReal;
     ok(T.peligro >= 2 * T.calma, `partido completo: ${T.peligro} s de jugadas y ${T.calma} s de calma (las jugadas tienen que ser al menos el doble) ${JSON.stringify(T)}`);
     ok(T.calma / Math.max(1, v.cortes) <= 6, `transiciones largas: ${T.calma} s de calma en ${v.cortes} cortes`); }
+  /* lo que se ve: ningún jugador a más de 10 m/s fuera de los fundidos (cortes, repeticiones, entretiempo) */
+  ok(v.velocidadVista.n > 10000 && v.velocidadVista.max <= 10, `velocidad vista máxima ${v.velocidadVista.max} m/s (límite 10) ${JSON.stringify(v.velocidadVista.log)}`);
+  /* carteles de pelota parada: salen cuando la pelota está en su lugar (córner en el banderín, penal en el punto) */
+  ok(v.carteles.every(c => c.tipo === 'corner' ? c.aBanderin <= 3 : c.tipo === 'penal' ? c.aPenal <= 1.5 : c.velPelota < .3), `cartel fuera de lugar: ${JSON.stringify(v.carteles.filter(c => c.tipo === 'corner' ? c.aBanderin > 3 : c.tipo === 'penal' ? c.aPenal > 1.5 : c.velPelota >= .3))}`);
   /* 6) movimiento: pelota pegada al pie en conducción, largo de paso real (velocidad/cadencia), sin patinaje ni saltos de pose */
   { const M = v.movimiento;
     ok(M.conduccion > 100 && M.pelotaPieMax < 0.8, `pelota-pie en conducción: máximo ${M.pelotaPieMax} m (límite 0,8) en ${M.conduccion} muestras`);
@@ -140,7 +144,7 @@ const v2 = await page.evaluate(async () => {
 ok(!v2.esV3 && v2.opciones.join() === 'completo,simular' && v2.jugadores >= 20 && v2.minuto >= 1, `v2: ${JSON.stringify(v2)}`);
 
 await browser.close();
-const res = { ok: !errors.length && !fallas.length, menu, completo3: { ...c3, v: undefined, duracion: c3.v.duracion, velMax: c3.v.velMax, cortes: c3.v.cortes, camara: c3.v.camara, cierre: c3.v.cierre, repeticiones: c3.v.repeticiones, festejos: c3.v.festejos, golesVistos: c3.v.golesVistos, movimiento: c3.v.movimiento, saltos: [c3.v.saltosCinta, c3.v.saltosPelota, c3.v.saltosDibujo], pred: c3.v.pred, tiempo: c3.v.tiempoReal },
+const res = { ok: !errors.length && !fallas.length, menu, completo3: { ...c3, v: undefined, duracion: c3.v.duracion, velMax: c3.v.velMax, cortes: c3.v.cortes, camara: c3.v.camara, cierre: c3.v.cierre, repeticiones: c3.v.repeticiones, festejos: c3.v.festejos, golesVistos: c3.v.golesVistos, movimiento: c3.v.movimiento, velocidadVista: c3.v.velocidadVista, carteles: c3.v.carteles, saltos: [c3.v.saltosCinta, c3.v.saltosPelota, c3.v.saltosDibujo], pred: c3.v.pred, tiempo: c3.v.tiempoReal },
   completo15: c15 && { segundosX4: c15.segundos, duracionX4: c15.v.duracion, velMax: c15.v.velMax, cortes: c15.v.cortes, camara: c15.v.camara }, mejores: mej, simular: sim, v2, errores: errors, fallas };
 writeFileSync('tests/out/v3tv.json', JSON.stringify(res, null, 1));
 console.log('VER EL PARTIDO (v3)', res.ok ? 'OK' : 'FALLÓ', '·', `completo 3 min: ${c3.segundos}s a x1 (viendo ${c3.v.duracion}s), vel máx ${c3.v.velMax}x, ${c3.v.cortes} cortes, cámara ${JSON.stringify(c3.v.camara)}, cierre ${c3.v.cierre.corriendo} corriendo de ${c3.v.cierre.muestras}`,

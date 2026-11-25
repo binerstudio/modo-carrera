@@ -41,6 +41,8 @@ jobs:
         run: node tests/v3tv.mjs http://localhost:8080/index.html
       - name: Motor v3 en el juego · un solo marcador (encabezado, gráfica de TV, eventos), local del mismo lado y reloj que espera al 2D (liga local/visitante, copa, neutral)
         run: node tests/v3marcador.mjs http://localhost:8080/index.html
+      - name: 2D del motor v3 · pantalla completa en iPhone (vertical girada a horizontal, horizontal, sin franjas)
+        run: node tests/v3pantalla.mjs http://localhost:8080/index.html
       - name: 2D del motor v3 · partido completo de 15 minutos (solo a mano; se mide a x4)
         if: github.event_name == 'workflow_dispatch'
         run: node tests/v3tv.mjs http://localhost:8080/index.html largo

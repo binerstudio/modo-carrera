@@ -6,6 +6,7 @@
      (y un gol aparece recién cuando se ve en el 2D);
    - el local siempre del mismo lado: encabezado a la izquierda, gráfica de TV a la izquierda, el "(local)" del relato,
      camiseta de local en el 2D;
+   - ningún jugador se ve moverse a más de 10 m/s fuera de los fundidos;
    - el minuto del encabezado y el reloj del juego nunca van más de 1' adelante del minuto que se ve en el 2D, y el partido
      no termina (ni pasa al descanso) antes de que el 2D llegue al pitazo.
    Además: "Simular hasta el final" termina de una.
@@ -74,7 +75,11 @@ async function caso(nombre, preparar) {
   ok(maxAdelJuego <= 1, `${nombre}: el reloj del juego fue ${maxAdelJuego}' adelante del 2D ${JSON.stringify(relojLog)}`);
   ok(finAntes == null || finAntes >= 90, `${nombre}: el partido terminó cuando el 2D mostraba el minuto ${finAntes}`);
   ok(vistos.has('ht') || vistos.has('second'), `${nombre}: no pasó por el entretiempo`);
-  return { nombre, venue: ini.venue, local, visita, comp: ini.comp, muestras: n, malos: malos.length, adelantoEncabezado: maxAdel, adelantoReloj: maxAdelJuego, finCon2D: finAntes };
+  /* movimiento posible: ningún jugador a más de 10 m/s (medido a x1) fuera de los fundidos */
+  const vel = await page.evaluate(() => { const v = MC2D.estado().v3; return v ? v.velocidadVista : null; });
+  ok(vel && vel.n > 1000 && vel.max <= 10, `${nombre}: velocidad vista máxima ${vel && vel.max} m/s (límite 10) ${JSON.stringify(vel && vel.log)}`);
+  await page.screenshot({ path: `tests/out/v3marcador-${nombre.replace(/[^a-z]+/gi, '-')}.png` }).catch(() => {});
+  return { nombre, venue: ini.venue, local, visita, comp: ini.comp, muestras: n, malos: malos.length, velocidadVistaMax: vel && vel.max, adelantoEncabezado: maxAdel, adelantoReloj: maxAdelJuego, finCon2D: finAntes };
 }
 const R = [];
 R.push(await caso('liga de local', () => { window.mcVenue = () => 'h'; }));

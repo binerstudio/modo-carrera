@@ -42,7 +42,9 @@ if(typeof oMatch==='function')window.createMatch=function(){
  const r=oMatch.apply(this,arguments);
  try{if(typeof career!=='undefined'&&esV3(career)&&match&&match.v2){preparar(match);
   if(window.mcMatchEv)mcMatchEv(match,'🏟 MOTOR v3','Este partido se juega simulado en la cancha: 22 jugadores y la pelota, minuto a minuto.',false,'')}
- }catch(e){console.warn('MC motor v3',e);if(match){delete match.v3;ESTADO.delete(match)}}
+ }catch(e){console.warn('MC motor v3',e);if(match){delete match.v3;ESTADO.delete(match)}
+  /* que se sepa: este partido se juega con el v2 */
+  try{if(window.mcMatchEv&&match)mcMatchEv(match,'⚠ MOTOR v2','Este partido no se pudo armar en la cancha (v3): se juega con el motor v2.',true,'');if(window.xToast)xToast('Este partido se juega con el motor v2 (no se pudo armar el v3)')}catch(e2){}}
  return r};
 
 /* con el v3 el reloj del juego no marca el ritmo (lo marca el 2D con la cinta): el motor simula un minuto cada 40 ms

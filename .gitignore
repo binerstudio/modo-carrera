@@ -1,3 +1,4 @@
 # salidas locales de las pruebas de navegador (el CI las sube a la rama capturas-ci)
 tests/out/v3tv*
-tests/out/v3marcador.json
+tests/out/v3marcador*
+tests/out/v3pantalla*
