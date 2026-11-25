@@ -40,7 +40,7 @@ async function caso(nombre, preparar) {
   ok(ini.v3, `${nombre}: el partido no es v3 ${JSON.stringify(ini)}`);
   await page.evaluate(() => { mcJugarPartido({ modo: 'completo', min: 3 }); mcSpeed(4); MC12.mTab('ev'); });
   const local = ini.venue === 'a' ? ini.away : ini.home, visita = ini.venue === 'a' ? ini.home : ini.away;
-  let relojLog = null, n = 0, maxAdel = -99, maxAdelJuego = -99, finAntes = null, vistos = new Set(), primero = null; const malos = [];
+  let velU = null, relojLog = null, n = 0, maxAdel = -99, maxAdelJuego = -99, finAntes = null, vistos = new Set(), primero = null; const malos = [];
   for (let i = 0; i < 900; i++) {
     await page.waitForTimeout(300);
     const s = await page.evaluate(() => {
@@ -50,10 +50,10 @@ async function caso(nombre, preparar) {
       return { izq: (q('#m12M .np.l b') || {}).textContent, der: (q('#m12M .np.r b') || {}).textContent, sc: (q('#m12M .cl strong') || {}).textContent,
         mn: (q('#m12M .cl .mn') || {}).textContent, ev, gl: ev.filter(t => /GOL LOCAL/.test(t)).length, gv: ev.filter(t => /GOL VISITANTE/.test(t)).length,
         tv: v && v.tvMarcador, min2d: v && v.minuto, resultado: v && v.resultado, saltado: !v, phase: match.phase, done: match.done,
-        juego: match.minute, h: match.h, a: match.a, ojo: !!(v && v.visto != null), kick: ((match.events || []).find(e => /COMIENZA EL PARTIDO/.test(e.title)) || {}).msg || '' };
+        vel: v && v.velocidadVista, juego: match.minute, h: match.h, a: match.a, ojo: !!(v && v.visto != null), kick: ((match.events || []).find(e => /COMIENZA EL PARTIDO/.test(e.title)) || {}).msg || '' };
     });
     if (!s.tv) continue;
-    n++;
+    n++; if (s.vel && s.vel.n) velU = s.vel;
     const sc = String(s.sc || '').split('-').map(x => +x.trim());
     const enc = sc, tv = s.tv.g, evs = [s.gl, s.gv];
     if (!(enc[0] === tv[0] && enc[1] === tv[1] && enc[0] === evs[0] && enc[1] === evs[1])) malos.push({ i, enc, tv, evs, min: s.min2d });
@@ -76,7 +76,7 @@ async function caso(nombre, preparar) {
   ok(finAntes == null || finAntes >= 90, `${nombre}: el partido terminó cuando el 2D mostraba el minuto ${finAntes}`);
   ok(vistos.has('ht') || vistos.has('second'), `${nombre}: no pasó por el entretiempo`);
   /* movimiento posible: ningún jugador a más de 10 m/s (medido a x1) fuera de los fundidos */
-  const vel = await page.evaluate(() => { const v = MC2D.estado().v3; return v ? v.velocidadVista : null; });
+  const vel = velU;   // la última medida tomada durante el partido
   ok(vel && vel.n > 1000 && vel.max <= 10, `${nombre}: velocidad vista máxima ${vel && vel.max} m/s (límite 10) ${JSON.stringify(vel && vel.log)}`);
   await page.screenshot({ path: `tests/out/v3marcador-${nombre.replace(/[^a-z]+/gi, '-')}.png` }).catch(() => {});
   return { nombre, venue: ini.venue, local, visita, comp: ini.comp, muestras: n, malos: malos.length, velocidadVistaMax: vel && vel.max, adelantoEncabezado: maxAdel, adelantoReloj: maxAdelJuego, finCon2D: finAntes };

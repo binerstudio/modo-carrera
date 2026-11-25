@@ -506,7 +506,7 @@ function postura(s,sp){const g=marcha(s,sp),L0=Q.on?{la:g.la,ra:g.ra,lk:g.lk,rk:
 /* v3: los cambios de pose se mezclan en 0,12 s (sin saltos de brazos y piernas) y se mide la marcha:
    largo de cada paso (velocidad / cadencia), patinaje (moverse sin dar pasos), saltos de pose y pelota-pie en conducción */
 const PCAMPOS=['la','ra','lk','rk','lu','ru','le','re','lean','rot','lift'];
-function mezclaPose(s,g,sp){const t=S.t,pz=(s.pose||'run')+'|'+(s.celeb||0)+'|'+(sp>.9&&POSE_BRAZOS.has(s.pose)?1:0)+(s.gk&&s.espera?'e':'')+(s.lat?'l':'')+(sp>6.2?'s':'');
+function mezclaPose(s,g,sp){const t=S.t,pz=(s.pose||'run')+'|'+(s.celeb||0)+'|'+(sp>.9&&POSE_BRAZOS.has(s.pose)?1:0)+(s.gk&&s.espera?'e':'');   // pique y paso lateral: los suaviza el filtro corto (si reiniciaran la mezcla, las piernas no cruzarían)
  if(s._g&&(s._pz!==pz||(s.poseT||0)+1e-6<(s._ptp||0))){s._de=s._g;s._bt=t}s._pz=pz;s._ptp=s.poseT||0;
  if(s._de){const w0=clamp((t-s._bt)/.12,0,1),w=w0*w0*(3-2*w0);if(w>=1)s._de=null;else for(const k of PCAMPOS)g[k]=s._de[k]+(g[k]-s._de[k])*w}
  /* además, un suavizado corto (40 ms) de todos los ángulos: los cambios de un cuadro al otro (arquero que se pone en
@@ -783,7 +783,10 @@ function poseCierre(R,s,sp){const C=R.cierreEv,rol=C.roles[s.sid];if(!rol)return
  else if(rol==='cabeza'&&sp<.8&&libre)accion(s,'cabeza',2);
  else if(rol==='saludo'&&libre&&sp<1.6&&R.list.some(o=>o.team!==s.team&&o.alpha>0&&C.roles[o.sid]==='saludo'&&Math.hypot(o.x-s.x,o.y-s.y)<2.4))accion(s,'saludo',1.1);
  /* control de calidad: nadie corriendo sin sentido (pasado el primer segundo y medio, cuando frenan) */
- if(R.vivo&&t>15){Q.cierre.muestras++;const v=s.spS!=null?s.spS:sp,p=s.pose&&s.pose!=='run'?s.pose:v<.3?'quieto':v<1.8?'caminando':v<3.8?'trotando':'corriendo';
+ /* velocidad en el último segundo (como la prueba del motor: la cinta está en decímetros y cuadro a cuadro el redondeo suma) */
+ const H=s._ch||(s._ch=[]);H.push([R.tp,s.x,s.y]);while(H.length>2&&R.tp-H[1][0]>=10)H.shift();
+ const v1=H.length>1&&R.tp-H[0][0]>=8?Math.hypot(s.x-H[0][1],s.y-H[0][2])/((R.tp-H[0][0])/10):(s.spS||0);
+ if(R.vivo&&t>15){Q.cierre.muestras++;const v=v1,p=s.pose&&s.pose!=='run'?s.pose:v<.3?'quieto':v<1.8?'caminando':v<3.8?'trotando':'corriendo';
   Q.cierre.poses[p]=(Q.cierre.poses[p]||0)+1;if(v>1.8){Q.cierre.corriendo++;Q.cierre.log={jugador:s.name,vel:+v.toFixed(2),rol,pose:s.pose}}}}
 /* animación de un sprite según su velocidad real (de la cinta) y su pose */
 function animar(s,dt){
