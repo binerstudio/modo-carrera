@@ -718,7 +718,9 @@ function actualizarRep(R,dtGame){
  while(R.evi<R.ev.length&&R.ev[R.evi].t<=R.tp){try{aplicarEvento(R,R.ev[R.evi])}catch(e){console.warn('MC2D v3',e)}R.evi++}
  const Z=cuadroEn(R.c,R.tp);if(!Z)return false;const {A,B,f}=Z,F=R.fmt,nJ=F.jugadores,vt=B.t>A.t?10/(B.t-A.t):0;
  const usados=new Set();
- const pon=(s,ia)=>{const ax=A.d[ia],ay=A.d[ia+1],bx=B.d[ia],by=B.d[ia+1];if(ax===-32768||bx===-32768)return;
+ /* puestos que cambian de jugador en el próximo cuadro (un cambio): no se interpolan, si no el que sale "se deslizaría" hasta el que entra */
+ const cambia=new Set();for(let i=R.evi;i<R.ev.length&&R.ev[i].t<=B.t;i++){const e=R.ev[i];if(e.tipo==='cambio'){cambia.add(5+e.sid*2);if(e.salienteSlot!=null&&e.salienteSlot>=0)cambia.add(F.salientes+e.salienteSlot*2)}}
+ const pon=(s,ia)=>{const ax=A.d[ia],ay=A.d[ia+1];let bx=B.d[ia],by=B.d[ia+1];if(cambia.has(ia)){bx=ax;by=ay}if(ax===-32768||bx===-32768)return;
   const x=lerp(ax,bx,f)/10,y=lerp(ay,by,f)/10;s.vx=(bx-ax)/10*vt;s.vy=(by-ay)/10*vt;s.x=x;s.y=y;usados.add(s)};
  for(let j=0;j<nJ;j++){const k=R.slot[j];if(k==null)continue;const s=spriteDe(R,k,j);s.sid=j;pon(s,5+j*2)}
  for(let q=0;q<(F.nSalientes||0);q++){const k=R.sal[q];if(k==null)continue;const s=spriteDe(R,k,q);if(usados.has(s))continue;pon(s,F.salientes+q*2)}
@@ -857,7 +859,7 @@ function frameV3(real,crudo){real=Math.min(.3,crudo||real);
  const prev=new Map(R.list.map(s=>[s,[s.x,s.y,s.alpha]])),pb=[R.ball.x,R.ball.y];
  const hay=actualizarRep(R,dtG);if(!hay)Q.mitad=true;   // sin cuadros todavía: el primero no cuenta como salto
  /* control de calidad: lo dibujado no salta (más rápido que lo que permite la cinta) y coincide con la cinta */
- if(dtG>0&&!Q.mitad){const lim=dtG*11+.6;for(const s of R.list){const p=prev.get(s);if(!p||p[2]<=0||s.alpha<=0)continue;const d=Math.hypot(s.x-p[0],s.y-p[1]);if(d>lim){Q.saltos.dibujo++;Q.saltos.log={jugador:s.name,d:+d.toFixed(2),lim:+lim.toFixed(2),t:R.tp}}}
+ if(dtG>0&&!Q.mitad){const lim=dtG*11+.6;for(const s of R.list){const p=prev.get(s);if(!p||p[2]<=0||s.alpha<=0)continue;const d=Math.hypot(s.x-p[0],s.y-p[1]);if(d>lim){Q.saltos.dibujo++;Q.saltos.log={jugador:s.name,clave:s.key,puesto:s.sid,puestos:R.slot.reduce((a,k,i)=>k===s.key?a.concat(i):a,[]),saliente:R.sal.indexOf(s.key),d:+d.toFixed(2),lim:+lim.toFixed(2),t:R.tp,de:[+p[0].toFixed(1),+p[1].toFixed(1)],a:[+s.x.toFixed(1),+s.y.toFixed(1)],eventos:Q.tv.eventos.filter(e=>Math.abs(e.t-R.tp)<30).map(e=>e.tipo+(e.sid!=null?'#'+e.sid:'')+(e.jid!=null?'@'+e.jid:''))}}}
   const db=Math.hypot(R.ball.x-pb[0],R.ball.y-pb[1]);if(db>dtG*48+.6){Q.saltos.dibujo++;Q.saltos.log={pelota:true,d:+db.toFixed(2),t:R.tp}}}
  if(hay)Q.mitad=false;
  if(Q.repPend&&R.tp>=Q.repPend.at&&!Q.corte){const P=Q.repPend;Q.repPend=null;if(visible())armarRepeticion(P)}
@@ -996,7 +998,8 @@ const API={
  marcador(m){if(Q.on&&m===S.m&&visible()&&!Q.saltado)return S.goles;if(!m||m!==S.m||!visible()||m.done)return[m.h,m.a];return S.goles},
  /* control de calidad (v3): lo dibujado es exactamente la cinta interpolada en el instante que se ve */
  verificarV3(){if(!Q.on||!Q.live)return null;const R=Q.live,Z=cuadroEn(R.c,R.tp);if(!Z)return null;const {A,B,f}=Z;let max=0,n=0;
-  for(let j=0;j<Q.tv.formato.jugadores;j++){const k=R.slot[j],s=k!=null?R.sp.get(k):null;if(!s||A.d[5+j*2]===-32768)continue;const x=lerp(A.d[5+j*2],B.d[5+j*2],f)/10,y=lerp(A.d[6+j*2],B.d[6+j*2],f)/10;max=Math.max(max,Math.hypot(s.x-x,s.y-y));n++}
+  const cambia=new Set();for(let i=R.evi;i<R.ev.length&&R.ev[i].t<=B.t;i++)if(R.ev[i].tipo==='cambio')cambia.add(R.ev[i].sid);
+  for(let j=0;j<Q.tv.formato.jugadores;j++){const k=R.slot[j],s=k!=null?R.sp.get(k):null;if(!s||A.d[5+j*2]===-32768)continue;const g=cambia.has(j)?0:f,x=lerp(A.d[5+j*2],B.d[5+j*2],g)/10,y=lerp(A.d[6+j*2],B.d[6+j*2],g)/10;max=Math.max(max,Math.hypot(s.x-x,s.y-y));n++}
   const bx=lerp(A.d[0],B.d[0],f)/10,by=lerp(A.d[1],B.d[1],f)/10;max=Math.max(max,Math.hypot(S.ball.x-bx,S.ball.y-by));
   const ia=Q.tv.formato.arbitro,rx=lerp(A.d[ia],B.d[ia],f)/10;return{difMax:+max.toFixed(4),jugadores:n,arbitroDif:+Math.abs(S.ref.x-rx).toFixed(4),dibujados:S.sp.filter(s=>s.alpha>0).length}},
  /* "Mejores jugadas" (v3): después de simular, se muestran solo las jugadas elegidas */
