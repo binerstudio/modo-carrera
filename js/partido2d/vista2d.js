@@ -781,7 +781,7 @@ function poseCierre(R,s,sp){const C=R.cierreEv,rol=C.roles[s.sid];if(!rol)return
 function animar(s,dt){
  if(s.pose&&s.pose!=='run'){s.poseT+=dt;if(s.poseT>=s.poseD){const prev=s.pose;s.pose='run';if(prev==='cayendo')accion(s,'levantandose')}}
  const sr=Math.hypot(s.vx,s.vy);s.spS=s.spS==null?sr:s.spS+(sr-s.spS)*clamp(dt/.35,0,1);   // velocidad suavizada (la cinta está en decímetros)
- const sp=s.spS,sp0=s._sp||0;s._sp=sp;s.ph+=dt*(1.6+sp*1.75)*(s.cad||1);
+ const sp=s.spS,sp0=s._sp||0;s._sp=sp;s.ph+=dt*(1.6+Math.min(sr,9)*1.75)*(s.cad||1);   // la cadencia sigue la velocidad real (sin retraso)
  s.estado=(sp<sp0-1.2&&sp>1)?'frenando':sp<.3?'quieto':sp<1.8?'caminando':sp<3.8?'trotando':sp<6.2?'corriendo':'esprintando';
  const b=S.ball;if(sp>.35)s.face=s.vx>=0?1:-1;else if(b&&s.pose==='run')s.face=b.x>=s.x?1:-1;
  s.back=false;s.lat=sp>.8&&Math.abs(s.vy)>1.8*Math.abs(s.vx);if(s.lat&&s.estado==='trotando')s.estado='lateral';
@@ -830,7 +830,7 @@ function umbral(){const {T}=verCfg(),Brem=Math.max(4,T-Q.realT)*.85,r=clamp(rest
  /* lo que sobra alarga la previa de cada jugada elegida (hasta 2 minutos de juego) */
  /* cronograma: si lo visto va atrasado respecto del partido, entran jugadas de menos puntaje (no más calma); si va
     adelantado, se sube el puntaje mínimo. Las que siempre entran (goles, penales, inicio y final) no se tocan */
- {const T2=Math.max(T*.6,T-38),t0=Q.tv.partes[1]||0,pr=clamp((tv0-t0)/Math.max(1,tv0-t0+restoTicks()),0,1),ade=T2*pr-Q.realT;Q.ade=ade;
+ {const T2=Math.max(T*.6,T-25),t0=Q.tv.partes[1]||0,pr=clamp((tv0-t0)/Math.max(1,tv0-t0+restoTicks()),0,1),ade=T2*pr-Q.realT;Q.ade=ade;
   const S2=[...new Set(L.map(x=>x[1][0]).filter(x=>x<1000))].sort((a,b)=>b-a);let i=S2.indexOf(th);if(i<0)i=th>=1000?-1:S2.length-1;
   const paso=Math.min(S2.length,Math.floor(Math.abs(ade)/6));if(ade>6)i=Math.min(S2.length-1,i+paso);else if(ade<-6)i=Math.max(-1,i-paso);
   th=i<0?1000:S2[i];Q.thMin=th<=S2[S2.length-1]}
@@ -888,7 +888,7 @@ function frameV3(real,crudo){real=Math.min(.3,crudo||real);
    if(nx){let a=desde(nx);if(f1!=null&&!Q.cruzo&&a>f1&&(p2==null||a<p2))a=p2!=null?p2:f1-1;
     /* cronograma: lo visto tiene que ir parejo con el partido. Si al llegar a la próxima jugada quedaría tiempo de sobra,
        el corte cae antes y ese sobrante se ve como la previa de la jugada (cómo se arma, a velocidad real) */
-    {const T0=verCfg().T,T=Math.max(T0*.6,T0-38),t0=tv.partes[1]||0,total=Math.max(1,R.tp-t0+restoTicks()),sobra=T*(a-t0)/total-Q.realT-6;   // 38 s quedan para el final (escena de cierre, festejos, fundidos)
+    {const T0=verCfg().T,T=Math.max(T0*.6,T0-25),t0=tv.partes[1]||0,total=Math.max(1,R.tp-t0+restoTicks()),sobra=T*(a-t0)/total-Q.realT-6;   // 25 s quedan para el final (escena de cierre, festejos, fundidos)
      if(sobra>0&&!(f1!=null&&!Q.cruzo&&a>=f1-1&&R.tp<f1-1&&p2==null))a=Math.max(R.tp,a-Math.min(sobra*10,Q.thMin?1e9:25))}   // la calma, solo como transición corta
     if(a-R.tp>30){if(a<=tMax){cortarA(a);sumaT(real)}else espera=true}}   // huecos de menos de 8 s de juego se ven (no se corta)
    else if(!tv.terminado)espera=true}   // todavía no se sabe cuál es la próxima: se espera al motor

@@ -764,7 +764,7 @@ P.objetivosFestejo=function(F){
   if(j===a){j.tx=F.punto[0];j.ty=F.punto[1];j.urg=k<60?1:.5;continue}
   if(j.eq===F.eq&&!j.gk&&a){const i=F.orden.indexOf(j.id);if(i<0||i>6){j.tx=j.x;j.ty=j.y;j.urg=.2;continue}
    /* los compañeros van al mismo banderín (no al goleador: así no lo encierran en el área) y lo abrazan ahí */
-   const p=F.punto,sx=p[0]<52.5?1:-1,sy=p[1]<34?1:-1,ang=(i%4)*MATH.PI/6,rad=1+MATH.floor(i/4)*.9;
+   const p=F.punto,sx=p[0]<52.5?1:-1,sy=p[1]<34?1:-1,ang=i<3?i*MATH.PI/4:(i-3)*MATH.PI/6,rad=i<3?1.2:2.1;   // dos rondas sin pisarse
    j.tx=clamp(p[0]+sx*MATH.cos(ang)*rad,.6,PW-.6);j.ty=clamp(p[1]+sy*MATH.sin(ang)*rad,.6,PH-.6);j.urg=.95;continue}
   /* el resto camina (nadie se queda amontonado en el área chica sobre el arquero): el arquero que recibió el gol vuelve a
      su arco; los demás rivales y los compañeros que no festejan caminan a su lugar en su campo, despacio y lamentándose */
