@@ -621,7 +621,7 @@ function frame(ts){S.raf=0;if(!S.cv||!S.cv.isConnected){return}
   const n=Math.max(1,Math.ceil(dt/.2)); for(let q=0;q<n;q++){S.t+=dt/n;pasoV2(m,dt/n,q===n-1?real:0);if(S.rep)break;grabar()}}   // cada sub-paso se graba (para la repetición)
  if(S.rep&&!Q.on){S.rep.t+=real*S.rep.v;if(S.rep.t>=S.rep.fin){S.rep=null;S.zoom=1.1;if(!S.play)next()}else{const L=S.rep.L;let i=0;while(i<L.length-2&&L[i+1].t<S.rep.t)i++;const A=L[i].b,B=(L[i+1]||L[i]).b;S.rep.b={x:(A.x+B.x)/2,y:(A.y+B.y)/2,fly:null}}}
  camara(real);
- if(Q.on&&Q.vista)medirVista(crudo);
+ if(Q.on&&Q.vista)medirVista(real,crudo);
  if(visible()){const t0=performance.now();if(Q.on&&Q.rep)dibujarRepV3();else if(S.rep)dibujarRepeticion();else draw();const ms=performance.now()-t0;S.perf.n++;S.perf.tot+=ms;if(ms>S.perf.max&&S.perf.n>30)S.perf.max=ms}
  if(S.perf)S.perf.frame+=performance.now()-tf0;S.raf=requestAnimationFrame(frame)}
 function pasoV2(m,dt,real){
@@ -934,10 +934,10 @@ function frameV3(real,crudo){real=Math.min(.3,crudo||real);
  const n=corteV3(m);if(n!==Q.ultCorte){Q.ultCorte=n;S.shown=n;contar();const gk=S.goles.join('-');if(gk!==Q.ultG){Q.ultG=gk;try{window.renderMatch&&renderMatch()}catch(e){}}else pedirRender()}   // un gol: el encabezado se actualiza en el mismo cuadro
  const mn=minutoV3();if(mn.txt!==Q.ultMin){Q.ultMin=mn.txt;try{window.MCV3TV&&MCV3TV.publicar(m)}catch(e){}pedirRender()}}
 /* control de calidad (v3): ningún jugador se ve moverse a más de lo posible (lo que cambia con la pantalla en negro no cuenta) */
-function medirVista(crudo){const V=Q.vista,neg=capaAlfa().a>=.98,L=Q.rep?Q.rep.R.list:Q.hl?(Q.hl.R?Q.hl.R.list:[]):Q.live?Q.live.list:[];V.fc=(V.fc||0)+1;
- if(crudo>.12){V.lentos++;V.neg=true}   // un cuadro muy lento (pestaña oculta, pausa del navegador) no cuenta como movimiento
+function medirVista(real,crudo){const V=Q.vista,neg=capaAlfa().a>=.98,L=Q.rep?Q.rep.R.list:Q.hl?(Q.hl.R?Q.hl.R.list:[]):Q.live?Q.live.list:[];V.fc=(V.fc||0)+1;
+ if(crudo>.05)V.lentos++;if(crudo>.5)V.neg=true;   // la cancha avanza como mucho 0,05 s por cuadro: en un cuadro lento se mide contra lo que avanzó (no contra el reloj); una pausa larga del navegador no cuenta
  for(const s of L){if(s.alpha<=0){s._vf=null;continue}
-  if(s._vf===V.fc-1&&!neg&&!V.neg&&crudo>0){const d=Math.hypot(s.x-s._vx,s.y-s._vy),v=d/crudo/Math.max(1,speed());V.n++;if(v>V.max){V.max=+v.toFixed(2);V.log={jugador:s.name,v:+v.toFixed(1),d:+d.toFixed(2),dt:+crudo.toFixed(3),rep:!!Q.rep,hl:!!Q.hl,tp:Q.live?Q.live.tp:null}}}
+  if(s._vf===V.fc-1&&!neg&&!V.neg&&real>0){const d=Math.hypot(s.x-s._vx,s.y-s._vy),v=d/real/Math.max(1,speed());V.n++;if(v>V.max){V.max=+v.toFixed(2);V.log={jugador:s.name,v:+v.toFixed(1),d:+d.toFixed(2),dt:+crudo.toFixed(3),rep:!!Q.rep,hl:!!Q.hl,tp:Q.live?Q.live.tp:null}}}
   s._vf=V.fc;s._vx=s.x;s._vy=s.y}
  V.neg=neg}
 function movResumen(){const M=Q.mov;if(!M)return null;const L=M.largo.slice().sort((a,b)=>a-b),q=f=>L.length?L[Math.min(L.length-1,Math.floor(L.length*f))]:null;
