@@ -274,7 +274,8 @@ function card(m,L,v,side,n,red,why,txt){const o=side==='o';if(o){m.rH++;m.rO=(m.
  if(o)m.ownPlayers=m.own.map(x=>x.p);
  ev(m,'🟥 EXPULSIÓN',`${txt?txt+' ':''}${n} (${clubOf(m,side)}) es expulsado (${why}) y ${clubOf(m,side)} queda con ${L.length}.`,true,side)}
 /* ---- control de tiempo ---- */
-function msPerMinute(){const base={1:520,2:260,4:130}[matchSpeed]||520,len=$('matchLength')?$('matchLength').value:'normal';return base*({quick:.5,normal:1,long:1.6}[len]||1)}
+function msPerMinute(){if(window.MCMsPorMinuto){const x=window.MCMsPorMinuto(match);if(x)return x}   /* motor v3: el ritmo lo marca el 2D con la cinta */
+ const base={1:520,2:260,4:130}[matchSpeed]||520,len=$('matchLength')?$('matchLength').value:'normal';return base*({quick:.5,normal:1,long:1.6}[len]||1)}
 function kickoffTxt(m){const t=m.tacR||{},A=m.venue==='a',L=A?m.away:m.home,V=A?m.home:m.away,TO=ownTac();
  return `Rueda el balón: ${L} (local) recibe a ${V}. GRL ${m.home} ${m.grlO??'-'} · ${m.away} ${m.grlR??'-'}. ${m.home} sale con un planteo ${(STYLE_TXT[TO.style]||TO.style).split(',')[0]} y ${m.away} con uno ${STYLE_TXT[t.style]||'equilibrado'}.`}
 function startHalf(h){

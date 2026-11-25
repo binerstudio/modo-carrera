@@ -47,8 +47,7 @@ if(typeof oMatch==='function')window.createMatch=function(){
 
 /* con el v3 el reloj del juego no marca el ritmo (lo marca el 2D con la cinta): el motor simula un minuto cada 40 ms
    para estar siempre adelante de lo que se ve (el 2D lo frena cuando ya tiene 15 minutos de ventaja) */
-const oMs=window.msPerMinute;
-if(typeof oMs==='function')window.msPerMinute=function(){try{if(typeof match!=='undefined'&&match&&match.v3&&ESTADO.get(match))return 40}catch(e){}return oMs.apply(this,arguments)};
+window.MCMsPorMinuto=m=>m&&m.v3&&ESTADO.get(m)?40:0;
 /* ---------- cada minuto: el v2 le pasa la posta al v3 si el partido es v3 ---------- */
 const oMinuto=window.MCMotor.minuto;
 window.MCMotor.minuto=function(m,API){
@@ -95,7 +94,8 @@ function minuto(m,API,S){
  traducir(m,API,S,V.eventosNuevos());
  S.tv.tMotor=V.t();if(fin){S.tv.fin[half]=V.t();if(V.terminado){S.tv.terminado=true;if(S.tv.clipsPend)armarClips(S,true)}}
  if(S.tv.clipsPend)armarClips(S,false);
- if(S.tv.cuadros.length>15000)S.tv.cuadros.splice(0,S.tv.cuadros.length-12000);   // en memoria solo los últimos minutos (el 2D va hasta 15 min atrás del motor)
+ /* en memoria solo lo que el 2D todavía no vio (si el 2D no está mirando, los últimos 20 minutos); tope de memoria: 60 minutos */
+ {const C=S.tv.cuadros;if(C.length>12000){const mira=S.tv.vistoT&&Date.now()-S.tv.vistoT<5000,lim=mira?S.tv.visto-300:C[C.length-1].t-12000;let k=0;while(k<C.length&&C[k].t<lim)k++;if(C.length-k>36000)k=C.length-36000;if(k)C.splice(0,k)}}
  actualizarStats(m,S);
  /* minutos jugados */
  for(const side of ['o','r'])for(const e of listaDe(m,side)){const st=API.ps(m,e,side);if(st)st.on++}

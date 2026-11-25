@@ -828,6 +828,7 @@ function frameV3(real,crudo){real=Math.min(.3,crudo||real);
  if(Q.rep){const P=Q.rep;P.R.tp+=real*P.v*speed();if(P.R.tp>=P.fin){Q.rep=null;S.zoom=1.25;Q.camSnap=true}else actualizarRep(P.R,real*P.v*speed()/10);Q.repReal+=real;sumaT(real);return}
  let pausa=false;try{pausa=!!matchPaused}catch(e){}
  if(R.c.length&&R.tp<R.c[0].t)saltarV3(R.c[0].t);
+ tv.visto=R.tp;tv.vistoT=Date.now();   // la conexión no borra la cinta que todavía no se vio
  revisarCinta();
  Q.umbT=(Q.umbT||0)-real;if(Q.umbT<=0){Q.umbT=.5;umbral()}
  const tMax=ultimoT();let dtG=0;
