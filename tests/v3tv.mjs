@@ -3,7 +3,10 @@
    - Partido completo de 3 min a x1: dura ~3 min (±30%, aceptado por el usuario), nunca se mueve nada más rápido que la velocidad real, hay cortes
      de fase, 0 saltos (cinta y dibujo), lo dibujado = la cinta, la cámara no salta, festejo/repetición si hay goles y la
      escena de cierre sin nadie corriendo; al final pasa al resultado.
-   - Mejores jugadas: solo los tipos marcados, uno tras otro. Simular partido: directo al resultado con estadísticas.
+   - Cada gol con su repetición (cinta, cámara lenta, 5-8 s antes); escena final sin nadie corriendo; en el partido
+     completo las jugadas ocupan al menos el doble que la calma; movimiento: pelota-pie < 0,8 m en conducción, largo de
+     paso (velocidad/cadencia) entre 0,4 y 2,4 m, sin patinaje ni saltos de pose.
+   - Mejores jugadas: solo los tipos marcados, por importancia (máximo 12), en orden de minuto; córners solo con remate. Simular partido: directo al resultado con estadísticas.
    - v2: el menú sin "Mejores jugadas" y el partido completo funciona.
    - Capturas: menú, corte de fase, estadio (TV con tribunas), festejo, repetición, mejores jugadas, escena final.
    Uso: node tests/v3tv.mjs <url de index.html> [largo]   ("largo": además, partido completo de 15 min medido a x4)  */
@@ -67,14 +70,30 @@ const c3 = await completo(3, 1, true);
   ok(v.saltosCinta === 0 && v.saltosPelota === 0 && v.saltosDibujo === 0, `saltos: cinta ${v.saltosCinta}/${v.saltosPelota}, dibujo ${v.saltosDibujo} ${JSON.stringify(v.saltoLog)}`);
   ok(c3.maxDif < 1e-6 && c3.muestras > 30, `lo dibujado no coincide con la cinta (dif ${c3.maxDif}, ${c3.muestras} muestras)`);
   ok(v.camara.saltos === 0, `la cámara saltó ${v.camara.saltos} veces fuera de los cortes`);
-  ok(c3.marcador[0] + c3.marcador[1] === 0 || v.repeticiones.length > 0, `hubo goles y ninguna repetición`);
+  /* 1) cada gol tiene su repetición: de la cinta, en cámara lenta, desde 5 a 8 s antes del gol, y se ve */
+  const gol = c3.marcador[0] + c3.marcador[1];
+  ok(v.golesVistos === gol, `goles vistos ${v.golesVistos} de ${gol}`);
+  ok(v.repeticiones.length === gol, `${gol} goles y ${v.repeticiones.length} repeticiones ${JSON.stringify(v.repFallas)}`);
+  ok(v.repeticiones.every(r => r.antes >= 5 && r.antes <= 8 && r.vel < 1 && r.real > 3), `repetición fuera de lo pedido: ${JSON.stringify(v.repeticiones)}`);
+  /* 2) escena final: nadie corre (velocidad ≤ 1,8 m/s pasado el primer segundo y medio) y hay festejo, piso, saludo o aplauso */
   ok(v.cierre.muestras > 500 && v.cierre.corriendo === 0, `escena final: ${JSON.stringify(v.cierre)}`);
+  ok(!Object.keys(v.cierre.poses).some(p => /^(run|trotando|corriendo)$/.test(p)), `escena final con poses de correr: ${JSON.stringify(v.cierre.poses)}`);
   ok(Object.keys(v.cierre.poses).some(p => /celebrando|abrazo|piso|cabeza|saludo|aplauso/.test(p)), 'escena final sin festejos ni saludos');
+  /* 4) partido completo: el tiempo es de las jugadas (peligro, goles, pelota parada con remate, festejos); la calma solo como transición corta */
+  { const T = v.tiempoReal;
+    ok(T.peligro >= 2 * T.calma, `partido completo: ${T.peligro} s de jugadas y ${T.calma} s de calma (las jugadas tienen que ser al menos el doble) ${JSON.stringify(T)}`);
+    ok(T.calma / Math.max(1, v.cortes) <= 6, `transiciones largas: ${T.calma} s de calma en ${v.cortes} cortes`); }
+  /* 6) movimiento: pelota pegada al pie en conducción, largo de paso real (velocidad/cadencia), sin patinaje ni saltos de pose */
+  { const M = v.movimiento;
+    ok(M.conduccion > 100 && M.pelotaPieMax < 0.8, `pelota-pie en conducción: máximo ${M.pelotaPieMax} m (límite 0,8) en ${M.conduccion} muestras`);
+    ok(M.pasos > 500 && M.pasoP5 >= 0.4 && M.pasoP95 <= 2.4, `largo de paso (velocidad/cadencia) fuera de rango: ${JSON.stringify(M)}`);
+    ok(M.patinaje === 0, `patinaje: ${M.patinaje} ${JSON.stringify(M.patLog)}`);
+    ok(M.saltosPose === 0, `saltos de pose: ${M.saltosPose} ${JSON.stringify(M.saltoLog)}`); }
 }
 await cap('resultado');
 
 /* 2) mejores jugadas: solo los tipos marcados */
-const TIP = { goles: ['gol'], corners: ['corner_ejecutado', 'corner', 'pase'], atajadas: ['atajada'], penales: ['remate'] };
+const TIP = { goles: ['gol'], corners: ['remate'], atajadas: ['atajada'], penales: ['remate'] };   // un córner entra solo si termina en remate
 const mej = await page.evaluate(async () => {
   match.finished = true; openMatch(); go('match'); mcJugarPartido({ modo: 'mejores', tipos: ['goles', 'corners', 'atajadas'] }); mcSpeed(4);
   let foto = false; const t0 = Date.now();
@@ -85,6 +104,11 @@ const mej = await page.evaluate(async () => {
   ok(M.clips.length > 0 && M.vistos.length === M.clips.length && M.fin, `mejores jugadas: ${M.vistos.length}/${M.clips.length} recortes vistos`);
   ok(M.clips.every(c => ['goles', 'corners', 'atajadas'].includes(c.tipo)), `mejores jugadas con tipos no marcados: ${M.clips.map(c => c.tipo)}`);
   ok(M.vistos.every(c => (TIP[c.tipo] || []).some(t => c.eventos.includes(t))), 'un recorte no tiene la jugada que dice');
+  /* 5) por importancia: como máximo 12, en orden de minuto, ninguno menos importante que uno que quedó afuera */
+  ok(M.clips.length <= 12, `mejores jugadas: ${M.clips.length} recortes (máximo 12)`);
+  ok(M.clips.every((c, i) => i === 0 || c.a > M.clips[i - 1].a), 'mejores jugadas fuera de orden de minuto');
+  { const C = M.candidatos || [], el = C.filter(c => c.elegido), fu = C.filter(c => !c.elegido), minEl = Math.min(...el.map(c => c.pri)), maxFu = Math.max(-1, ...fu.map(c => c.pri));
+    ok(el.length === M.clips.length && minEl >= maxFu, `mejores jugadas: quedó afuera una más importante (${maxFu} > ${minEl})`); }
   ok(mej.pref.modo === 'mejores', 'no se recordó la elección del menú'); }
 /* captura de "mejores jugadas" (otro partido, solo goles, a x1 para la foto) */
 await page.evaluate(() => { match.finished = true; openMatch(); go('match'); mcJugarPartido({ modo: 'mejores', tipos: ['goles', 'atajadas'] }); mcSpeed(1); });
@@ -115,7 +139,7 @@ const v2 = await page.evaluate(async () => {
 ok(!v2.esV3 && v2.opciones.join() === 'completo,simular' && v2.jugadores >= 20 && v2.minuto >= 1, `v2: ${JSON.stringify(v2)}`);
 
 await browser.close();
-const res = { ok: !errors.length && !fallas.length, menu, completo3: { ...c3, v: undefined, duracion: c3.v.duracion, velMax: c3.v.velMax, cortes: c3.v.cortes, camara: c3.v.camara, cierre: c3.v.cierre, repeticiones: c3.v.repeticiones, festejos: c3.v.festejos, saltos: [c3.v.saltosCinta, c3.v.saltosPelota, c3.v.saltosDibujo], pred: c3.v.pred, tiempo: c3.v.tiempoReal },
+const res = { ok: !errors.length && !fallas.length, menu, completo3: { ...c3, v: undefined, duracion: c3.v.duracion, velMax: c3.v.velMax, cortes: c3.v.cortes, camara: c3.v.camara, cierre: c3.v.cierre, repeticiones: c3.v.repeticiones, festejos: c3.v.festejos, golesVistos: c3.v.golesVistos, movimiento: c3.v.movimiento, saltos: [c3.v.saltosCinta, c3.v.saltosPelota, c3.v.saltosDibujo], pred: c3.v.pred, tiempo: c3.v.tiempoReal },
   completo15: c15 && { segundosX4: c15.segundos, duracionX4: c15.v.duracion, velMax: c15.v.velMax, cortes: c15.v.cortes, camara: c15.v.camara }, mejores: mej, simular: sim, v2, errores: errors, fallas };
 writeFileSync('tests/out/v3tv.json', JSON.stringify(res, null, 1));
 console.log('VER EL PARTIDO (v3)', res.ok ? 'OK' : 'FALLÓ', '·', `completo 3 min: ${c3.segundos}s a x1 (viendo ${c3.v.duracion}s), vel máx ${c3.v.velMax}x, ${c3.v.cortes} cortes, cámara ${JSON.stringify(c3.v.camara)}, cierre ${c3.v.cierre.corriendo} corriendo de ${c3.v.cierre.muestras}`,

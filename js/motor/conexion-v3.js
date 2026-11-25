@@ -155,36 +155,45 @@ function traducir1(m,API,S,x){
   }
  }
 }
-/* ---------- "Mejores jugadas": mientras se simula, se guardan solo los recortes de la cinta de las jugadas elegidas ----------
-   tipos: goles, penales, tirosLibres, corners, peligro (remates con xG ≥ 0,12), atajadas, faltas (tarjetas y faltas
-   graves), cambios (lesiones y cambios). Cada recorte lleva sus cuadros, sus eventos y quién ocupaba cada puesto. */
-function prepararClips(S,tipos){const T=S.tv;T.clips=[];T.clipsPend=[];T.tipos=new Set(tipos||[]);T.pend={};T.slots={slot:T.puestos.map(p=>p.clave),sal:[null,null,null],hist:[]}}
-function marcarClip(S,x){const T=S.tv,ty=T.tipos,P=T.pend,add=(a,b,tipo)=>{const L=T.clipsPend[T.clipsPend.length-1];
-  if(L&&a<=L.b+20){L.b=Math.max(L.b,b);if(ORDEN.indexOf(tipo)<ORDEN.indexOf(L.tipo)){L.tipo=tipo;L.t=x.t}return}
-  T.clipsPend.push({a,b,tipo,t:x.t,slot:T.slots.slot.slice(),sal:T.slots.sal.slice()})};
- /* quién ocupa cada puesto (para dibujar el recorte con los jugadores correctos) */
- if(P.libre&&x.equipo===P.libre.e&&x.t>P.libre.t&&/^(pase|remate|jugada_ensayada|corner_ejecutado)$/.test(x.tipo)){add(x.t-30,x.t+60,P.libre.tipo);P.libre=null}
+/* ---------- "Mejores jugadas": mientras se simula, se guardan solo los recortes de la cinta de las jugadas candidatas ----------
+   Se eligen por importancia (como máximo MAX_CLIPS, después ordenados por minuto), siempre dentro de los tipos marcados:
+   goles > ocasiones claras (remate con xG alto, palo, atajada difícil) > penales > tiros libres con remate > córners SOLO si
+   terminan en remate > faltas y tarjetas > lesiones y cambios > atajadas fáciles.
+   Cada recorte lleva sus cuadros, sus eventos y quién ocupaba cada puesto. */
+const MAX_CLIPS=12,PRI={goles:6,ocasion:5,penales:4,tirosLibres:3,corners:2,faltas:1.5,cambios:1,atajadas:.8};
+function prepararClips(S,tipos){const T=S.tv;T.clips=[];T.cand=[];T.clipsPend=[];T.tipos=new Set(tipos||[]);T.pend={};T.slots={slot:T.puestos.map(p=>p.clave),sal:[null,null,null],hist:[]}}
+function marcarClip(S,x){const T=S.tv,ty=T.tipos,P=T.pend,add=(a,b,tipo,pri)=>{const L=T.clipsPend[T.clipsPend.length-1];
+  if(L&&a<=L.b+20){L.b=Math.max(L.b,b);L.a=Math.min(L.a,a);if(pri>L.pri){L.tipo=tipo;L.t=x.t;L.pri=pri}return}
+  T.clipsPend.push({a,b,tipo,pri,t:x.t,slot:T.slots.slot.slice(),sal:T.slots.sal.slice()})};
+ /* córner o tiro libre: entra solo si ese equipo remata en los 15 s siguientes */
+ if(P.libre&&x.t-P.libre.t>150)P.libre=null;
+ if(P.libre&&x.tipo==='remate'&&!x.penal&&x.equipo===P.libre.e){add(P.libre.t-30,x.t+30,P.libre.tipo,PRI[P.libre.tipo]+Math.min(.5,x.xg||0));P.libre=null}
  switch(x.tipo){
-  case 'gol':if(ty.has('goles'))add(x.t-120,x.t+(x.festejo||40)+10,'goles');break;
+  case 'gol':if(ty.has('goles'))add(x.t-120,x.t+(x.festejo||40)+10,'goles',PRI.goles);break;
   case 'penal':P.penal=x.t;break;
-  case 'remate':if(x.penal&&P.penal!=null){if(ty.has('penales'))add(P.penal-10,x.t+40,'penales');P.penal=null}else if(x.xg>=.12&&ty.has('peligro'))add(x.t-80,x.t+25,'peligro');break;
-  case 'atajada':if(!x.penal&&ty.has('atajadas'))add(x.t-60,x.t+25,'atajadas');break;
+  case 'remate':if(x.penal&&P.penal!=null){if(ty.has('penales'))add(P.penal-10,x.t+40,'penales',PRI.penales);P.penal=null}
+   else{P.ultRem={t:x.t,xg:x.xg||0};if(x.xg>=.25&&ty.has('peligro'))add(x.t-80,x.t+25,'peligro',PRI.ocasion+x.xg)}break;
+  case 'palo':if(ty.has('peligro'))add(x.t-80,x.t+30,'peligro',PRI.ocasion+.4);break;
+  case 'atajada':if(!x.penal&&ty.has('atajadas')){const r=P.ultRem&&x.t-P.ultRem.t<30?P.ultRem.xg:0,dif=(x.p!=null&&x.p<.85)||r>=.2;
+   add(x.t-60,x.t+25,'atajadas',dif?PRI.ocasion+Math.max(r,x.p!=null?1-x.p:0):PRI.atajadas)}break;
   case 'tiro_libre':if(x.modo&&x.modo!=='pase'&&ty.has('tirosLibres'))P.libre={e:x.equipo,t:x.t,tipo:'tirosLibres'};break;
   case 'corner':if(ty.has('corners'))P.libre={e:x.equipo,t:x.t,tipo:'corners'};break;
-  case 'amarilla':case 'roja':if(ty.has('faltas'))add(x.t-60,x.t+40,'faltas');break;
-  case 'falta':if(x.gravedad&&x.gravedad!=='normal'&&ty.has('faltas'))add(x.t-30,x.t+30,'faltas');break;
-  case 'lesion':if(ty.has('cambios'))add(x.t-30,x.t+70,'cambios');break;
-  case 'cambio':if(ty.has('cambios'))add(x.t-10,x.t+90,'cambios');break;
+  case 'amarilla':case 'roja':if(ty.has('faltas'))add(x.t-60,x.t+40,'faltas',PRI.faltas+(x.tipo==='roja'?.3:0));break;
+  case 'falta':if(x.gravedad&&x.gravedad!=='normal'&&ty.has('faltas'))add(x.t-30,x.t+30,'faltas',PRI.faltas);break;
+  case 'lesion':if(ty.has('cambios'))add(x.t-30,x.t+70,'cambios',PRI.cambios);break;
+  case 'cambio':if(ty.has('cambios'))add(x.t-10,x.t+90,'cambios',PRI.cambios);break;
  }
  if(x.tipo==='cambio'){if(x.salienteSlot>=0)T.slots.sal[x.salienteSlot]=x.saleClave;T.slots.slot[x.sid]=x.clave}   // después: el recorte arranca con el que sale
 }
-const ORDEN=['goles','penales','peligro','atajadas','tirosLibres','corners','faltas','cambios'];
 function armarClips(S,todo){const T=S.tv,c=T.cuadros,lim=todo?1e12:T.tMotor;
  while(T.clipsPend.length&&(T.clipsPend[0].b<=lim||todo)){const P=T.clipsPend.shift();
   const cu=c.filter(q=>q.t>=P.a&&q.t<=P.b);if(cu.length<10)continue;
   const ev=T.eventos.filter(e=>e.t>=P.a&&e.t<=P.b);
   const h=T.partes[2]!=null&&P.t>=T.partes[2]?2:1,k=Math.floor((P.t-(T.partes[h]||0))/600),min=k<45?String((h===1?0:45)+k+1):((h===1?45:90)+'+'+(k-44));
-  T.clips.push({a:cu[0].t,b:cu[cu.length-1].t,tipo:P.tipo,min,cuadros:cu,eventos:ev,slot:P.slot,sal:P.sal})}}
+  T.cand.push({a:cu[0].t,b:cu[cu.length-1].t,tipo:P.tipo,pri:P.pri,min,cuadros:cu,eventos:ev,slot:P.slot,sal:P.sal})}
+ /* los más importantes (a igual importancia, el primero), mostrados en orden de minuto */
+ const el=T.cand.slice().sort((p,q)=>q.pri-p.pri||p.a-q.a).slice(0,MAX_CLIPS);T.clips=el.sort((p,q)=>p.a-q.a);
+ T.candidatos=T.cand.map(q=>({tipo:q.tipo,pri:+q.pri.toFixed(2),a:q.a,elegido:el.includes(q)}))}
 /* para el 2D: la cinta en vivo del partido v3 (o null si el partido no es v3) */
 window.MCV3TV={de:m=>{const S=m&&m.v3?ESTADO.get(m):null;return S?S.tv:null},
  /* el menú elige "Mejores jugadas" antes de simular: desde ahí se guardan los recortes */

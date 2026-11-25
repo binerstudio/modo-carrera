@@ -322,7 +322,7 @@ if (!(F.muySuperior.gana >= .60 && F.muySuperior.gana <= .80)) out.fallas.push(`
 }
 /* ETAPA 6 · lo que dibuja el 2D: la cinta no salta, nadie se teletransporta, festejos, árbitro, córners de gol, arquero */
 {
-  const NS = 20; let saltosJ = 0, saltosB = 0, forz = 0, goles = 0, conFestejo = 0, conAbrazo = 0, arbFuera = 0, arbKm = 0, log = null, cierres = 0, cierreVel = 0;
+  const NS = 20; let saltosJ = 0, saltosB = 0, forz = 0, goles = 0, conFestejo = 0, conAbrazo = 0, arbFuera = 0, arbKm = 0, log = null, cierres = 0, cierreVel = 0, festChica = 0; const festLejos = [];
   const corners = [];
   for (let i = 0; i < NS; i++) {
     const [, h, a] = LG.fixture[(i * 37) % LG.fixture.length];
@@ -339,12 +339,17 @@ if (!(F.muySuperior.gana >= .60 && F.muySuperior.gana <= .80)) out.fallas.push(`
       const ax = d[o + c.arbitro] / 10, ay = d[o + c.arbitro + 1] / 10; if (ax < -2 || ax > 107 || ay < -2 || ay > 70) arbFuera++;
       arbKm += Math.hypot(d[o + c.arbitro] - d[q + c.arbitro], d[o + c.arbitro + 1] - d[q + c.arbitro + 1]) / 10000;
     }
-    /* escena de cierre: existe y nadie corre (pasado el primer segundo y medio, cuando frenan) */
-    { const ce = r.eventos.find(e => e.tipo === 'cierre'); if (ce) { cierres++; for (let k = idx(ce.t) + 16; k < F; k++) for (let j = 0; j < 22; j++) { const o = k * n, q = (k - 1) * n; cierreVel = Math.max(cierreVel, Math.hypot(d[o + 5 + j * 2] - d[q + 5 + j * 2], d[o + 6 + j * 2] - d[q + 6 + j * 2])); } } }
+    /* escena de cierre: existe y nadie corre: pasado el primer segundo y medio (cuando frenan) todos van a 1,8 m/s o menos (caminando) */
+    /* velocidad medida en 1 s (10 cuadros): la cinta está en decímetros y cuadro a cuadro el redondeo agrega hasta 0,7 m/s */
+    { const ce = r.eventos.find(e => e.tipo === 'cierre'); if (ce) { cierres++; for (let k = idx(ce.t) + 15; k < F; k++) for (let j = 0; j < 22; j++) { const o = k * n, q = (k - 10) * n; cierreVel = Math.max(cierreVel, Math.hypot(d[o + 5 + j * 2] - d[q + 5 + j * 2], d[o + 6 + j * 2] - d[q + 6 + j * 2]) / 10); } } }
     for (const g of r.eventos.filter(e => e.tipo === 'gol')) {
       goles++;
       if (g.festejo) { conFestejo++; const k = idx(g.t + 120), o = k * n, j = g.jid, x = d[o + 5 + j * 2], y = d[o + 6 + j * 2];
-        if ([...Array(22).keys()].some(q => q !== j && Math.hypot(d[o + 5 + q * 2] - x, d[o + 6 + q * 2] - y) / 10 < 2.5)) conAbrazo++; }
+        if ([...Array(22).keys()].some(q => q !== j && Math.hypot(d[o + 5 + q * 2] - x, d[o + 6 + q * 2] - y) / 10 < 2.5)) conAbrazo++;
+        /* el goleador festeja en el banderín o contra la tribuna; nadie amontonado en el área chica (salvo el arquero) */
+        const der = g.x > 52.5, sx = x / 10, sy = y / 10, dc = Math.min(Math.hypot(sx - (der ? 105 : 0), sy), Math.hypot(sx - (der ? 105 : 0), sy - 68));
+        if (!(dc < 4.5 || Math.min(sy, 68 - sy) < 3)) festLejos.push({ partido: i, min: Math.round(g.t / 600), pos: [+sx.toFixed(1), +sy.toFixed(1)] });
+        for (let k = idx(g.t + 50); k <= idx(g.t + g.festejo); k++) { const o2 = k * n; let m = 0; for (let q = 0; q < 22; q++) { if (q === 0 || q === 11) continue; const x2 = d[o2 + 5 + q * 2] / 10, y2 = d[o2 + 6 + q * 2] / 10; if ((der ? x2 > 99.5 : x2 < 5.5) && y2 > 24.84 && y2 < 43.16) m++; } festChica = Math.max(festChica, m); } }
       if (g.origen === 'corner') { const der = g.x > 52.5; let max = 0;
         for (let k = idx(g.t - 45); k <= idx(g.t + 15); k++) { const o = k * n; let m = 0; for (let j = 0; j < 22; j++) { const x = d[o + 5 + j * 2] / 10, y = d[o + 6 + j * 2] / 10; if ((der ? x > 88.5 : x < 16.5) && y > 13.84 && y < 54.16) m++; } max = Math.max(max, m); }
         corners.push(max); }
@@ -352,10 +357,11 @@ if (!(F.muySuperior.gana >= .60 && F.muySuperior.gana <= .80)) out.fallas.push(`
   }
   const gkErr = (sum.gkErr || 0) / (sum.goles || 1);
   out.etapa6 = { partidos: NS, saltosJugadores: saltosJ, saltosPelota: saltosB, primerSalto: log, esperasForzadas: forz, goles, festejos: conFestejo, conAbrazo, arbitroFueraDeLugar: arbFuera, arbitroKmPorPartido: +(arbKm / NS).toFixed(1),
-    escenaDeCierre: cierres, velocidadMaximaEnElCierre: +cierreVel.toFixed(2), golesDeCorner: corners.length, jugadoresEnElAreaEnLaRepeticion: corners, golesErrorArquero: +gkErr.toFixed(3), origenGoles: Object.fromEntries(Object.entries(sum.origen || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => [k, +(v / (sum.goles || 1)).toFixed(3)])) };
+    escenaDeCierre: cierres, velocidadMaximaEnElCierre: +cierreVel.toFixed(2), festejoMaxEnAreaChica: festChica, festejosLejosDelBanderin: festLejos, golesDeCorner: corners.length, jugadoresEnElAreaEnLaRepeticion: corners, golesErrorArquero: +gkErr.toFixed(3), origenGoles: Object.fromEntries(Object.entries(sum.origen || {}).sort((a, b) => b[1] - a[1]).map(([k, v]) => [k, +(v / (sum.goles || 1)).toFixed(3)])) };
   if (saltosJ || saltosB) out.fallas.push(`Etapa 6: la cinta tiene saltos (jugadores ${saltosJ}, pelota ${saltosB}) ${JSON.stringify(log)}`);
   if (forz) out.fallas.push(`Etapa 6: ${forz} pelotas paradas se ejecutaron acomodando jugadores de golpe`);
-  if (cierres < NS || cierreVel > 4.5) out.fallas.push(`Etapa 6: escena de cierre ${cierres}/${NS}, velocidad máxima ${cierreVel.toFixed(2)} m/s`);
+  if (festChica > 1 || festLejos.length) out.fallas.push(`Etapa 6: festejo con ${festChica} jugadores en el área chica (máximo 1) o goleador lejos del banderín/tribuna ${JSON.stringify(festLejos)}`);
+  if (cierres < NS || cierreVel > 1.8) out.fallas.push(`Etapa 6: escena de cierre ${cierres}/${NS}, velocidad máxima ${cierreVel.toFixed(2)} m/s`);
   if (conFestejo < goles * .85 || conAbrazo < conFestejo * .8) out.fallas.push(`Etapa 6: festejos ${conFestejo}/${goles}, con abrazo ${conAbrazo}`);
   if (arbFuera || out.etapa6.arbitroKmPorPartido < 4) out.fallas.push(`Etapa 6: árbitro raro (fuera ${arbFuera}, ${out.etapa6.arbitroKmPorPartido} km)`);
   if (corners.some(x => x < 5)) out.fallas.push(`Etapa 6: un gol de córner con menos de 5 jugadores en el área (${corners})`);

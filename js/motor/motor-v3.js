@@ -350,8 +350,8 @@ P.chequeoTiro=function(){
    if(this.R()<p){
     this.st.atajadas[1-e]++;
     const pc=clamp(.25+a.manejo*.006-(sp-15)*.02,.05,.9);
-    if(this.R()<pc&&this.enArea(gk)){this.ev('atajada',1-e,gk,{rematador:T.j.nombre,retenida:true});this.tomar(gk,true);return false}
-    this.ev('atajada',1-e,gk,{rematador:T.j.nombre,retenida:false});
+    if(this.R()<pc&&this.enArea(gk)){this.ev('atajada',1-e,gk,{rematador:T.j.nombre,retenida:true,p:T.gkEval.p});this.tomar(gk,true);return false}
+    this.ev('atajada',1-e,gk,{rematador:T.j.nombre,retenida:false,p:T.gkEval.p});
     T.gkEval.atajo=true;
     const s=B.y>gk.y?1:-1,dw=this.dir(e),dl=MATH.max(0,PW-bax);
     let afuera=this.R()<CAL.rebotaAfuera;
@@ -763,8 +763,14 @@ P.objetivosFestejo=function(F){
  for(const j of this.A){
   if(j===a){j.tx=F.punto[0];j.ty=F.punto[1];j.urg=k<60?1:.5;continue}
   if(j.eq===F.eq&&!j.gk&&a){const i=F.orden.indexOf(j.id);if(i<0||i>6){j.tx=j.x;j.ty=j.y;j.urg=.2;continue}
-   const ang=i*.9+.4,rad=.9+(i>3?.5:0);j.tx=clamp(a.x+MATH.cos(ang)*rad,.6,PW-.6);j.ty=clamp(a.y+MATH.sin(ang)*rad,.6,PH-.6);j.urg=.95;continue}
-  j.tx=j.x+j.vx*.2;j.ty=j.y+j.vy*.2;j.urg=.15;   // el resto frena y se queda (los rivales, lamentándose)
+   /* los compañeros van al mismo banderín (no al goleador: así no lo encierran en el área) y lo abrazan ahí */
+   const p=F.punto,sx=p[0]<52.5?1:-1,sy=p[1]<34?1:-1,ang=(i%4)*MATH.PI/6,rad=1+MATH.floor(i/4)*.9;
+   j.tx=clamp(p[0]+sx*MATH.cos(ang)*rad,.6,PW-.6);j.ty=clamp(p[1]+sy*MATH.sin(ang)*rad,.6,PH-.6);j.urg=.95;continue}
+  /* el resto camina (nadie se queda amontonado en el área chica sobre el arquero): el arquero que recibió el gol vuelve a
+     su arco; los demás rivales y los compañeros que no festejan caminan a su lugar en su campo, despacio y lamentándose */
+  const camina=MATH.min(.3,1.6/j.vmax);
+  if(j.gk){j.tx=this.wx(j.eq,1.2);j.ty=34;j.urg=camina;continue}
+  j.tx=this.wx(j.eq,MATH.min(j.bx*.85,j.eq===F.eq?50:42));j.ty=this.wy(j.eq,j.by);j.urg=k<15?.15:camina;
  }
 };
 /* forma del equipo: tres líneas a distancia real, corta y angosta sin pelota, larga y ancha con pelota,
@@ -943,7 +949,7 @@ P.mover=function(){
    const dx=j.tx-j.x,dy=j.ty-j.y,d=hyp(dx,dy);
    if(d<.25){dvx=0;dvy=0}else{const sp=j.urg>=.9?MATH.min(vm*j.urg,d*1.4):MATH.min(vm*j.urg,MATH.max(0,d-.8)*.7);dvx=dx/d*sp;dvy=dy/d*sp}
   }
-  let ac=j.acc*DT*(j.gk&&j.tiroTarget?2.5:1);
+  let ac=j.acc*DT*(j.gk&&j.tiroTarget?2.5:this.estado==='cierre'?2.5:1);   // al pitazo final frenan enseguida
   let ax=dvx-j.vx,ay=dvy-j.vy;const m=hyp(ax,ay);if(m>ac){ax*=ac/m;ay*=ac/m}
   j.vx+=ax;j.vy+=ay;
   let sp=hyp(j.vx,j.vy);const lim=vm*(j.gk&&j.tiroTarget?1.25:1);if(sp>lim){j.vx*=lim/sp;j.vy*=lim/sp;sp=lim}
@@ -1556,7 +1562,7 @@ P.cierre=function(){
 };
 P.tickCierre=function(k){
  const R=this.roles;
- for(const j of this.A){const r=R[j.id];if(!r)continue;const lento=MATH.min(.4,2.4/j.vmax),camina=MATH.min(.25,1.5/j.vmax);
+ for(const j of this.A){const r=R[j.id];if(!r)continue;const lento=MATH.min(.25,1.6/j.vmax),camina=MATH.min(.22,1.4/j.vmax);   // al pitazo final nadie corre: caminan
   switch(r.rol){
    case 'festeja':{const p=r.grupo||[j.x,j.y];j.tx=p[0];j.ty=p[1];j.urg=lento;break}
    case 'aplaude':{j.tx=clamp(r.x0,6,PW-6);j.ty=r.y0<34?2.5:PH-2.5;j.urg=camina;break}
