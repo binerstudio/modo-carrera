@@ -791,14 +791,22 @@ function momentos(){const E=Q.tv.eventos,M=Q.mom,add=(a,b,cat,t)=>M.push({a,b,ca
    case 'cambio':add(e.t-20,e.t+80,'cambio',e.t);break;
   }}}
 /* el puntaje mínimo que entra en el tiempo real que queda; lo que sobra alarga la previa de cada jugada elegida */
-function umbral(){const {T}=verCfg(),Brem=Math.max(4,T-Q.realT)*1.08,r=clamp(restoTicks()/57000,0,1);
- /* siempre entran: los saques del medio, el final de cada tiempo, los goles (con su festejo y repetición) y los penales */
- const L=Object.entries(CAT).sort((a,b)=>b[1][0]-a[1][0]);let E=0,n=0,th=1000;
- for(const [k,[s,c,d]] of L){const fijo=k==='inicio'||k==='fin',e=(fijo?1:r)*c*d;if(s<1000&&E+e>Brem)break;E+=e;if(!fijo)n+=r*c;if(s<1000)th=s}
- Q.th=th;Q.extra=clamp((Brem-E)/Math.max(1,n),0,45)*10;Q.pred={T,Brem:+Brem.toFixed(1),E:+E.toFixed(1),umbral:th,previa:+(Q.extra/10).toFixed(1)}}
-const desde=m=>m.cat==='inicio'||m.cat==='fin'?m.a:m.a-Q.extra;
-function enVentana(t){for(const m of Q.mom)if(m.s>=Q.th&&t>=desde(m)&&t<=m.b)return m;return null}
-function proximaVentana(t){let best=null;for(const m of Q.mom)if(m.s>=Q.th&&m.b>t){const a=desde(m);if(a>t&&(!best||a<desde(best)))best=m}return best}
+function umbral(){const {T}=verCfg(),Brem=Math.max(4,T-Q.realT)*.85,r=clamp(restoTicks()/57000,0,1);
+ /* lo que va pasando en ESTE partido corrige lo esperado (un 0-0 trabado tiene menos jugadas que un 4-3) */
+ const tv0=Q.live?Q.live.tp:0,nObs=Q.mom.filter(m=>m.cat!=='inicio'&&m.cat!=='fin'&&m.t<=tv0).length,nEsp=(1-r)*Object.entries(CAT).reduce((a,[k,v])=>a+(k==='inicio'||k==='fin'?0:v[1]),0),kc=clamp((nObs+6)/(nEsp+6),.5,1.8);
+ /* siempre entran: los saques del medio, el final de cada tiempo, los goles (con su festejo) y los penales; si con eso
+    ya no alcanza el tiempo, los goles se muestran más compactos (menos previa, festejo más corto y sin repetición) */
+ const fijos=CAT.inicio[1]*CAT.inicio[2]*(r>.5?1:.5)+CAT.fin[1]*CAT.fin[2]*(r>.5?1:.5),oblig=r*kc*(CAT.gol[1]*CAT.gol[2]+CAT.penal[1]*CAT.penal[2]);
+ Q.fi=clamp((Brem-fijos)/Math.max(1,oblig),.3,1);
+ const L=Object.entries(CAT).sort((a,b)=>b[1][0]-a[1][0]);let E=fijos+oblig*Q.fi,n=r*kc*(CAT.gol[1]+CAT.penal[1]),th=1000;
+ for(const [k,[s,c,d]] of L){if(s>=1000)continue;const e=r*kc*c*d;if(E+e>Brem)break;E+=e;n+=r*kc*c;th=s}
+ /* lo que sobra alarga la previa de cada jugada elegida (hasta 2 minutos de juego) */
+ Q.th=th;Q.extra=0;   // el tiempo que sobra lo reparte el cronograma (ver frameV3)
+Q.pred={T,Brem:+Brem.toFixed(1),E:+E.toFixed(1),umbral:th,previa:+(Q.extra/10).toFixed(1),fi:+Q.fi.toFixed(2),kc:+kc.toFixed(2),toca:+(T*(tv0-(Q.tv.partes[1]||0))/Math.max(1,tv0-(Q.tv.partes[1]||0)+restoTicks())).toFixed(1)}}
+const desde=m=>m.cat==='inicio'||m.cat==='fin'?m.a:m.cat==='gol'?m.t-(m.t-m.a)*(Q.fi||1)-Q.extra:m.a-Q.extra;
+const hasta=m=>m.cat==='gol'?m.t+(m.b-m.t)*Math.max(.4,Q.fi||1):m.b;
+function enVentana(t){for(const m of Q.mom)if(m.s>=Q.th&&t>=desde(m)&&t<=hasta(m))return m;return null}
+function proximaVentana(t){let best=null;for(const m of Q.mom)if(m.s>=Q.th&&hasta(m)>t){const a=desde(m);if(a>t&&(!best||a<desde(best)))best=m}return best}
 function enPeligro(t){const m=Q.on&&Q.mom?enVentana(t):null;return !!(m&&m.s<1000)}
 /* ticks que faltan jugar (estimado con el descuento cuando ya se conoce) */
 function restoTicks(){const tv=Q.tv,t=Q.live?Q.live.tp:0,h=tv.partes[2]!=null&&t>=tv.partes[2]?2:1,t0=tv.partes[h]!=null?tv.partes[h]:t;
@@ -818,11 +826,11 @@ function armarRepeticion(P){const c=Q.tv.cuadros,min=verCfg().min,L=min>=10?80:m
 const FUNDIDO=.32;
 /* reloj del presupuesto: se cuenta "a x1" (con x2/x4 se ven las mismas jugadas en menos tiempo); realW es el tiempo real */
 function sumaT(r){Q.realT+=r*speed();Q.realW=(Q.realW||0)+r}
-function cortarA(t){const tv=Q.tv,R=Q.live;Q.corte={fase:'sale',k:0,a:t,de:R.tp};Q.cortes++}
+function cortarA(t){const tv=Q.tv,R=Q.live;Q.corte={fase:'sale',k:0,a:t,de:R.tp,dur:FUNDIDO/Math.max(1,speed())};Q.cortes++}
 function avanzarCorte(real){const C=Q.corte,R=Q.live,tv=Q.tv;C.k+=real;
- if(C.fase==='sale'&&C.k>=FUNDIDO){const p2=tv.partes[2];saltarV3(C.a);if(p2!=null&&C.a>=p2)Q.cruzo=true;Q.mitad=true;Q.camSnap=true;
+ if(C.fase==='sale'&&C.k>=C.dur){const p2=tv.partes[2];saltarV3(C.a);if(p2!=null&&C.a>=p2)Q.cruzo=true;Q.mitad=true;Q.camSnap=true;
   Q.corteTxt='⏩ '+minutoV3(C.a).txt+"'";C.fase='entra';C.k=0;if(Q.capturaCorte!==false)Q.ultimoCorte={de:+(C.de/600).toFixed(1),a:+(C.a/600).toFixed(1)}}
- else if(C.fase==='entra'&&C.k>=FUNDIDO){Q.corte=null}}
+ else if(C.fase==='entra'&&C.k>=C.dur){Q.corte=null}}
 /* un cuadro del modo v3 */
 function frameV3(real,crudo){real=Math.min(.3,crudo||real);
  const m=S.m,tv=Q.tv,R=Q.live;refrescarEntradas(m);momentos();
@@ -841,7 +849,11 @@ function frameV3(real,crudo){real=Math.min(.3,crudo||real);
   let espera=false;
   if(!enVentana(R.tp)){const nx=proximaVentana(R.tp);
    if(nx){let a=desde(nx);if(f1!=null&&!Q.cruzo&&a>f1&&(p2==null||a<p2))a=p2!=null?p2:f1-1;
-    if(a-R.tp>25){if(a<=tMax){cortarA(a);sumaT(real)}else espera=true}}
+    /* cronograma: lo visto tiene que ir parejo con el partido. Si al llegar a la próxima jugada quedaría tiempo de sobra,
+       el corte cae antes y ese sobrante se ve como la previa de la jugada (cómo se arma, a velocidad real) */
+    {const T0=verCfg().T,T=Math.max(T0*.6,T0-38),t0=tv.partes[1]||0,total=Math.max(1,R.tp-t0+restoTicks()),sobra=T*(a-t0)/total-Q.realT-6;   // 38 s quedan para el final (escena de cierre, festejos, fundidos)
+     if(sobra>0&&!(f1!=null&&!Q.cruzo&&a>=f1-1&&R.tp<f1-1&&p2==null))a=Math.max(R.tp,a-sobra*10)}
+    if(a-R.tp>80){if(a<=tMax){cortarA(a);sumaT(real)}else espera=true}}   // huecos de menos de 8 s de juego se ven (no se corta)
    else if(!tv.terminado)espera=true}   // todavía no se sabe cuál es la próxima: se espera al motor
   if(espera)Q.esperaReal+=real;
   else if(!Q.corte){
@@ -862,7 +874,7 @@ function frameV3(real,crudo){real=Math.min(.3,crudo||real);
  if(dtG>0&&!Q.mitad){const lim=dtG*11+.6;for(const s of R.list){const p=prev.get(s);if(!p||p[2]<=0||s.alpha<=0)continue;const d=Math.hypot(s.x-p[0],s.y-p[1]);if(d>lim){Q.saltos.dibujo++;Q.saltos.log={jugador:s.name,clave:s.key,puesto:s.sid,puestos:R.slot.reduce((a,k,i)=>k===s.key?a.concat(i):a,[]),saliente:R.sal.indexOf(s.key),d:+d.toFixed(2),lim:+lim.toFixed(2),t:R.tp,de:[+p[0].toFixed(1),+p[1].toFixed(1)],a:[+s.x.toFixed(1),+s.y.toFixed(1)],eventos:Q.tv.eventos.filter(e=>Math.abs(e.t-R.tp)<30).map(e=>e.tipo+(e.sid!=null?'#'+e.sid:'')+(e.jid!=null?'@'+e.jid:''))}}}
   const db=Math.hypot(R.ball.x-pb[0],R.ball.y-pb[1]);if(db>dtG*48+.6){Q.saltos.dibujo++;Q.saltos.log={pelota:true,d:+db.toFixed(2),t:R.tp}}}
  if(hay)Q.mitad=false;
- if(Q.repPend&&R.tp>=Q.repPend.at&&!Q.corte){const P=Q.repPend;Q.repPend=null;if(visible())armarRepeticion(P)}
+ if(Q.repPend&&R.tp>=Math.min(Q.repPend.at,Q.repPend.tg+((Q.repPend.at-Q.repPend.tg)*Math.max(.55,Q.fi||1)))&&!Q.corte){const P=Q.repPend;Q.repPend=null;if(visible()&&(Q.fi||1)>=.8)armarRepeticion(P)}   // si vamos atrasados, sin repetición
  /* recorte de memoria: se guardan los últimos 30 s ya vistos */
  const c=tv.cuadros;if(c.length&&c[0].t<R.tp-300){let k=0;while(k<c.length&&c[k].t<R.tp-300)k++;c.splice(0,k)}
  S.ball=R.ball;S.ref=R.ref;S.owner=R.owner;S.sp=R.list;
@@ -887,7 +899,7 @@ function frameMejores(real){const H=Q.hl;H.k+=real;
  const mn=minutoV3();if(mn.txt!==Q.ultMin){Q.ultMin=mn.txt;pedirRender()}}
 /* capa del modo v3: fundido de los cortes, carteles de "Mejores jugadas" y el resultado final */
 function capaV3(ctx){const w=S.w,h=S.h;let a=0,txt=null,sub=null;
- if(Q.corte){a=Q.corte.fase==='sale'?Q.corte.k/FUNDIDO:1-Q.corte.k/FUNDIDO;txt=Q.corte.fase==='entra'?Q.corteTxt:null}
+ if(Q.corte){const D=Q.corte.dur||FUNDIDO;a=Q.corte.fase==='sale'?Q.corte.k/D:1-Q.corte.k/D;txt=Q.corte.fase==='entra'?Q.corteTxt:null}
  const H=Q.hl;if(H){const C=H.clips[H.i];
   if(H.fase==='titulo'&&C){a=.62;const g=golesHasta(C.a),ab=abrev();txt=`${C.min}' · ${TIT[C.tipo]||C.tipo}`;sub=`${ab[0]} ${g[0]} - ${g[1]} ${ab[1]}`}
   else if(H.fase==='sale')a=H.k/FUNDIDO;
