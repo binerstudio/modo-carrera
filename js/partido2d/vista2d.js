@@ -843,12 +843,12 @@ function umbral(){const {T}=verCfg(),Brem=Math.max(4,T-Q.realT)*.85,r=clamp(rest
  /* lo que sobra alarga la previa de cada jugada elegida (hasta 2 minutos de juego) */
  /* cronograma: si lo visto va atrasado respecto del partido, entran jugadas de menos puntaje (no más calma); si va
     adelantado, se sube el puntaje mínimo. Las que siempre entran (goles, penales, inicio y final) no se tocan */
- {const T2=Math.max(T*.6,T-25),t0=Q.tv.partes[1]||0,pr=clamp((tv0-t0)/Math.max(1,tv0-t0+restoTicks()),0,1),ade=T2*pr-Q.realT;Q.ade=ade;
+ {const T2=Math.max(T*.6,T-15),t0=Q.tv.partes[1]||0,pr=clamp((tv0-t0)/Math.max(1,tv0-t0+restoTicks()),0,1),ade=T2*pr-Q.realT;Q.ade=ade;
   const S2=[...new Set(L.map(x=>x[1][0]).filter(x=>x<1000))].sort((a,b)=>b-a);let i=S2.indexOf(th);if(i<0)i=th>=1000?-1:S2.length-1;
   const paso=Math.min(S2.length,Math.floor(Math.abs(ade)/6));if(ade>6)i=Math.min(S2.length-1,i+paso);else if(ade<-6)i=Math.max(-1,i-paso);
   th=i<0?1000:S2[i];Q.thMin=th<=S2[S2.length-1]}
- /* si ya entran todas las jugadas y todavía sobra tiempo, cada una arranca hasta 5 s antes (su armado) en vez de agregar calma */
- Q.th=th;Q.extra=Q.thMin&&Q.ade>6?Math.min(50,Math.round(Q.ade*1.5)):0;
+ /* si lo visto va atrasado, además de entrar más jugadas cada una arranca hasta 5 s antes (su armado), en vez de agregar calma */
+ Q.th=th;Q.extra=Q.ade>4?Math.min(50,Math.round(Q.ade*2)):0;
 Q.pred={T,Brem:+Brem.toFixed(1),E:+E.toFixed(1),umbral:th,previa:+(Q.extra/10).toFixed(1),fi:+Q.fi.toFixed(2),kc:+kc.toFixed(2),toca:+(T*(tv0-(Q.tv.partes[1]||0))/Math.max(1,tv0-(Q.tv.partes[1]||0)+restoTicks())).toFixed(1)}}
 const desde=m=>m.cat==='inicio'||m.cat==='fin'?m.a:m.cat==='gol'?m.t-(m.t-m.a)*(Q.fi||1)-Q.extra:m.a-Q.extra;
 const hasta=m=>m.cat==='gol'?m.t+(m.b-m.t)*Math.max(.4,Q.fi||1):m.b;
@@ -904,7 +904,7 @@ function frameV3(real,crudo){real=Math.min(.3,crudo||real);
    if(nx){let a=desde(nx);if(f1!=null&&!Q.cruzo&&a>f1&&(p2==null||a<p2))a=p2!=null?p2:f1-1;
     /* cronograma: lo visto tiene que ir parejo con el partido. Si al llegar a la próxima jugada quedaría tiempo de sobra,
        el corte cae antes y ese sobrante se ve como la previa de la jugada (cómo se arma, a velocidad real) */
-    {const T0=verCfg().T,T=Math.max(T0*.6,T0-25),t0=tv.partes[1]||0,total=Math.max(1,R.tp-t0+restoTicks()),sobra=T*(a-t0)/total-Q.realT-6;   // 25 s quedan para el final (escena de cierre, festejos, fundidos)
+    {const T0=verCfg().T,T=Math.max(T0*.6,T0-15),t0=tv.partes[1]||0,total=Math.max(1,R.tp-t0+restoTicks()),sobra=T*(a-t0)/total-Q.realT-6;   // 15 s quedan para el final (escena de cierre, festejos, fundidos)
      if(sobra>0&&!(f1!=null&&!Q.cruzo&&a>=f1-1&&R.tp<f1-1&&p2==null))a=Math.max(R.tp,a-Math.min(sobra*10,25))}   // la calma: como mucho 2,5 s de transición   // la calma, solo como transición corta
     if(a-R.tp>30){if(a<=tMax){cortarA(a);sumaT(real)}else espera=true}}   // huecos de menos de 8 s de juego se ven (no se corta)
    else if(!tv.terminado)espera=true}   // todavía no se sabe cuál es la próxima: se espera al motor
@@ -986,7 +986,7 @@ function revisarCinta(){const c=Q.tv.cuadros,F=Q.tv.formato;if(!F)return;Q.rc=Q.
   st.cambio=new Set(Q.tv.eventos.filter(e=>e.tipo==='cambio'&&Math.abs(e.t-q.t)<=1).map(e=>e.sid));
   if(p&&q.t===p.t+1&&!(Q.tv.partes[2]!=null&&q.t===Q.tv.partes[2])){
    for(let j=0;j<F.jugadores;j++){if(st.cambio&&st.cambio.has(j))continue;const d=Math.hypot(q.d[5+j*2]-p.d[5+j*2],q.d[6+j*2]-p.d[6+j*2])/10;if(d>1.5){Q.saltos.cinta++;Q.saltos.log={slot:j,d:+d.toFixed(2),t:q.t}}}
-   const db=Math.hypot(q.d[0]-p.d[0],q.d[1]-p.d[1])/10;if(db>5){Q.saltos.pelota++;Q.saltos.log={pelota:true,d:+db.toFixed(2),t:q.t}}}
+   const db=Math.hypot(q.d[0]-p.d[0],q.d[1]-p.d[1])/10;if(db>5){Q.saltos.pelota++;Q.saltos.log={pelota:true,d:+db.toFixed(2),t:q.t,de:[p.d[0]/10,p.d[1]/10,p.d[3],p.d[4]],a:[q.d[0]/10,q.d[1]/10,q.d[3],q.d[4]],eventos:Q.tv.eventos.filter(e=>Math.abs(e.t-q.t)<60).map(e=>e.t+':'+e.tipo+(e.jid!=null?'@'+e.jid:''))}}}
   st.prev=q;st.t=q.t}}
 function initV3(m,tv){Q.on=true;Q.saltado=false;Q.tv=tv;Q.ent=new Map();refrescarEntradas(m);Q.mom=[];Q.th=1000;Q.extra=0;Q.evw=0;Q.cortes=0;Q.corteReal=0;Q.velMax=0;Q.resultado=false;Q.finT=0;Q.htT=0;Q.htPedido=false;Q.hl=null;Q.corte=null;Q.umbT=0;Q.duracion=null;Q.ultimoCorte=null;Q.realW=0;Q.camSaltos=0;Q.camVel=0;Q.mitad=true;Q.camSnap=true;Q.cierre={muestras:0,corriendo:0,poses:{},log:null};Q.pendTL=null;Q.pendPen=null;Q.desc={};Q.repCola=[];Q.repFallas=[];Q.golesVistos=0;Q.rep=null;Q.trans=null;Q.vista={max:0,log:null,n:0,lentos:0};Q.carteles=[];Q.ultG='';Q.mov={pasos:0,largo:[],patinaje:0,patLog:null,saltosPose:0,poseMax:0,saltoLog:null,cond:0,pieMax:0,pieLejos:0};Q.protoReal=0;Q.transiciones=0;
  Q.saltos={cinta:0,pelota:0,dibujo:0,log:null};Q.festVisto=0;Q.abrazoVisto=0;Q.lamentoVisto=0;Q.repStats=[];Q.esperaReal=0;Q.peligroReal=0;Q.calmaReal=0;Q.repReal=0;Q.rc=null;

@@ -1098,7 +1098,7 @@ P.retirar=function(j){
  if(L.length<=7){this.suspender(e);return}
  j.fuera=true;j.s.salio=+this.minAbs().toFixed(1);
  const k=L.indexOf(j);if(k>=0)L.splice(k,1);
- if(B.dueno===j){B.dueno=null;B.tipo='suelta'}
+ if(B.dueno===j){B.dueno=null;B.tipo='suelta';B.vx=B.vy=0}
  this.salir(j,false);
  this.activos();this.interrumpir(30);this.minimoEnCancha[e]=MATH.min(this.minimoEnCancha[e],L.length);
  if(j.gk){ /* sin arquero: entra uno del banco si se puede; si no, ataja un jugador de campo */
@@ -1146,6 +1146,8 @@ P.crearJugador=function(raw,e,id,sl){
 };
 P.cambio=function(e,sale,raw,motivo,extra){
  const C=this.cambios[e];
+ /* un cambio que llega del juego con la pelota en juego: si el que sale la tenía, la pelota queda suelta donde está (no se va con él) */
+ {const B=this.B;if(B.dueno===sale){B.dueno=null;B.tipo='suelta';B.vx=B.vy=0}}
  if(C.rean!==this.rean||!this.rean){if(!this.enEntretiempo){C.ventanas++}C.rean=this.rean}
  C.n++;this.st.cambios[e]++;this.interrumpir(25);
  const gk=extra&&extra.gk;
