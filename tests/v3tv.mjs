@@ -1,6 +1,6 @@
 /* MODO CARRERA · cómo se ve el partido con el motor v3 (navegador real)
    - Menú al tocar "Comenzar partido": Partido completo (3 a 15 min), Mejores jugadas, Simular partido; se recuerda.
-   - Partido completo de 3 min a x1: dura ~3 min (±20%), nunca se mueve nada más rápido que la velocidad real, hay cortes
+   - Partido completo de 3 min a x1: dura ~3 min (±30%, aceptado por el usuario), nunca se mueve nada más rápido que la velocidad real, hay cortes
      de fase, 0 saltos (cinta y dibujo), lo dibujado = la cinta, la cámara no salta, festejo/repetición si hay goles y la
      escena de cierre sin nadie corriendo; al final pasa al resultado.
    - Mejores jugadas: solo los tipos marcados, uno tras otro. Simular partido: directo al resultado con estadísticas.
@@ -61,7 +61,7 @@ async function completo(min, vel, fotos) {
 const c3 = await completo(3, 1, true);
 { const v = c3.v, dur = c3.segundos;   // tiempo real de reloj, desde que arranca hasta el resultado (esperas incluidas)
   ok(c3.done && v.resultado && /ESTAD/.test(c3.tab), `partido completo (3 min): no terminó en el resultado (${JSON.stringify({ done: c3.done, tab: c3.tab })})`);
-  ok(dur >= 144 && dur <= 216, `partido completo (3 min) a x1 duró ${dur} s (objetivo 180 ±20%)`);
+  ok(dur >= 126 && dur <= 234, `partido completo (3 min) a x1 duró ${dur} s (objetivo 180 ±30%)`);
   ok(v.velMax <= 1.05, `algo se movió más rápido que la velocidad real a x1 (${v.velMax}x)`);
   ok(v.cortes >= 3, `casi no hubo cortes de fase (${v.cortes})`);
   ok(v.saltosCinta === 0 && v.saltosPelota === 0 && v.saltosDibujo === 0, `saltos: cinta ${v.saltosCinta}/${v.saltosPelota}, dibujo ${v.saltosDibujo} ${JSON.stringify(v.saltoLog)}`);
@@ -100,7 +100,7 @@ let c15 = null;
 if (LARGO) {
   await page.evaluate(() => { match.finished = true; openMatch(); go('match'); });
   c15 = await completo(15, 4, false); const v = c15.v, dur = c15.segundos * 4;
-  ok(dur >= 720 && dur <= 1080, `partido completo (15 min): ${c15.segundos} s a x4 = ${dur} s a x1 (objetivo 900 ±20%)`);
+  ok(dur >= 630 && dur <= 1170, `partido completo (15 min): ${c15.segundos} s a x4 = ${dur} s a x1 (objetivo 900 ±30%)`);
   ok(v.velMax <= 4.2, `a x4 algo se movió a ${v.velMax}x`);
   ok(v.saltosDibujo === 0 && v.camara.saltos === 0, `15 min: saltos de dibujo ${v.saltosDibujo}, de cámara ${v.camara.saltos}`);
 }
