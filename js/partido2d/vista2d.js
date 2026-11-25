@@ -163,7 +163,8 @@ function runPlay(dt){const p=S.play;if(!p)return;p.t-=dt;const st=p.steps[p.i];
  if(p.i<0||p.t<=0||(st&&st.u&&st.u())){p.i++;if(p.i>=p.steps.length){finish(p);return}const n=p.steps[p.i];p.t=n.d;try{n.f&&n.f()}catch(e){console.warn('MC2D',e)}}}
 function finish(p){S.play=null;S.reset=false;S.sp.forEach(s=>{if(!s.out)s.ov=null});if(p.reveal)reveal(p.reveal);if(S.golT&&iniciarRepeticion())return;next()}
 function reveal(n){if(n>S.shown){S.shown=n;contar();try{window.renderMatch&&renderMatch()}catch(e){}}}
-function contar(){const E=(S.m.events||[]).slice(0,S.shown);let o=0,r=0;E.forEach(e=>{if(/GOL (LOCAL|VISITANTE)/.test(e.title||'')){if(e.side==='r')r++;else o++}});S.goles=[o,r]}
+function golesDe(E){let o=0,r=0;E.forEach(e=>{if(/GOL (LOCAL|VISITANTE)/.test(e.title||'')){if(e.side==='r')r++;else o++}});return[o,r]}   // [propio, rival]
+function contar(){S.goles=golesDe((S.m.events||[]).slice(0,S.shown))}
 function banner(txt,col,d){S.banner={txt,col:col||'#e2bd70',t:d||2.4}}
 function bigTxt(txt,col,d){S.big={txt,col:col||'#e2bd70',t:d||1.6,d:d||1.6}}
 function teamOfSide(side){return side==='r'?1:0}
@@ -916,7 +917,7 @@ function frameV3(real,crudo){real=Math.min(.3,crudo||real);
  S.ball=R.ball;S.ref=R.ref;S.owner=R.owner;S.sp=R.list;
  /* relato, marcador y reloj: lo que ya se vio en la cancha */
  const n=corteV3(m);if(n!==Q.ultCorte){Q.ultCorte=n;S.shown=n;contar();pedirRender()}
- const mn=minutoV3();if(mn.txt!==Q.ultMin){Q.ultMin=mn.txt;pedirRender()}}
+ const mn=minutoV3();if(mn.txt!==Q.ultMin){Q.ultMin=mn.txt;try{window.MCV3TV&&MCV3TV.publicar(m)}catch(e){}pedirRender()}}
 function movResumen(){const M=Q.mov;if(!M)return null;const L=M.largo.slice().sort((a,b)=>a-b),q=f=>L.length?L[Math.min(L.length-1,Math.floor(L.length*f))]:null;
  return{pasos:M.pasos,pasoP5:q(.05),pasoMediana:q(.5),pasoP95:q(.95),patinaje:M.patinaje,patLog:M.patLog,saltosPose:M.saltosPose,poseMax:M.poseMax,saltoLog:M.saltoLog,conduccion:M.cond,pelotaPieMax:M.pieMax,pelotaPieLejos:M.pieLejos}}
 function mostrarResultado(){Q.saltado=true;try{if(window.MC12&&MC12.mTab)MC12.mTab('stats');else pedirRender();setTimeout(()=>{const t=document.querySelector('#m12M .tbs');if(t&&!document.body.classList.contains('m2d-full'))t.scrollIntoView({behavior:'smooth',block:'start'})},200)}catch(e){}}
@@ -1004,7 +1005,7 @@ function drawStadium(ctx){const w=S.w,h=S.h,top=S.cam==='cen'||S.cam==='tac';
  if(top)for(let i=0;i<10;i++){const x0=-4+i*11.3;cartel(x0,x0+11,PH+3.6,0,.95,true,i+3)}}
 /* marcador de TV (v3): equipos con sus colores, resultado y reloj del partido (con el descuento) */
 function marcadorTV(ctx){const m=S.m;if(!m)return 8;const ab=n=>String(n||'').replace(/^(Club |CA |CD |FC |AC |SS |RC |Real |Atlético |Deportivo )/i,'').slice(0,3).toUpperCase();
- const loc=m.venue==='a'?m.away:m.home,vis=m.venue==='a'?m.home:m.away,g=m.venue==='a'?[S.goles[1],S.goles[0]]:S.goles,mn=minutoV3();
+ const G=API.marcador(m),loc=m.venue==='a'?m.away:m.home,vis=m.venue==='a'?m.home:m.away,g=m.venue==='a'?[G[1],G[0]]:G,mn=minutoV3();
  const K=S.kits,c1=K&&K.local&&K.local.c1||'#c33',c2=K&&K.visita&&K.visita.c1||'#33c';ctx.save();
  const x=10,y=10,hgt=24;ctx.font='800 13px "Barlow Semi Condensed",Arial';ctx.textBaseline='middle';
  ctx.fillStyle='rgba(6,12,28,.92)';ctx.fillRect(x,y,176,hgt);ctx.fillStyle=c1;ctx.fillRect(x,y,5,hgt);ctx.fillStyle=c2;ctx.fillRect(x+97,y,5,hgt);
@@ -1040,12 +1041,16 @@ const API={
    const gir=document.createElement('div');gir.className='m2d-girar';gir.textContent='Girá el teléfono para verlo más grande';S.wrap.appendChild(gir)}
   S.host=host;if(document.body.classList.contains('m2d-full')){host.innerHTML=''}else{host.innerHTML='';host.appendChild(S.wrap)}S.cam=S.cam||camPref;S.w=0;resize();if(!S.raf)S.raf=requestAnimationFrame(frame)},
  /* el reloj del motor espera mientras se muestra una jugada (o hay eventos sin mostrar) */
- retener(m){if(!m||m!==S.m||m.done||!visible())return false;
-  if(Q.on){if(Q.hl)return false;const nx=proximaVentana(Q.live.tp);return Q.tv.tMotor-Q.live.tp>9000&&!!nx&&desde(nx)+600<=Q.tv.tMotor}   // v3: el motor va hasta 15 min adelante, y sigue hasta tener la cinta de la próxima jugada
-  return!!S.rep||!!(S.play&&!S.play.filler)||S.shown<(m.events||[]).length},
- corte(m){if(Q.on&&m===S.m&&visible()&&(Q.live||Q.hl)&&!Q.saltado)return Math.min(corteV3(m),(m.events||[]).length);
+ retener(m){if(!m||m!==S.m||m.done)return false;
+  /* v3: el 2D manda aunque el canvas no esté en pantalla en ese instante (al redibujar la página se desconecta un momento) */
+  if(Q.on){if(Q.hl||Q.saltado||!Q.live)return false;const nx=proximaVentana(Q.live.tp);return Q.tv.tMotor-Q.live.tp>9000&&!!nx&&desde(nx)+600<=Q.tv.tMotor}   // v3: el motor va hasta 15 min adelante, y sigue hasta tener la cinta de la próxima jugada
+  if(!visible())return false;return!!S.rep||!!(S.play&&!S.play.filler)||S.shown<(m.events||[]).length},
+ /* v3: hasta qué instante de la cancha se vio (null: nadie mira o se salteó, el juego no espera) */
+ vistoV3(m){if(!Q.on||!m||m!==S.m||Q.saltado||Q.hl||!Q.live)return null;return Q.live.tp},
+ corte(m){if(Q.on&&m===S.m&&(Q.live||Q.hl)&&!Q.saltado)return Math.min(corteV3(m),(m.events||[]).length);
   if(!m||m!==S.m||!visible()||m.done)return(m&&m.events||[]).length;return Math.min(S.shown,(m.events||[]).length)},
- marcador(m){if(Q.on&&m===S.m&&visible()&&!Q.saltado)return S.goles;if(!m||m!==S.m||!visible()||m.done)return[m.h,m.a];return S.goles},
+ /* v3: una sola fuente del marcador: los goles del relato que ya se vieron en la cancha ([propio, rival]) */
+ marcador(m){if(Q.on&&m===S.m&&!Q.saltado)return Q.hl?S.goles:golesDe((m.events||[]).slice(0,Math.min(corteV3(m),(m.events||[]).length)));if(!m||m!==S.m||!visible()||m.done)return[m.h,m.a];return S.goles},
  /* control de calidad (v3): lo dibujado es exactamente la cinta interpolada en el instante que se ve */
  verificarV3(){if(!Q.on||!Q.live)return null;const R=Q.live,Z=cuadroEn(R.c,R.tp);if(!Z)return null;const {A,B,f}=Z;let max=0,n=0;
   const cambia=new Set();for(let i=R.evi;i<R.ev.length&&R.ev[i].t<=B.t;i++)if(R.ev[i].tipo==='cambio')cambia.add(R.ev[i].sid);
@@ -1056,7 +1061,7 @@ const API={
  mejores(m){if(!m||m!==S.m||!Q.on)return false;const tv=v3de(m);if(!tv||!tv.clips)return false;iniciarMejores();return true},
  etiqueta(m){return Q.on&&m===S.m&&Q.hl&&!Q.hl.fin?'Mejores jugadas':null},
  /* minuto que se está viendo (v3); null = el del motor */
- minuto(m){if(Q.on&&m===S.m&&visible()&&(Q.live||Q.hl)&&!Q.saltado)return minutoV3().txt;return null},
+ minuto(m){if(Q.on&&m===S.m&&(Q.live||Q.hl)&&!Q.saltado)return minutoV3().txt;return null},
  saltar(){if(!S.m)return;if(Q.on){Q.saltado=true;Q.hl=null;Q.corte=null;saltarV3(ultimoT());return}S.rep=null;S.golT=null;S.play=null;S.queue=[];S.shown=(S.m.events||[]).length;contar();S.owner=null;S.phase=S.m.done?'done':S.phase},
  /* control de calidad: dibuja todas las poses con las camisetas de dos clubes (no participa del partido) */
  hojaPoses(cv,local,visita){local=local||'River Plate';visita=visita||'Boca Juniors';const ctx=cv.getContext('2d'),pk=S.kits,pm=S.m,pc=S.cam,pT=S.camT;
@@ -1085,7 +1090,7 @@ const API={
    festejos:Q.festVisto,abrazos:Q.abrazoVisto,lamentos:Q.lamentoVisto,repeticiones:Q.repStats,enRepeticion:!!Q.rep,tiempoReal:{pared:+(Q.realW||0).toFixed(1),viendo:+Q.realT.toFixed(1),peligro:+Q.peligroReal.toFixed(1),calma:+Q.calmaReal.toFixed(1),repeticion:+Q.repReal.toFixed(1),inicioYFinal:+(Q.protoReal||0).toFixed(1),esperando:+Q.esperaReal.toFixed(1),cortes:+(Q.corteReal||0).toFixed(1)},
    golesVistos:Q.golesVistos||0,repFallas:Q.repFallas||[],movimiento:movResumen(),
    minuto:minutoV3().txt,ver:verCfg(),pred:Q.pred,cortes:Q.cortes,ultimoCorte:Q.ultimoCorte,corteFase:Q.corte?Q.corte.fase:null,camara:{saltos:Q.camSaltos||0,velMax:+(Q.camVel||0).toFixed(2)},enCorte:!!Q.corte,velMax:+(Q.velMax||0).toFixed(3),duracion:Q.duracion,resultado:!!Q.resultado,cierre:Q.cierre,
-   mejores:Q.hl?{candidatos:Q.tv.candidatos||[],clips:Q.hl.clips.map(c=>({tipo:c.tipo,min:c.min,a:c.a,b:c.b,pri:c.pri})),i:Q.hl.i,fase:Q.hl.fase,vistos:Q.hl.vistos,fin:!!Q.hl.fin}:null,cartel:S.banner?S.banner.txt:null,grande:S.big?S.big.txt:null,festejoActivo:!!(Q.live&&Q.live.fest&&Q.live.tp>=Q.live.fest.t0&&Q.live.tp<=Q.live.fest.hasta),cuadrosEnMemoria:Q.tv.cuadros.length,arbitro:S.ref?[+S.ref.x.toFixed(1),+S.ref.y.toFixed(1)]:null}:null;
+   mejores:Q.hl?{candidatos:Q.tv.candidatos||[],clips:Q.hl.clips.map(c=>({tipo:c.tipo,min:c.min,a:c.a,b:c.b,pri:c.pri})),i:Q.hl.i,fase:Q.hl.fase,vistos:Q.hl.vistos,fin:!!Q.hl.fin}:null,cartel:S.banner?S.banner.txt:null,grande:S.big?S.big.txt:null,festejoActivo:!!(Q.live&&Q.live.fest&&Q.live.tp>=Q.live.fest.t0&&Q.live.tp<=Q.live.fest.hasta),cuadrosEnMemoria:Q.tv.cuadros.length,tvMarcador:(()=>{const m=S.m,G=API.marcador(m),A=m.venue==='a';return{loc:A?m.away:m.home,vis:A?m.home:m.away,g:A?[G[1],G[0]]:G,kitLocal:S.kits&&S.kits.local?S.kits.local.c1:null}})(),visto:Q.live?Q.live.tp:null,arbitro:S.ref?[+S.ref.x.toFixed(1),+S.ref.y.toFixed(1)]:null}:null;
   return{v3,rend,repeticiones:S.repN||0,enRepeticion:!!S.rep,zoom:+(S.zoom||1).toFixed(2),med,saltosJugadores:S.ptele||0,saltoLog:S.pteleLog||null,jugada:S.play?S.play.label:null,mostrados:S.shown,eventos:S.m?(S.m.events||[]).length:0,camara:S.cam,jugadores:S.sp.filter(s=>!s.out).length,goles:S.goles.slice(),cuadros:S.t,teletransportes:S.tele,teleLog:S.teleLog||null,estados:est,tacticos:tac,acciones:acc,posesionId:S.posId}}
 };
 /* pantalla completa: Fullscreen API cuando existe; en iPhone (Safari no la permite para esto) una capa fija que ocupa toda la pantalla */

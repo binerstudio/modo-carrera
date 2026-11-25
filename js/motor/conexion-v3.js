@@ -30,7 +30,7 @@ function preparar(m){
  const vivo=V3.enVivo(eOwn===0?own:riv,eOwn===0?riv:own,{semilla:(m.v2&&m.v2.semilla?m.v2.semilla:'mc')+'|v3',cinta:false,cintaCada:1,neutral:m.venue==='n',
   arbitro:arb?{severidad:arb.severidad,precision:arb.precision}:undefined,dtExterno:[true,true],alCuadro:(t,f)=>{TV.cuadros.push({t,d:Int16Array.from(f)})}});
  TV.puestos=vivo.puestos();TV.formato=vivo.formato();
- const S={vivo,eOwn,parte:0,finParte1:false,tac:JSON.stringify(tacO),tv:TV};
+ const S={vivo,eOwn,parte:0,finParte1:false,finH:0,hist:[],tac:JSON.stringify(tacO),tv:TV};
  if(m.ver&&m.ver.modo==='mejores')prepararClips(S,m.ver.tipos);
  ESTADO.set(m,S);m.v3={version:V3.VERSION,local:eOwn===0?'propio':'rival'};
  return S;
@@ -80,9 +80,17 @@ function sincronizar(m,S){
  if(t&&js!==S.tac){S.tac=js;S.vivo.tactica(S.eOwn,t)}
 }
 
+/* con el 2D mirando, el juego muestra lo que el 2D ya mostró: el motor va adelante (para tener la cinta), pero el reloj,
+   las estadísticas y el fin de cada tiempo esperan a que el 2D llegue (el marcador y el relato los filtra el 2D por t3).
+   Sin 2D (o con "Simular hasta el final") no se espera. */
+function vistoDe(m){try{return window.MC2D&&MC2D.vistoV3?MC2D.vistoV3(m):null}catch(e){return null}}
+function publicar(m,S,todo){const v=todo?1e15:vistoDe(m);if(v==null||!S.hist.length)return;let h=S.hist[0];for(const x of S.hist){if(x.t>v)break;h=x}
+ m.minute=h.minute;m.lbl=h.lbl;Object.assign(m,h.st)}
+function finVisto(m,S,half){const v=vistoDe(m),ok=v==null||S.tv.fin[half]==null||v>=S.tv.fin[half]-3;if(ok)publicar(m,S,true);return ok}
 function minuto(m,API,S){
  const c=m.clock,half=c.half,V=S.vivo;
- if(V.terminado)return true;
+ if(V.terminado){publicar(m,S);return finVisto(m,S,2)}
+ if(S.finH===half){publicar(m,S);return finVisto(m,S,half)}   // el motor ya terminó este tiempo: se espera al 2D
  if(S.parte!==half){
   if(half===1&&S.parte===0){V.empezar(1);S.parte=1;S.tv.partes[1]=V.t()}
   else if(half===2&&S.parte===1){if(!V.empezar(2)){traducir(m,API,S,V.eventosNuevos());S.tv.terminado=true;return true}S.parte=2;S.tv.partes[2]=V.t()}
@@ -97,6 +105,7 @@ function minuto(m,API,S){
  /* en memoria solo lo que el 2D todavía no vio (si el 2D no está mirando, los últimos 20 minutos); tope de memoria: 60 minutos */
  {const C=S.tv.cuadros;if(C.length>12000){const mira=S.tv.vistoT&&Date.now()-S.tv.vistoT<5000,lim=mira?S.tv.visto-300:C[C.length-1].t-12000;let k=0;while(k<C.length&&C[k].t<lim)k++;if(C.length-k>36000)k=C.length-36000;if(k)C.splice(0,k)}}
  actualizarStats(m,S);
+ S.hist.push({t:V.t(),minute:m.minute,lbl:m.lbl,st:{shotsH:m.shotsH,shotsA:m.shotsA,onH:m.onH,onA:m.onA,cornersH:m.cornersH,cornersA:m.cornersA,foulsH:m.foulsH,foulsA:m.foulsA,offH:m.offH,offA:m.offA,xgH:m.xgH,xgA:m.xgA,savesH:m.savesH,savesA:m.savesA,pos:m.pos}});
  /* minutos jugados */
  for(const side of ['o','r'])for(const e of listaDe(m,side)){const st=API.ps(m,e,side);if(st)st.on++}
  /* cambios planeados del rival y automáticos propios (igual que en v1/v2) */
@@ -106,7 +115,9 @@ function minuto(m,API,S){
   sincronizar(m,S);
  }
  if(fin&&half===1)S.finParte1=true;
- return fin||V.terminado;
+ if(fin||V.terminado)S.finH=half;
+ publicar(m,S);
+ return(fin||V.terminado)&&finVisto(m,S,V.terminado?2:half);
 }
 
 function actualizarStats(m,S){
@@ -196,6 +207,7 @@ function armarClips(S,todo){const T=S.tv,c=T.cuadros,lim=todo?1e12:T.tMotor;
  T.candidatos=T.cand.map(q=>({tipo:q.tipo,pri:+q.pri.toFixed(2),a:q.a,elegido:el.includes(q)}))}
 /* para el 2D: la cinta en vivo del partido v3 (o null si el partido no es v3) */
 window.MCV3TV={de:m=>{const S=m&&m.v3?ESTADO.get(m):null;return S?S.tv:null},
+ publicar:m=>{const S=m&&m.v3?ESTADO.get(m):null;if(S&&!m.done)publicar(m,S)},
  /* el menú elige "Mejores jugadas" antes de simular: desde ahí se guardan los recortes */
  mejores:(m,tipos)=>{const S=m&&m.v3?ESTADO.get(m):null;if(!S)return false;prepararClips(S,tipos);return true}};
 

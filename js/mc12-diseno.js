@@ -592,7 +592,7 @@ function clubBuild(){const c=C(),s=$('dashboard');if(!c||!s)return;let box=$('m1
    ===================================================================== */
 let MT='stats';
 const PH={pre:'Previa',first:'1º Tiempo',ht:'Entretiempo',second:'2º Tiempo'};
-function rows(m){const c=C();const own=m.venue==='h';const H=own?m.own.map(e=>({n:e.p.number,name:e.p.name,g:e.g})):m.riv.map(e=>({name:e.name,g:e.g}));const A=own?m.riv.map(e=>({name:e.name,g:e.g})):m.own.map(e=>({n:e.p.number,name:e.p.name,g:e.g}));return{H,A}}
+function rows(m){const c=C();const own=m.venue!=='a';/* el local primero (cancha neutral: el propio) */const H=own?m.own.map(e=>({n:e.p.number,name:e.p.name,g:e.g})):m.riv.map(e=>({name:e.name,g:e.g}));const A=own?m.riv.map(e=>({name:e.name,g:e.g})):m.own.map(e=>({n:e.p.number,name:e.p.name,g:e.g}));return{H,A}}
 /* Cancha en perspectiva dibujada en SVG (las posiciones salen de la formación real de cada equipo) */
 const PJ=(u,v)=>{const y0=6,y1=128,wf=420,wn=700;const vv=v*.82+.18*v*v;return[300+(u-.5)*(wf+(wn-wf)*vv),y0+(y1-y0)*vv]};
 const poly=pts=>pts.map(p=>PJ(p[0],p[1]).map(n=>n.toFixed(1)).join(',')).join(' ');
@@ -630,36 +630,37 @@ const evTxt=e=>isGoal(e.title)?golTxt(e):first(e.msg);
 function matchBuild(){const s=$('match'),m=curMatch(),c=C();if(!s||!c)return;let box=$('m12M');
  if(!box){box=document.createElement('div');box.id='m12M';box.className='m12x';s.insertBefore(box,s.firstChild)}
  if(!m){box.innerHTML='<div class="w"><p class="em">No hay un partido en juego.</p></div>';return}
- const own=m.venue==='h',fH=own?(c.formation||'4-3-3'):(m.tacR&&m.tacR.formation)||'4-4-2',fA=own?(m.tacR&&m.tacR.formation)||'4-4-2':(c.formation||'4-3-3');
+ /* el local siempre a la izquierda (como el relato y la gráfica de TV): nombres, escudos, formación, marcador y estadísticas */
+ const own=m.venue!=='a',LN=own?m.home:m.away,VN=own?m.away:m.home,fH=own?(c.formation||'4-3-3'):(m.tacR&&m.tacR.formation)||'4-4-2',fA=own?(m.tacR&&m.tacR.formation)||'4-4-2':(c.formation||'4-3-3');
  const sH=own?(c.style||'Equilibrado'):(m.tacR&&m.tacR.style)||'Equilibrado',sA=own?(m.tacR&&m.tacR.style)||'Equilibrado':(c.style||'Equilibrado');
  const isL=/^LIGA/i.test(String(m.compLabel||''));const comp=isL?`${lgName(c.country)} - ${String(m.compLabel).replace(/^LIGA\s*·\s*/i,'').replace(/^FECHA/i,'Fecha')}`:(m.compLabel||'Partido');
  const ph=(window.MC2D&&MC2D.etiqueta&&MC2D.etiqueta(m))||(m.done?'Final':(PH[m.phase]||''));const mv=window.MC2D&&MC2D.minuto?MC2D.minuto(m):null,mn=m.phase==='pre'?"0'":(mv||m.lbl||m.minute||0)+"'";
  const R=rows(m),hot=(m.scorers||[]).slice(-1)[0];
  /* 12.6 · con el simulador 2D se muestra solo lo que ya se vio en la animación */
- const CUT=window.MC2D?MC2D.corte(m):(m.events||[]).length,SC=window.MC2D?MC2D.marcador(m):[m.h,m.a];
- const le=lastEv({events:(m.events||[]).slice(0,CUT)});let leH='';if(le){const g=isGoal(le.title);const team=/LOCAL/i.test(le.title)?m.home:/VISIT/i.test(le.title)?m.away:'';
+ const CUT=window.MC2D?MC2D.corte(m):(m.events||[]).length,SC0=window.MC2D?MC2D.marcador(m):[m.h,m.a],SC=own?SC0:[SC0[1],SC0[0]];
+ const le=lastEv({events:(m.events||[]).slice(0,CUT)});let leH='';if(le){const g=isGoal(le.title);const team=/LOCAL/i.test(le.title)?LN:/VISIT/i.test(le.title)?VN:'';
   leH=`<div class="le">${evIcon(le.title)}<b>${esc(le.lbl!=null?le.lbl+"'":'')}</b><strong>${g&&team?'¡GOL DE '+esc(team.toUpperCase())+'!':esc(clean(le.title))}</strong></div><p class="lm">${esc(evTxt(le))}</p>`}
  const prog=Math.max(0,Math.min(100,(mv?parseInt(mv,10):m.done?90:(m.minute||0))/90*100));
  const running=!m.done&&(m.phase==='first'||m.phase==='second');let paused=false;try{paused=matchPaused}catch(e){}
  let sp=2;try{sp=matchSpeed}catch(e){}
  const act=m.done?['mcMainAction()',(($('matchAction')||{}).textContent||'SIGUIENTE FECHA').replace(/→/,'').trim()]:m.phase==='pre'?[window.mcVerPartido?'mcVerPartido()':'mcMainAction()','COMENZAR PARTIDO']:m.phase==='ht'?['mcMainAction()','JUGAR EL 2º TIEMPO']:['mcSimEnd()','SIMULAR HASTA<br>EL FINAL'];
- const ST=[['Posesión',Math.round(m.pos||50),100-Math.round(m.pos||50),'%'],['Tiros',m.shotsH,m.shotsA],['Tiros al arco',m.onH,m.onA],['Goles esperados (xG)',(m.xgH||0).toFixed(1),(m.xgA||0).toFixed(1)],['Saques de esquina',m.cornersH,m.cornersA]];
+ const ST0=[['Posesión',Math.round(m.pos||50),100-Math.round(m.pos||50),'%'],['Tiros',m.shotsH,m.shotsA],['Tiros al arco',m.onH,m.onA],['Goles esperados (xG)',(m.xgH||0).toFixed(1),(m.xgA||0).toFixed(1)],['Saques de esquina',m.cornersH,m.cornersA]],ST=own?ST0:ST0.map(r=>[r[0],r[2],r[1],r[3]]);
  const stH=ST.map(r=>{const p=r[3]?r[1]:pct(r[1],r[2]);return `<div class="sr"><b>${r[1]}${r[3]||''}</b><div><span>${r[0]}</span><div class="sb"><i style="width:${p}%"></i></div></div><b>${r[2]}${r[3]||''}</b></div>`}).join('');
  const E=(m.events||[]).slice(0,CUT).reverse();const key=E.filter(e=>/GOL|TARJETA|AMARILLA|ROJA|ARCO|CAMBIO|LESI|OCASI/i.test(e.title||''));
  const evRow=(e,i)=>`<div class="er${i===0&&/GOL/i.test(e.title)?' hl':''}"><b>${esc(e.lbl!=null?e.lbl+"'":'')}</b>${evIcon(e.title)}<span><strong>${esc(clean(e.title))}</strong> · ${esc(evTxt(e))}</span></div>`;
  const evP=`<div class="pn ev"><h4>EVENTOS DEL PARTIDO</h4>${(key.length?key:E).slice(0,4).map(evRow).join('')||'<p class="em">Todavía no hubo eventos.</p>'}</div>`;
  let body='';
  if(MT==='stats')body=`<div class="g2"><div class="pn st">${stH}</div>${evP}</div>`;
- else if(MT==='form'){const L=(t,f,l)=>`<div class="pn fm"><h4>${esc(t)} · ${esc(f)}</h4>${l.map(p=>`<div class="fr"><b>${p.n||''}</b><span>${esc(nm(p.name))}</span><em>${esc(p.g||'')}</em></div>`).join('')}</div>`;body=`<div class="g2">${L(m.home,fH,R.H)}${L(m.away,fA,R.A)}</div>`}
+ else if(MT==='form'){const L=(t,f,l)=>`<div class="pn fm"><h4>${esc(t)} · ${esc(f)}</h4>${l.map(p=>`<div class="fr"><b>${p.n||''}</b><span>${esc(nm(p.name))}</span><em>${esc(p.g||'')}</em></div>`).join('')}</div>`;body=`<div class="g2">${L(LN,fH,R.H)}${L(VN,fA,R.A)}</div>`}
  else if(MT==='tac')body=`<div class="g2"><div class="pn fm"><h4>TU PLANTEO</h4><div class="fr"><span>Formación</span><em>${esc(c.formation||'—')}</em></div><div class="fr"><span>Estilo</span><em>${esc(c.style||'—')}</em></div>${[['Mentalidad','mentality'],['Presión','pressing'],['Ritmo','rhythm'],['Anchura','width'],['Profundidad','depth']].map(x=>`<div class="fr"><span>${x[0]}</span><em>${c[x[1]]!=null?c[x[1]]:'—'}</em></div>`).join('')}</div>
   <div class="pn fm"><h4>DECISIONES</h4><p class="em" style="text-align:left">Cambios realizados: <b>${m.subsOwn||0}/5</b></p><button class="gb sm" onclick="openMatchSubs()">${sv('swap','bi')}HACER CAMBIOS</button><button class="gh" onclick="go('tactics')">${sv('sliders','bi')}CAMBIAR TÁCTICA</button><p class="em" style="text-align:left">Rival: ${esc(m.tacR?m.tacR.formation+' · '+m.tacR.style:'—')}</p></div></div>`;
  else body=`<div class="pn ev all"><h4>TODOS LOS EVENTOS</h4>${E.map(evRow).join('')||'<p class="em">Todavía no hubo eventos.</p>'}</div>`;
  box.innerHTML=`<div class="w">
  <div class="top"><div class="sbg"></div>${LOGO}
   <div class="cp">${sv('trophy','ci')}${esc(comp)}</div>
-  <div class="sb2"><div class="cr l">${badge(m.home,96)}</div><div class="np l"><b>${esc(m.home)}</b><span>${esc(fH)} ${esc(sH)}</span></div>
+  <div class="sb2"><div class="cr l">${badge(LN,96)}</div><div class="np l"><b>${esc(LN)}</b><span>${esc(fH)} ${esc(sH)}</span></div>
    <div class="cl"><b class="mn">${esc(mn)}</b><small>${esc(ph)}</small><strong>${SC[0]} - ${SC[1]}</strong></div>
-   <div class="np r"><b>${esc(m.away)}</b><span>${esc(fA)} ${esc(sA)}</span></div><div class="cr r">${badge(m.away,96)}</div></div>
+   <div class="np r"><b>${esc(VN)}</b><span>${esc(fA)} ${esc(sA)}</span></div><div class="cr r">${badge(VN,96)}</div></div>
   ${window.MC2D?'<div class="pt pt2d" id="m2dHost"></div>':`<div class="pt">${pitchSVG(m,fH,fA,R,hot)}</div>`}
   ${leH?`<div class="lev">${leH}</div>`:''}</div>
  <div class="ctl"><button class="pz" onclick="${running?'toggleMatchPause()':act[0]}" title="${running&&!paused?'Pausar':'Jugar'}">${sv(running&&!paused?'pause':'play')}</button>
