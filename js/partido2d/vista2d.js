@@ -582,15 +582,14 @@ function draw(){const ctx=S.cx,dpr=S.dpr;ctx.setTransform(dpr,0,0,dpr,0,0);drawP
 /* ---------- bucle ---------- */
 function speed(){let v=1;try{v=matchSpeed||1}catch(e){}return v}
 function frame(ts){S.raf=0;if(!S.cv||!S.cv.isConnected){return}
- const now=ts/1000,crudo=S.last?now-S.last:.016,real=Math.min(.05,crudo);S.last=now;const tf0=performance.now();if(S.perf){S.perf.real+=crudo;if(crudo>.05)S.perf.lentos++}const dt=real*speed()*(Q.on?1:ritmoV2());S.t+=dt;
+ const now=ts/1000,crudo=S.last?now-S.last:.016,real=Math.min(.05,crudo);S.last=now;const tf0=performance.now();if(S.perf){S.perf.real+=crudo;if(crudo>.05)S.perf.lentos++}const dt=real*speed()*(Q.on?1:ritmoV2());if(Q.on||!m0()||S.rep)S.t+=dt;
  resize();const m=S.m;
  if(m&&Q.on){try{frameV3(real,crudo)}catch(e){console.warn('MC2D v3',e)}if(S.banner){S.banner.t-=real;if(S.banner.t<=0)S.banner=null}if(S.big){S.big.t-=real;if(S.big.t<=0)S.big=null}
   const R=Q.live,Z=R?cuadroEn(Q.tv.cuadros,R.tp+12):null;Q.fut=Z?[Z.A.d[0]/10,Z.A.d[1]/10]:null;
   /* festejo: la cámara sigue al goleador */
   const F=R&&R.fest&&R.tp>=R.fest.t0+10&&R.tp<=R.fest.hasta?R.sp.get(R.fest.clave):null;Q.foco=F&&F.alpha>0?[F.x,F.y]:null}
  else if(m&&!S.rep){/* v1/v2: con la duración corta el 2D va más rápido; se divide en sub-pasos chicos para que nada salte */
-  const n=Math.max(1,Math.ceil(dt/.2));for(let q=0;q<n;q++)pasoV2(m,dt/n,q===n-1?real:0)}
- if(m&&!S.rep&&!Q.on)grabar();
+  const n=Math.max(1,Math.ceil(dt/.2)); for(let q=0;q<n;q++){S.t+=dt/n;pasoV2(m,dt/n,q===n-1?real:0);if(S.rep)break;grabar()}}   // cada sub-paso se graba (para la repetición)
  if(S.rep&&!Q.on){S.rep.t+=real*S.rep.v;if(S.rep.t>=S.rep.fin){S.rep=null;S.zoom=1.1;if(!S.play)next()}else{const L=S.rep.L;let i=0;while(i<L.length-2&&L[i+1].t<S.rep.t)i++;const A=L[i].b,B=(L[i+1]||L[i]).b;S.rep.b={x:(A.x+B.x)/2,y:(A.y+B.y)/2,fly:null}}}
  camara(real);
  if(visible()){const t0=performance.now();if(Q.on&&Q.rep)dibujarRepV3();else if(S.rep)dibujarRepeticion();else draw();const ms=performance.now()-t0;S.perf.n++;S.perf.tot+=ms;if(ms>S.perf.max&&S.perf.n>30)S.perf.max=ms}
@@ -628,6 +627,7 @@ function dibujarRepeticion(){const R=S.rep,L=R.L;let i=0;while(i<L.length-2&&L[i
   ctx.fillStyle='rgba(255,255,255,.75)';ctx.fillRect(x,y+23,tw*clamp((R.t-L[0].t)/(R.fin-L[0].t),0,1),2);ctx.restore()}
  finally{S.sp.forEach((s,j)=>Object.assign(s,guard[j]));if(gref)Object.assign(S.ref,gref);Object.assign(S.ball,gb);S.owner=go;S.camX=gcx;S.camY=gcy;S.banner=gbn;S.big=gbig}}
 
+function m0(){return !!S.m}
 function ritmoV2(){const v=S.m&&S.m.ver;if(v&&v.min)return clamp(720/(v.min*60),.8,4);   // v1/v2: el 2D actúa el relato; con los minutos elegidos se ajusta su ritmo
  return{quick:4,normal:2.4,long:1.2}[largoPartido()]||2.4}
 function dibujarRepV3(){const R=Q.rep.R,g={sp:S.sp,ball:S.ball,ref:S.ref,owner:S.owner,banner:S.banner,big:S.big};
