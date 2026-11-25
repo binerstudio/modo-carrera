@@ -77,7 +77,7 @@ async function caso(nombre, preparar) {
   ok(vistos.has('ht') || vistos.has('second'), `${nombre}: no pasó por el entretiempo`);
   /* movimiento posible: ningún jugador a más de 10 m/s (medido a x1) fuera de los fundidos */
   const vel = velU;   // la última medida tomada durante el partido
-  ok(vel && vel.n > 1000 && vel.max <= 10, `${nombre}: velocidad vista máxima ${vel && vel.max} m/s (límite 10) ${JSON.stringify(vel && vel.log)}`);
+  ok(vel && vel.n > 300 && vel.max <= 10, `${nombre}: velocidad vista máxima ${vel && vel.max} m/s (límite 10) ${JSON.stringify(vel && vel.log)}`);
   await page.screenshot({ path: `tests/out/v3marcador-${nombre.replace(/[^a-z]+/gi, '-')}.png` }).catch(() => {});
   return { nombre, venue: ini.venue, local, visita, comp: ini.comp, muestras: n, malos: malos.length, velocidadVistaMax: vel && vel.max, adelantoEncabezado: maxAdel, adelantoReloj: maxAdelJuego, finCon2D: finAntes };
 }

@@ -507,7 +507,7 @@ function postura(s,sp){const g=marcha(s,sp),L0=Q.on?{la:g.la,ra:g.ra,lk:g.lk,rk:
    largo de cada paso (velocidad / cadencia), patinaje (moverse sin dar pasos), saltos de pose y pelota-pie en conducción */
 const PATADA=new Set(['pasando','rematando','volea','pasando-primera','controlando','entrada','barrida','cabeceando','saltando','amague','proteccion','cayendo','levantandose']);
 const PCAMPOS=['la','ra','lk','rk','lu','ru','le','re','lean','rot','lift'];
-function mezclaPose(s,g,sp){const t=S.t,pz=(s.pose||'run')+'|'+(s.celeb||0)+'|'+(sp>.9&&POSE_BRAZOS.has(s.pose)?1:0)+(s.gk&&s.espera?'e':'');   // pique y paso lateral: los suaviza el filtro corto (si reiniciaran la mezcla, las piernas no cruzarían)
+function mezclaPose(s,g,sp){const t=S.t,pz=(s.pose||'run')+'|'+(s.celeb||0)+'|'+(sp>.9&&POSE_BRAZOS.has(s.pose)?1:0);   // pique, paso lateral y guardia del arquero: los suaviza el filtro corto (si reiniciaran la mezcla a cada rato, las piernas quedarían congeladas)
  if(s._g&&(s._pz!==pz||(s.poseT||0)+1e-6<(s._ptp||0))){s._de=s._g;s._bt=t}s._pz=pz;s._ptp=s.poseT||0;
  if(s._de){const w0=clamp((t-s._bt)/.12,0,1),w=w0*w0*(3-2*w0);if(w>=1)s._de=null;else for(const k of PCAMPOS)g[k]=s._de[k]+(g[k]-s._de[k])*w}
  /* además, un suavizado corto (40 ms) de todos los ángulos: los cambios de un cuadro al otro (arquero que se pone en
