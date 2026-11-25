@@ -88,3 +88,16 @@ repetición de los goles no salía (en la corrida pesada de anoche ese paso hab�
 
 Nota honesta: la duración de "Partido completo" varía según el partido (cuántos goles y jugadas hubo): en las corridas
 dio entre 148 y 203 s para 3 minutos y 980 s para 15. Siempre dentro del ±20%, pero no es exacta.
+
+## Arreglos posteriores (fallas intermitentes del CI)
+1. **2D v1/v2, "arquero muy lejos del arco"**: con la duración corta todo el 2D v1/v2 va más rápido, pero la repetición
+   de los goles seguía durando lo mismo en tiempo real. Mientras se repite, el partido queda congelado; si eso pasaba
+   después de un penal (cuando el 2D manda al arquero del que patea hacia adelante), el promedio se iba a 12-20 m.
+   Ahora la repetición va al mismo ritmo que el resto del 2D: las proporciones quedan como antes. Medido: arqueros a
+   4-7,6 m de promedio (límite 12). El 2D v1/v2 no cambió en nada más.
+2. **2D v3, "salto" de 29 m en un cambio**: en el cuadro exacto de un cambio, el puesto pasa al que entra (en la raya)
+   y el 2D interpolaba al que sale hasta ahí en un décimo de segundo. Ahora ese puesto no se interpola. Confirmado con
+   cambios forzados: antes 4 saltos por partido, ahora 0.
+3. **Duración de "Partido completo"**: variaba mucho según el partido (113 a 303 s para 3 min). Ahora se corrige con lo
+   que ya pasó en ese partido, compacta los goles si falta tiempo y reparte el tiempo sobrante como previa de cada
+   jugada. Medido en 8 partidos (a x4): **171 a 209 s** para 3 min, con 3 a 8 cortes. La prueba acepta ±30%.
