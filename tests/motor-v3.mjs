@@ -349,6 +349,7 @@ if (!(F.muySuperior.gana >= .60 && F.muySuperior.gana <= .80)) out.fallas.push(`
       for (const e of r.eventos) {
         if (!['lateral', 'corner', 'tiro_libre', 'saque_arco', 'saque_centro'].includes(e.tipo)) continue;
         let k = idx(e.t); if (e.tipo !== 'saque_centro') while (k < F - 1 && d[k * n + 4] !== 1) k++;
+        if (e.tipo !== 'saque_centro' && r.eventos.some(q => (q.tipo === 'entretiempo' || q.tipo === 'final') && q.t >= e.t && q.t <= c.t[k])) continue;   // se terminó el tiempo antes de ejecutarla
         const bx = d[k * n] / 10, by = d[k * n + 1] / 10, riv = [...Array(22).keys()].filter(j => (j < 11 ? 0 : 1) !== e.equipo);
         const dmin = Math.min(...riv.map(j => Math.hypot(P_(k, j)[0] - bx, P_(k, j)[1] - by)));
         let mal = false;
