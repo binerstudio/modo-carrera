@@ -844,11 +844,11 @@ function frameV3(real,crudo){real=Math.min(.3,crudo||real);
   if(espera)Q.esperaReal+=real;
   else if(!Q.corte){
    let nt=R.tp+real*10*speed();   // velocidad real
-   if(f1!=null&&!Q.cruzo&&nt>f1-1){if(p2==null||tMax<p2+2){nt=f1-1;
-     /* entretiempo: el partido sigue solo con el 2º tiempo */
-     if(R.tp>=f1-2){Q.htT=(Q.htT||0)+real;if(Q.htT>1.2&&!Q.htPedido){Q.htPedido=true;try{if(match&&match===m&&match.phase==='ht')mcMainAction()}catch(e){}}}}
+   if(f1!=null&&!Q.cruzo&&nt>f1-1){if(p2==null||tMax<p2+2){nt=f1-1}
     else{R.tp=p2;Q.cruzo=true;Q.mitad=true;nt=p2;Q.camSnap=true}}
    const lim=tv.terminado?tMax:tMax-1;if(nt>lim)nt=Math.max(R.tp,lim);
+   /* entretiempo: cuando ya se vio todo el 1º tiempo, el partido sigue solo con el 2º */
+   if(f1!=null&&!Q.cruzo&&p2==null&&R.tp>=Math.min(f1,tMax)-3){Q.htT=(Q.htT||0)+real;if(Q.htT>1.2&&!Q.htPedido){try{if(match&&match===m&&match.phase==='ht'){Q.htPedido=true;mcMainAction()}}catch(e){}}}
    if(Q.mitad){dtG=0}
    else{dtG=(nt-R.tp)/10;if(nt>R.tp){sumaT(real);Q.tObs+=nt-R.tp;if(enPeligro(R.tp)){Q.dObs+=nt-R.tp;Q.peligroReal+=real}else Q.calmaReal+=real;
      const vel=(nt-R.tp)/10/real;if(vel>Q.velMax)Q.velMax=vel}else Q.esperaReal+=real;R.tp=nt}
