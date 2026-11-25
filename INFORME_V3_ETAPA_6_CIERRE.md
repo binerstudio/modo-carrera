@@ -43,9 +43,21 @@
   saltos de pose (medidos en la prueba).
 
 ## Capturas (rama `capturas-ci`)
-`v3tv-repeticion.png`, `v3tv-festejo.png`, `v3tv-escena-final.png`, `v3tv-mejores-jugadas.png`, `v3tv-corte.png`,
-`v3marcador-liga-de-local-.png`, `v3marcador-liga-de-visitante-.png`, `v3marcador-copa-de-visitante-.png`,
-`v3marcador-cancha-neutral-.png`, `v3pantalla-vertical.png`, `v3pantalla-horizontal.png`.
+`v3tv-repeticion.png`, `v3tv-festejo.png`, `v3tv-mejores-jugadas.png`, `v3tv-corte.png`,
+`v3marcador-liga-de-local.png`, `v3marcador-liga-de-visitante.png`, `v3marcador-copa-de-visitante-.png`,
+`v3marcador-cancha-neutral.png`, `v3pantalla-vertical.png`, `v3pantalla-horizontal.png`.
 
 ## CI
-Ver la sección final (se completa con la corrida liviana del último push).
+**Liviano, corrida 122 (sobre `b2c7197`): todo en verde.**
+- Motor v2 (300) ✅ · Motor v3 (300 + etapa 6) ✅: arqueros (correlación 0,74; 3,5 m de la línea con la pelota cerca y
+  8,6 m lejos), reanudaciones 0 fallas (99 saques del medio, 250 tiros libres, 322 saques de arco, 1465 laterales, 202
+  córners), cierre a 1,49 m/s como máximo, festejo con nadie en el área chica a los 8 s.
+- Huella, temporadas, 2D v2, `v3.html`, v3 en el juego, actualización desde 12.2.2 ✅
+- Ver el partido (v3) ✅: 3 min = 184 s reales; 89 s de jugadas y 12 s de calma; 3 goles con 3 repeticiones (6,5 s antes,
+  0,6x); velocidad vista máxima 8,6 m/s; escena final 0 corriendo; pelota-pie 0,58 m; sin patinaje ni saltos de pose.
+- Marcador, localía y reloj ✅: liga de local, de visitante, copa y neutral: 0 diferencias entre encabezado, gráfica y
+  eventos, el reloj nunca adelante del 2D, velocidad vista 7,5-8,1 m/s; "Simular hasta el final" en 0,6 s.
+- Pantalla completa en iPhone ✅: vertical 390x664 con el dibujo girado 664x390, horizontal sin girar.
+
+Nota: en esta corrida no salieron las capturas `v3tv-escena-final.png` ni `v3tv-estadio.png` (dependen del momento en
+que la prueba saca la foto); sí están repetición, festejo, mejores jugadas, corte y las de marcador y pantalla completa.
