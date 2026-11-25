@@ -516,15 +516,18 @@ function mezclaPose(s,g,sp){const t=S.t,pz=(s.pose||'run')+'|'+(s.celeb||0)+'|'+
  const M=Q.mov,medir=M&&Q.live&&S.sp===Q.live.list&&!Q.rep&&!Q.corte&&!Q.hl&&s.alpha>.9;
  if(medir&&s._g&&s._gt!=null){const dt=t-s._gt;if(dt>0&&dt<.06){let d=0;for(const k of PCAMPOS)d=Math.max(d,Math.abs(g[k]-s._g[k]));d/=dt;if(d>M.poseMax)M.poseMax=+d.toFixed(1);if(d>45){M.saltosPose++;M.saltoLog={jugador:s.name,pose:pz,d:+d.toFixed(2)}}}
   /* pasos: cada vez que las piernas se cruzan */
-  const lado=g.la-g.ra>=0;const dx=s._px!=null?Math.hypot(s.x-s._px,s.y-s._py):0;if(dx<2)s._dist=(s._dist||0)+dx;
-  if(PATADA.has(s.pose)){s._dist=0;s._lado=lado}   // una patada (pase, remate, control, entrada) es un movimiento de pierna: no es patinar
-  if(s._lado!=null&&lado!==s._lado){if(sp>1.5&&s._spPaso>1.5&&s._dist>0){M.pasos++;M.largo.push(+s._dist.toFixed(2))}s._dist=0;s._spPaso=sp}
+  /* pasos: cada medio ciclo de la marcha (las piernas se cruzan). Se cuenta con la fase con la que se dibujan las piernas,
+     así no depende de cuántos cuadros por segundo da la máquina (con cuadros lentos se cruzan más de una vez entre dos) */
+  const dx=s._px!=null?Math.hypot(s.x-s._px,s.y-s._py):0;if(dx<2)s._dist=(s._dist||0)+dx;
+  const kph=Math.floor((s.ph||0)/Math.PI),dk=s._kph!=null?kph-s._kph:0;
+  if(PATADA.has(s.pose)){s._dist=0}   // una patada, una estirada, un control: movimiento de piernas, no es patinar
+  else if(dk>0){if(sp>1.5&&s._spPaso>1.5&&s._dist>0){M.pasos+=dk;const L=s._dist/dk;for(let q=0;q<dk;q++)M.largo.push(+L.toFixed(2))}s._dist=0;s._spPaso=sp}
   else s._spPaso=Math.min(s._spPaso==null?sp:s._spPaso,sp);
-  if(sp>1.2&&s._dist>3.5){M.patinaje++;M.patLog={jugador:s.name,pose:pz,vel:+sp.toFixed(1),estado:s.estado,lat:!!s.lat,la:+g.la.toFixed(2),ra:+g.ra.toFixed(2),mezcla:!!s._de,dist:+s._dist.toFixed(2)};s._dist=0}
-  s._lado=lado;
+  if(sp>1.2&&s._dist>3.5&&!(POSE_BRAZOS.has(s.pose)&&sp<=.9)){M.patinaje++;M.patLog={jugador:s.name,pose:pz,vel:+sp.toFixed(1),estado:s.estado,dist:+s._dist.toFixed(2),ph:+(s.ph||0).toFixed(2)};s._dist=0}
+  s._kph=kph;
   /* pelota pegada al pie en conducción (pelota en el piso, dueño corriendo) */
   const b=S.ball;if(s===S.owner&&Q.live.conduce&&b&&b.z<.3&&sp>1.5){const db=Math.hypot(b.x-s.x,b.y-s.y);M.cond++;M.pieMax=Math.max(M.pieMax,+db.toFixed(2));if(db>=.8)M.pieLejos++}}
- else{s._lado=null;s._dist=0}
+ else{s._kph=null;s._dist=0}
  s._g=Object.assign({},g);s._gt=t;s._px=s.x;s._py=s.y}
 function figura(ctx,s,P,isRef){const kit=isRef?{d:'liso',c1:'#111111',c2:'#ffd400',sh:'#111111',me:'#111111',cu:'#ffd400',ma:'#111111'}:kitOf(s);const r=isRef?{alto:1,ancho:1,pelo:'corto',cpelo:'#2b1d14',bot:'#111',lean:0,brazos:1}:rasgos(s);
  const sc=P[2],H=1.85*sc*FIG*r.alto;if(H<3)return;const sp=Q.on&&s.spS!=null?s.spS:Math.hypot(s.vx,s.vy),f=s.face||1;const g=postura(s,sp);if(Q.on&&!isRef)mezclaPose(s,g,sp);
