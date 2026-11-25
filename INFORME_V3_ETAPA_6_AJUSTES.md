@@ -53,7 +53,7 @@ o trotan suave. No cambia nada del partido (ni resultado ni estadísticas). Desp
 | Simular partido | ✅ directo a estadísticas |
 | Lo elegido se recuerda | ✅ |
 | v2: menú sin "Mejores jugadas", partido completo | ✅ |
-| Partido completo 15 min (medido a x4) | solo en la corrida pesada a mano |
+| Partido completo 15 min (medido a x4) | ✅ en CI: 245 s a x4 = 980 s a x1 |
 
 `tests/motor-v3.mjs` (300 partidos): ✅, con la escena de cierre (velocidad máxima 3,6 m/s) y lo de la etapa 6.
 Locales también: v3 en el juego ✅, 2D v2 ✅, temporadas ✅, huella con `file://` igual que antes.
@@ -79,4 +79,12 @@ Locales también: v3 en el juego ✅, 2D v2 ✅, temporadas ✅, huella con `fil
 En el camino apareció y se arregló una falla del 2D **v2** que venía de la entrega anterior: con la duración corta la
 repetición de los goles no salía (en la corrida pesada de anoche ese paso había dado rojo). Ahora graba en cada sub-paso.
 
-**Pesado (a mano):** ver abajo.
+**Pesado (corrida 97, a mano, sobre `83e333c`): todo en verde.**
+- Motor v2 (1000) ✅ · Motor v3 (1000 + etapa 6) ✅ · **Calibración 3000+3600 ✅** · huella, auditoría, 2D v2, `v3.html`,
+  v3 en el juego, temporadas, actualización ✅
+- Ver el partido: completo de 3 min = **166 s** y **148 s** en las dos corridas de ese job (objetivo 180 ±20%: la de
+  148 quedó cerca del borde de abajo); **completo de 15 min = 245 s a x4 = 980 s a x1** (objetivo 900 ±20%).
+  Velocidad máxima siempre 1x (o 4x a x4), cámara sin saltos, escena final sin nadie corriendo.
+
+Nota honesta: la duración de "Partido completo" varía según el partido (cuántos goles y jugadas hubo): en las corridas
+dio entre 148 y 203 s para 3 minutos y 980 s para 15. Siempre dentro del ±20%, pero no es exacta.
