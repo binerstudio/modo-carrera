@@ -503,8 +503,8 @@ function postura(s,sp){const g=marcha(s,sp),L0=Q.on?{la:g.la,ra:g.ra,lk:g.lk,rk:
 /* v3: los cambios de pose se mezclan en 0,12 s (sin saltos de brazos y piernas) y se mide la marcha:
    largo de cada paso (velocidad / cadencia), patinaje (moverse sin dar pasos), saltos de pose y pelota-pie en conducción */
 const PCAMPOS=['la','ra','lk','rk','lu','ru','le','re','lean','rot','lift'];
-function mezclaPose(s,g,sp){const t=S.t,pz=s.pose||'run';
- if(s._pz!==pz&&s._g){s._de=s._g;s._bt=t}s._pz=pz;
+function mezclaPose(s,g,sp){const t=S.t,pz=(s.pose||'run')+'|'+(s.celeb||0)+'|'+(sp>.9&&POSE_BRAZOS.has(s.pose)?1:0);
+ if(s._g&&(s._pz!==pz||(s.poseT||0)+1e-6<(s._ptp||0))){s._de=s._g;s._bt=t}s._pz=pz;s._ptp=s.poseT||0;
  if(s._de){const w0=clamp((t-s._bt)/.12,0,1),w=w0*w0*(3-2*w0);if(w>=1)s._de=null;else for(const k of PCAMPOS)g[k]=s._de[k]+(g[k]-s._de[k])*w}
  const M=Q.mov,medir=M&&Q.live&&S.sp===Q.live.list&&!Q.rep&&!Q.corte&&!Q.hl&&s.alpha>.9;
  if(medir&&s._g&&s._gt!=null){const dt=t-s._gt;if(dt>0&&dt<.06){let d=0;for(const k of PCAMPOS)d=Math.max(d,Math.abs(g[k]-s._g[k]));if(d>M.poseMax)M.poseMax=+d.toFixed(2);if(d>.9){M.saltosPose++;M.saltoLog={jugador:s.name,pose:pz,d:+d.toFixed(2)}}}
@@ -512,10 +512,10 @@ function mezclaPose(s,g,sp){const t=S.t,pz=s.pose||'run';
   const lado=g.la-g.ra>=0;const dx=s._px!=null?Math.hypot(s.x-s._px,s.y-s._py):0;if(dx<2)s._dist=(s._dist||0)+dx;
   if(s._lado!=null&&lado!==s._lado){if(sp>1.5&&s._spPaso>1.5&&s._dist>0){M.pasos++;M.largo.push(+s._dist.toFixed(2))}s._dist=0;s._spPaso=sp}
   else s._spPaso=Math.min(s._spPaso==null?sp:s._spPaso,sp);
-  if(sp>1.2&&s._dist>3.5){M.patinaje++;M.patLog={jugador:s.name,pose:pz,vel:+sp.toFixed(1)};s._dist=0}
+  if(sp>1.2&&s._dist>3.5){M.patinaje++;M.patLog={jugador:s.name,pose:pz,vel:+sp.toFixed(1),estado:s.estado,lat:!!s.lat,la:+g.la.toFixed(2),ra:+g.ra.toFixed(2),mezcla:!!s._de,dist:+s._dist.toFixed(2)};s._dist=0}
   s._lado=lado;
   /* pelota pegada al pie en conducción (pelota en el piso, dueño corriendo) */
-  const b=S.ball;if(s===S.owner&&b&&b.z<.3&&sp>1.5){const db=Math.hypot(b.x-s.x,b.y-s.y);M.cond++;M.pieMax=Math.max(M.pieMax,+db.toFixed(2));if(db>=.8)M.pieLejos++}}
+  const b=S.ball;if(s===S.owner&&Q.live.conduce&&b&&b.z<.3&&sp>1.5){const db=Math.hypot(b.x-s.x,b.y-s.y);M.cond++;M.pieMax=Math.max(M.pieMax,+db.toFixed(2));if(db>=.8)M.pieLejos++}}
  else{s._lado=null;s._dist=0}
  s._g=Object.assign({},g);s._gt=t;s._px=s.x;s._py=s.y}
 function figura(ctx,s,P,isRef){const kit=isRef?{d:'liso',c1:'#111111',c2:'#ffd400',sh:'#111111',me:'#111111',cu:'#ffd400',ma:'#111111'}:kitOf(s);const r=isRef?{alto:1,ancho:1,pelo:'corto',cpelo:'#2b1d14',bot:'#111',lean:0,brazos:1}:rasgos(s);
@@ -747,7 +747,7 @@ function actualizarRep(R,dtGame){
  /* pelota y árbitro */
  const b=R.ball;b.x=lerp(A.d[0],B.d[0],f)/10;b.y=lerp(A.d[1],B.d[1],f)/10;b.z=Math.max(0,lerp(A.d[2],B.d[2],f)/10);b.fly=null;
  {const r=R.ref,ia=F.arbitro;r.vx=(B.d[ia]-A.d[ia])/10*vt;r.vy=(B.d[ia+1]-A.d[ia+1])/10*vt;r.x=lerp(A.d[ia],B.d[ia],f)/10;r.y=lerp(A.d[ia+1],B.d[ia+1],f)/10;animar(r,dtGame)}
- const oid=A.d[3];if(oid!==R.ownerId){R.ownerId=oid;const s=oid>=0&&R.slot[oid]!=null?spriteDe(R,R.slot[oid],oid):null;if(s&&(!s.pose||s.pose==='run'))accion(s,'controlando',.3);R.owner=s}
+ const oid=A.d[3];R.conduce=oid>=0&&B.d[3]===oid&&A.d[4]===1&&B.d[4]===1;if(oid!==R.ownerId){R.ownerId=oid;const s=oid>=0&&R.slot[oid]!=null?spriteDe(R,R.slot[oid],oid):null;if(s&&(!s.pose||s.pose==='run'))accion(s,'controlando',.3);R.owner=s}
  /* festejo: el goleador festeja al llegar al córner, los compañeros lo abrazan, los rivales se lamentan */
  const Fe=R.fest&&R.tp>=R.fest.t0&&R.tp<=R.fest.hasta?R.fest:null;
  for(const s of R.list){
@@ -789,7 +789,7 @@ function animar(s,dt){
    elegidos (3 a 15) se muestran los momentos de más puntaje que entran; entre uno y otro la calma se SALTEA con un corte
    (fundido breve y el reloj avanza). Lo que se ve va siempre a velocidad real: nunca se acelera el movimiento
    (x2 y x4 solo si el usuario los elige). Cuantos más minutos, más jugadas (y más previa de cada una).               */
-const CAT={inicio:[1000,2,6],fin:[1000,2,20],gol:[1000,2.7,34],penal:[1000,.33,15],roja:[80,.16,11],grande:[70,3,9],palo:[65,.8,9],
+const CAT={inicio:[1000,2,6],fin:[1000,2,13],gol:[1000,2.7,34],penal:[1000,.33,15],roja:[80,.16,11],grande:[70,3,9],palo:[65,.8,9],
  atajada:[60,7,9],libre:[50,1.5,10],corner:[45,10,10],remate:[40,7,9],amarilla:[30,4,10],lesion:[25,.6,10],chico:[20,15,9],cambio:[15,8.5,10]};
 function verCfg(){const m=S.m,v=(m&&m.ver)||{};const min=clamp(+v.min||({quick:3,normal:5,long:10}[largoPartido()]||5),3,15);return{modo:v.modo||'completo',T:min*60,min}}
 function momentos(){const E=Q.tv.eventos,M=Q.mom,add=(a,b,cat,t)=>M.push({a,b,cat,s:CAT[cat][0],t});
@@ -799,8 +799,8 @@ function momentos(){const E=Q.tv.eventos,M=Q.mom,add=(a,b,cat,t)=>M.push({a,b,ca
   if(Q.pendTL&&e.tipo==='remate'&&!e.penal&&e.equipo===Q.pendTL.e&&e.t>Q.pendTL.t){add(Q.pendTL.t-30,e.t+25,Q.pendTL.cat,e.t);Q.pendTL=null}
   switch(e.tipo){
    case 'inicio':case 'segundo_tiempo':add(e.t,e.t+60,'inicio',e.t);break;
-   case 'entretiempo':add(e.t-80,e.t,'fin',e.t);break;
-   case 'final':add(e.t-80,e.t+5,'fin',e.t);break;
+   case 'entretiempo':add(e.t-30,e.t,'fin',e.t);break;
+   case 'final':add(e.t-30,e.t+5,'fin',e.t);break;
    case 'cierre':add(e.t-5,(e.hasta||e.t+160)+20,'fin',e.t);break;
    case 'remate':if(e.penal&&Q.pendPen!=null){add(Q.pendPen,e.t+40,'penal',e.t);Q.pendPen=null}else add(e.t-70,e.t+20,e.xg>=.3?'grande':e.xg>=.12?'remate':'chico',e.t);break;
    case 'gol':add(e.t-90,e.t+(e.festejo||40)+5,'gol',e.t);break;
@@ -886,8 +886,8 @@ function frameV3(real,crudo){real=Math.min(.3,crudo||real);
     /* cronograma: lo visto tiene que ir parejo con el partido. Si al llegar a la próxima jugada quedaría tiempo de sobra,
        el corte cae antes y ese sobrante se ve como la previa de la jugada (cómo se arma, a velocidad real) */
     {const T0=verCfg().T,T=Math.max(T0*.6,T0-38),t0=tv.partes[1]||0,total=Math.max(1,R.tp-t0+restoTicks()),sobra=T*(a-t0)/total-Q.realT-6;   // 38 s quedan para el final (escena de cierre, festejos, fundidos)
-     if(sobra>0&&!(f1!=null&&!Q.cruzo&&a>=f1-1&&R.tp<f1-1&&p2==null))a=Math.max(R.tp,a-Math.min(sobra*10,Q.thMin?1e9:40))}   // la calma, solo como transición corta
-    if(a-R.tp>60){if(a<=tMax){cortarA(a);sumaT(real)}else espera=true}}   // huecos de menos de 8 s de juego se ven (no se corta)
+     if(sobra>0&&!(f1!=null&&!Q.cruzo&&a>=f1-1&&R.tp<f1-1&&p2==null))a=Math.max(R.tp,a-Math.min(sobra*10,Q.thMin?1e9:25))}   // la calma, solo como transición corta
+    if(a-R.tp>30){if(a<=tMax){cortarA(a);sumaT(real)}else espera=true}}   // huecos de menos de 8 s de juego se ven (no se corta)
    else if(!tv.terminado)espera=true}   // todavía no se sabe cuál es la próxima: se espera al motor
   if(espera)Q.esperaReal+=real;
   else if(!Q.corte){

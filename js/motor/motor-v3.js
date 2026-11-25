@@ -770,7 +770,7 @@ P.objetivosFestejo=function(F){
      su arco; los demás rivales y los compañeros que no festejan caminan a su lugar en su campo, despacio y lamentándose */
   const camina=MATH.min(.3,1.6/j.vmax);
   if(j.gk){j.tx=this.wx(j.eq,1.2);j.ty=34;j.urg=camina;continue}
-  j.tx=this.wx(j.eq,MATH.min(j.bx*.85,j.eq===F.eq?50:42));j.ty=this.wy(j.eq,j.by);j.urg=k<15?.15:camina;
+  j.tx=this.wx(j.eq,MATH.min(j.bx*.85,j.eq===F.eq?50:42));j.ty=this.wy(j.eq,j.by);j.urg=camina;
  }
 };
 /* forma del equipo: tres líneas a distancia real, corta y angosta sin pelota, larga y ancha con pelota,
@@ -1562,7 +1562,7 @@ P.cierre=function(){
 };
 P.tickCierre=function(k){
  const R=this.roles;
- for(const j of this.A){const r=R[j.id];if(!r)continue;const lento=MATH.min(.25,1.6/j.vmax),camina=MATH.min(.22,1.4/j.vmax);   // al pitazo final nadie corre: caminan
+ for(const j of this.A){const r=R[j.id];if(!r)continue;const lento=MATH.min(.2,1.3/j.vmax),camina=MATH.min(.2,1.3/j.vmax);   // al pitazo final nadie corre: caminan
   switch(r.rol){
    case 'festeja':{const p=r.grupo||[j.x,j.y];j.tx=p[0];j.ty=p[1];j.urg=lento;break}
    case 'aplaude':{j.tx=clamp(r.x0,6,PW-6);j.ty=r.y0<34?2.5:PH-2.5;j.urg=camina;break}
