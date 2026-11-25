@@ -503,11 +503,14 @@ function postura(s,sp){const g=marcha(s,sp),L0=Q.on?{la:g.la,ra:g.ra,lk:g.lk,rk:
 /* v3: los cambios de pose se mezclan en 0,12 s (sin saltos de brazos y piernas) y se mide la marcha:
    largo de cada paso (velocidad / cadencia), patinaje (moverse sin dar pasos), saltos de pose y pelota-pie en conducción */
 const PCAMPOS=['la','ra','lk','rk','lu','ru','le','re','lean','rot','lift'];
-function mezclaPose(s,g,sp){const t=S.t,pz=(s.pose||'run')+'|'+(s.celeb||0)+'|'+(sp>.9&&POSE_BRAZOS.has(s.pose)?1:0);
+function mezclaPose(s,g,sp){const t=S.t,pz=(s.pose||'run')+'|'+(s.celeb||0)+'|'+(sp>.9&&POSE_BRAZOS.has(s.pose)?1:0)+(s.gk&&s.espera?'e':'')+(s.lat?'l':'')+(sp>6.2?'s':'');
  if(s._g&&(s._pz!==pz||(s.poseT||0)+1e-6<(s._ptp||0))){s._de=s._g;s._bt=t}s._pz=pz;s._ptp=s.poseT||0;
  if(s._de){const w0=clamp((t-s._bt)/.12,0,1),w=w0*w0*(3-2*w0);if(w>=1)s._de=null;else for(const k of PCAMPOS)g[k]=s._de[k]+(g[k]-s._de[k])*w}
+ /* además, un suavizado corto (40 ms) de todos los ángulos: los cambios de un cuadro al otro (arquero que se pone en
+    guardia, paso lateral, pique) no saltan; la marcha (medio segundo por paso o más) casi no cambia */
+ if(s._g&&s._gt!=null){const dt=t-s._gt;if(dt>0&&dt<.1){const k=1-Math.exp(-dt/.04);for(const c of PCAMPOS)g[c]=s._g[c]+(g[c]-s._g[c])*k}}
  const M=Q.mov,medir=M&&Q.live&&S.sp===Q.live.list&&!Q.rep&&!Q.corte&&!Q.hl&&s.alpha>.9;
- if(medir&&s._g&&s._gt!=null){const dt=t-s._gt;if(dt>0&&dt<.06){let d=0;for(const k of PCAMPOS)d=Math.max(d,Math.abs(g[k]-s._g[k]));if(d>M.poseMax)M.poseMax=+d.toFixed(2);if(d>.9){M.saltosPose++;M.saltoLog={jugador:s.name,pose:pz,d:+d.toFixed(2)}}}
+ if(medir&&s._g&&s._gt!=null){const dt=t-s._gt;if(dt>0&&dt<.06){let d=0;for(const k of PCAMPOS)d=Math.max(d,Math.abs(g[k]-s._g[k]));d/=dt;if(d>M.poseMax)M.poseMax=+d.toFixed(1);if(d>45){M.saltosPose++;M.saltoLog={jugador:s.name,pose:pz,d:+d.toFixed(2)}}}
   /* pasos: cada vez que las piernas se cruzan */
   const lado=g.la-g.ra>=0;const dx=s._px!=null?Math.hypot(s.x-s._px,s.y-s._py):0;if(dx<2)s._dist=(s._dist||0)+dx;
   if(s._lado!=null&&lado!==s._lado){if(sp>1.5&&s._spPaso>1.5&&s._dist>0){M.pasos++;M.largo.push(+s._dist.toFixed(2))}s._dist=0;s._spPaso=sp}

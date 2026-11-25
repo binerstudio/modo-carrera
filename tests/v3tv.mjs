@@ -88,6 +88,7 @@ const c3 = await completo(3, 1, true);
     ok(M.conduccion > 100 && M.pelotaPieMax < 0.8, `pelota-pie en conducción: máximo ${M.pelotaPieMax} m (límite 0,8) en ${M.conduccion} muestras`);
     ok(M.pasos > 500 && M.pasoP5 >= 0.4 && M.pasoP95 <= 2.4, `largo de paso (velocidad/cadencia) fuera de rango: ${JSON.stringify(M)}`);
     ok(M.patinaje === 0, `patinaje: ${M.patinaje} ${JSON.stringify(M.patLog)}`);
+    /* salto de pose: un ángulo de brazo o pierna que cambia a más de 45 rad/s (unos 0,75 rad en un cuadro de 60 fps); la marcha más rápida llega a ~20 */
     ok(M.saltosPose === 0, `saltos de pose: ${M.saltosPose} ${JSON.stringify(M.saltoLog)}`); }
 }
 await cap('resultado');
