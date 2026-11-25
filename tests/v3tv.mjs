@@ -21,7 +21,7 @@ page.on('pageerror', e => errors.push('pageerror: ' + e.message));
 page.on('console', m => { if ((m.type() === 'error' && !/Failed to load resource/.test(m.text())) || (m.type() === 'warning' && /MC2D|motor v3/i.test(m.text()))) errors.push('console: ' + m.text()); });
 page.on('dialog', d => d.accept()); page.on('crash', () => errors.push('la página se cayó (crash)'));
 await page.goto(URL, { waitUntil: 'load' }); await page.waitForTimeout(1500);
-const cap = async (n, sel) => { await (sel ? page.locator(sel).screenshot({ path: `tests/out/v3tv-${n}.png` }) : page.screenshot({ path: `tests/out/v3tv-${n}.png` })).catch(() => {}); };
+const cap = async (n, sel) => { for (let k = 0; k < 3; k++) { try { if (sel) { const b = await page.locator(sel).boundingBox(); await page.screenshot({ path: `tests/out/v3tv-${n}.png`, clip: b }); } else await page.screenshot({ path: `tests/out/v3tv-${n}.png` }); return true; } catch (e) { await page.waitForTimeout(150); } } return false; };
 await page.evaluate(() => {
   go('newcareer'); const c = document.getElementById('country'); c.value = 'Argentina'; fillClubs();
   document.getElementById('clubChoice').value = 'River Plate'; document.getElementById('manager').value = 'Prueba';
@@ -47,7 +47,8 @@ async function completo(min, vel, fotos) {
     if (e.ver && !v.enCorte) { maxDif = Math.max(maxDif, e.ver.difMax); verif.push(e.ver.difMax); }
     if (fotos) {
       if (!f.tv && i === 10) { f.tv = 1; await cap('estadio', '#m2dHost'); }
-      if (!f.corte && v.enCorte) { f.corte = 1; await page.waitForTimeout(150); await cap('corte', '#m2dHost'); }
+      if (!f.corte && v.cortes >= 2) { f.corte = 1;   /* el corte dura medio segundo: se espera el próximo y se saca la foto en el fundido */
+        await page.waitForFunction(n => { const x = MC2D.estado().v3; return x.cortes > n && x.corteFase === 'entra'; }, v.cortes, { timeout: 60000, polling: 40 }).catch(() => {}); await cap('corte', '#m2dHost'); }
       if (!f.fest && v.festejoActivo && !v.enRepeticion) { f.fest = 1; await page.waitForTimeout(300); await cap('festejo', '#m2dHost'); }
       if (!f.rep && v.enRepeticion) { f.rep = 1; await cap('repeticion', '#m2dHost'); }
       if (!f.cierre && v.cierre && v.cierre.muestras > 400) { f.cierre = 1; await cap('escena-final', '#m2dHost'); }
