@@ -101,3 +101,7 @@ dio entre 148 y 203 s para 3 minutos y 980 s para 15. Siempre dentro del ±20%, 
 3. **Duración de "Partido completo"**: variaba mucho según el partido (113 a 303 s para 3 min). Ahora se corrige con lo
    que ya pasó en ese partido, compacta los goles si falta tiempo y reparte el tiempo sobrante como previa de cada
    jugada. Medido en 8 partidos (a x4): **171 a 209 s** para 3 min, con 3 a 8 cortes. La prueba acepta ±30%.
+
+**CI liviano después de estos arreglos (corrida 104, sobre `5afc3fe`): todo en verde.** 2D v2 ✅ con arqueros a 6,9 y
+4,3 m de promedio (límite 12) · Ver el partido (v3) ✅: completo de 3 min = 163 s reales a x1 (rango aceptado 126-234 s),
+3 cortes, 0 saltos, cámara sin saltos, escena final 0 corriendo · motor v2/v3 300, huella, temporadas, actualización ✅.
