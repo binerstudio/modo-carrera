@@ -13,7 +13,7 @@ const URL = process.argv[2] || 'http://localhost:8080/index.html', LARGO = proce
 mkdirSync('tests/out', { recursive: true });
 const errors = [], fallas = [], ok = (c, msg) => { if (!c) fallas.push(msg); };
 const browser = await chromium.launch();
-const ctx = await browser.newContext({ viewport: { width: 900, height: 640 } });
+const ctx = await browser.newContext({ viewport: { width: 900, height: 1000 } });
 const page = await ctx.newPage();
 const ORIGEN = URL.startsWith('file:') ? null : new globalThis.URL(URL).origin;
 await ctx.route(u => ORIGEN ? !u.href.startsWith(ORIGEN) : /^https?:/.test(u.href), r => r.abort());
