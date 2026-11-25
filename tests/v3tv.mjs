@@ -59,7 +59,7 @@ async function completo(min, vel, fotos) {
   return { min, vel, segundos: Math.round((Date.now() - t0) / 1000), v: r.v, marcador: [r.h, r.a], done: r.done, tab: r.tab, maxDif, muestras: verif.length };
 }
 const c3 = await completo(3, 1, true);
-{ const v = c3.v, dur = v.duracion;
+{ const v = c3.v, dur = c3.segundos;   // tiempo real de reloj, desde que arranca hasta el resultado (esperas incluidas)
   ok(c3.done && v.resultado && /ESTAD/.test(c3.tab), `partido completo (3 min): no terminó en el resultado (${JSON.stringify({ done: c3.done, tab: c3.tab })})`);
   ok(dur >= 144 && dur <= 216, `partido completo (3 min) a x1 duró ${dur} s (objetivo 180 ±20%)`);
   ok(v.velMax <= 1.05, `algo se movió más rápido que la velocidad real a x1 (${v.velMax}x)`);
@@ -99,8 +99,8 @@ ok(sim.done && sim.tiros[0] + sim.tiros[1] > 0 && /ESTAD/.test(sim.tab) && sim.f
 let c15 = null;
 if (LARGO) {
   await page.evaluate(() => { match.finished = true; openMatch(); go('match'); });
-  c15 = await completo(15, 4, false); const v = c15.v, dur = v.duracion * 4;
-  ok(dur >= 720 && dur <= 1080, `partido completo (15 min): ${v.duracion} s a x4 = ${dur} s a x1 (objetivo 900 ±20%)`);
+  c15 = await completo(15, 4, false); const v = c15.v, dur = c15.segundos * 4;
+  ok(dur >= 720 && dur <= 1080, `partido completo (15 min): ${c15.segundos} s a x4 = ${dur} s a x1 (objetivo 900 ±20%)`);
   ok(v.velMax <= 4.2, `a x4 algo se movió a ${v.velMax}x`);
   ok(v.saltosDibujo === 0 && v.camara.saltos === 0, `15 min: saltos de dibujo ${v.saltosDibujo}, de cámara ${v.camara.saltos}`);
 }
@@ -116,9 +116,9 @@ ok(!v2.esV3 && v2.opciones.join() === 'completo,simular' && v2.jugadores >= 20 &
 
 await browser.close();
 const res = { ok: !errors.length && !fallas.length, menu, completo3: { ...c3, v: undefined, duracion: c3.v.duracion, velMax: c3.v.velMax, cortes: c3.v.cortes, camara: c3.v.camara, cierre: c3.v.cierre, repeticiones: c3.v.repeticiones, festejos: c3.v.festejos, saltos: [c3.v.saltosCinta, c3.v.saltosPelota, c3.v.saltosDibujo], pred: c3.v.pred, tiempo: c3.v.tiempoReal },
-  completo15: c15 && { duracionX4: c15.v.duracion, velMax: c15.v.velMax, cortes: c15.v.cortes, camara: c15.v.camara }, mejores: mej, simular: sim, v2, errores: errors, fallas };
+  completo15: c15 && { segundosX4: c15.segundos, duracionX4: c15.v.duracion, velMax: c15.v.velMax, cortes: c15.v.cortes, camara: c15.v.camara }, mejores: mej, simular: sim, v2, errores: errors, fallas };
 writeFileSync('tests/out/v3tv.json', JSON.stringify(res, null, 1));
-console.log('VER EL PARTIDO (v3)', res.ok ? 'OK' : 'FALLÓ', '·', `completo 3 min: ${c3.v.duracion}s a x1, vel máx ${c3.v.velMax}x, ${c3.v.cortes} cortes, cámara ${JSON.stringify(c3.v.camara)}, cierre ${c3.v.cierre.corriendo} corriendo de ${c3.v.cierre.muestras}`,
-  `· mejores: ${(mej.mejores || { clips: [] }).clips.length} recortes · simular: ${sim.tab}`, c15 ? `· completo 15 min: ${c15.v.duracion}s a x4` : '');
+console.log('VER EL PARTIDO (v3)', res.ok ? 'OK' : 'FALLÓ', '·', `completo 3 min: ${c3.segundos}s a x1 (viendo ${c3.v.duracion}s), vel máx ${c3.v.velMax}x, ${c3.v.cortes} cortes, cámara ${JSON.stringify(c3.v.camara)}, cierre ${c3.v.cierre.corriendo} corriendo de ${c3.v.cierre.muestras}`,
+  `· mejores: ${(mej.mejores || { clips: [] }).clips.length} recortes · simular: ${sim.tab}`, c15 ? `· completo 15 min: ${c15.segundos}s a x4` : '');
 errors.forEach(e => console.log('ERROR:', e)); fallas.forEach(f => console.log('FALLA:', f));
 process.exit(res.ok ? 0 : 1);

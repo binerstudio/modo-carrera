@@ -854,11 +854,11 @@ function frameV3(real,crudo){real=Math.min(.3,crudo||real);
    /* final: termina la escena de cierre y pasa a la pantalla de resultado */
    if(tv.terminado&&R.tp>=tMax-.5){Q.finT=(Q.finT||0)+real;if(Q.finT>1&&!Q.resultado){Q.resultado=true;Q.duracion=+(Q.realW||0).toFixed(1);mostrarResultado()}}}}
  const prev=new Map(R.list.map(s=>[s,[s.x,s.y,s.alpha]])),pb=[R.ball.x,R.ball.y];
- actualizarRep(R,dtG);
+ const hay=actualizarRep(R,dtG);if(!hay)Q.mitad=true;   // sin cuadros todavía: el primero no cuenta como salto
  /* control de calidad: lo dibujado no salta (más rápido que lo que permite la cinta) y coincide con la cinta */
  if(dtG>0&&!Q.mitad){const lim=dtG*11+.6;for(const s of R.list){const p=prev.get(s);if(!p||p[2]<=0||s.alpha<=0)continue;const d=Math.hypot(s.x-p[0],s.y-p[1]);if(d>lim){Q.saltos.dibujo++;Q.saltos.log={jugador:s.name,d:+d.toFixed(2),lim:+lim.toFixed(2),t:R.tp}}}
   const db=Math.hypot(R.ball.x-pb[0],R.ball.y-pb[1]);if(db>dtG*48+.6){Q.saltos.dibujo++;Q.saltos.log={pelota:true,d:+db.toFixed(2),t:R.tp}}}
- Q.mitad=false;
+ if(hay)Q.mitad=false;
  if(Q.repPend&&R.tp>=Q.repPend.at&&!Q.corte){const P=Q.repPend;Q.repPend=null;if(visible())armarRepeticion(P)}
  /* recorte de memoria: se guardan los últimos 30 s ya vistos */
  const c=tv.cuadros;if(c.length&&c[0].t<R.tp-300){let k=0;while(k<c.length&&c[k].t<R.tp-300)k++;c.splice(0,k)}
@@ -988,7 +988,7 @@ const API={
   S.host=host;if(document.body.classList.contains('m2d-full')){host.innerHTML=''}else{host.innerHTML='';host.appendChild(S.wrap)}S.cam=S.cam||camPref;S.w=0;resize();if(!S.raf)S.raf=requestAnimationFrame(frame)},
  /* el reloj del motor espera mientras se muestra una jugada (o hay eventos sin mostrar) */
  retener(m){if(!m||m!==S.m||m.done||!visible())return false;
-  if(Q.on)return !Q.hl&&Q.tv.tMotor-Q.live.tp>9000&&!!proximaVentana(Q.live.tp);   // v3: el motor va hasta 15 min adelante (y sigue si todavía no apareció la próxima jugada)
+  if(Q.on){if(Q.hl)return false;const nx=proximaVentana(Q.live.tp);return Q.tv.tMotor-Q.live.tp>9000&&!!nx&&desde(nx)+600<=Q.tv.tMotor}   // v3: el motor va hasta 15 min adelante, y sigue hasta tener la cinta de la próxima jugada
   return!!S.rep||!!(S.play&&!S.play.filler)||S.shown<(m.events||[]).length},
  corte(m){if(Q.on&&m===S.m&&visible()&&(Q.live||Q.hl)&&!Q.saltado)return Math.min(corteV3(m),(m.events||[]).length);
   if(!m||m!==S.m||!visible()||m.done)return(m&&m.events||[]).length;return Math.min(S.shown,(m.events||[]).length)},

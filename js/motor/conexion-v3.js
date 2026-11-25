@@ -45,6 +45,10 @@ if(typeof oMatch==='function')window.createMatch=function(){
  }catch(e){console.warn('MC motor v3',e);if(match){delete match.v3;ESTADO.delete(match)}}
  return r};
 
+/* con el v3 el reloj del juego no marca el ritmo (lo marca el 2D con la cinta): el motor simula un minuto cada 40 ms
+   para estar siempre adelante de lo que se ve (el 2D lo frena cuando ya tiene 15 minutos de ventaja) */
+const oMs=window.msPerMinute;
+if(typeof oMs==='function')window.msPerMinute=function(){try{if(typeof match!=='undefined'&&match&&match.v3&&ESTADO.get(match))return 40}catch(e){}return oMs.apply(this,arguments)};
 /* ---------- cada minuto: el v2 le pasa la posta al v3 si el partido es v3 ---------- */
 const oMinuto=window.MCMotor.minuto;
 window.MCMotor.minuto=function(m,API){
