@@ -39,11 +39,12 @@ async function caso(nombre, preparar) {
   ok(ini.v3, `${nombre}: el partido no es v3 ${JSON.stringify(ini)}`);
   await page.evaluate(() => { mcJugarPartido({ modo: 'completo', min: 3 }); mcSpeed(4); MC12.mTab('ev'); });
   const local = ini.venue === 'a' ? ini.away : ini.home, visita = ini.venue === 'a' ? ini.home : ini.away;
-  let n = 0, maxAdel = -99, maxAdelJuego = -99, finAntes = null, vistos = new Set(), primero = null; const malos = [];
+  let relojLog = null, n = 0, maxAdel = -99, maxAdelJuego = -99, finAntes = null, vistos = new Set(), primero = null; const malos = [];
   for (let i = 0; i < 900; i++) {
     await page.waitForTimeout(300);
     const s = await page.evaluate(() => {
       const q = x => document.querySelector(x), v = MC2D.estado().v3;
+      if (!q('#m12M .pn.ev.all')) MC12.mTab('ev');   // al terminar, la pantalla pasa sola a "Estadísticas": se vuelve a "Eventos" para leerlos
       const ev = [...document.querySelectorAll('#m12M .pn.ev.all .er strong')].map(x => x.textContent);
       return { izq: (q('#m12M .np.l b') || {}).textContent, der: (q('#m12M .np.r b') || {}).textContent, sc: (q('#m12M .cl strong') || {}).textContent,
         mn: (q('#m12M .cl .mn') || {}).textContent, ev, gl: ev.filter(t => /GOL LOCAL/.test(t)).length, gv: ev.filter(t => /GOL VISITANTE/.test(t)).length,
@@ -60,7 +61,7 @@ async function caso(nombre, preparar) {
     const m2 = min2(s.min2d);
     if (m2 != null && !s.resultado && !s.done) {
       const mh = min2(s.mn); if (mh != null) maxAdel = Math.max(maxAdel, mh - m2);
-      if (s.phase === 'first' || s.phase === 'second') maxAdelJuego = Math.max(maxAdelJuego, (s.juego || 0) - m2);
+      if (s.phase === 'first' || s.phase === 'second') { const d = (s.juego || 0) - m2; if (d > maxAdelJuego) { maxAdelJuego = d; relojLog = { i, juego: s.juego, min2d: s.min2d, phase: s.phase, ojo: s.ojo }; } }
     }
     if (s.done && finAntes == null) finAntes = m2;
     vistos.add(s.phase);
@@ -70,7 +71,7 @@ async function caso(nombre, preparar) {
   ok(n > 50, `${nombre}: casi no hubo muestras (${n})`);
   ok(!malos.length, `${nombre}: ${malos.length} muestras con marcador o lados distintos; primera: ${JSON.stringify(malos[0])}`);
   ok(maxAdel <= 1, `${nombre}: el minuto del encabezado fue ${maxAdel}' adelante del 2D`);
-  ok(maxAdelJuego <= 1, `${nombre}: el reloj del juego fue ${maxAdelJuego}' adelante del 2D`);
+  ok(maxAdelJuego <= 1, `${nombre}: el reloj del juego fue ${maxAdelJuego}' adelante del 2D ${JSON.stringify(relojLog)}`);
   ok(finAntes == null || finAntes >= 90, `${nombre}: el partido terminó cuando el 2D mostraba el minuto ${finAntes}`);
   ok(vistos.has('ht') || vistos.has('second'), `${nombre}: no pasó por el entretiempo`);
   return { nombre, venue: ini.venue, local, visita, comp: ini.comp, muestras: n, malos: malos.length, adelantoEncabezado: maxAdel, adelantoReloj: maxAdelJuego, finCon2D: finAntes };

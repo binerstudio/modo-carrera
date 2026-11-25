@@ -92,8 +92,8 @@ function minuto(m,API,S){
  if(V.terminado){publicar(m,S);return finVisto(m,S,2)}
  if(S.finH===half){publicar(m,S);return finVisto(m,S,half)}   // el motor ya terminó este tiempo: se espera al 2D
  if(S.parte!==half){
-  if(half===1&&S.parte===0){V.empezar(1);S.parte=1;S.tv.partes[1]=V.t()}
-  else if(half===2&&S.parte===1){if(!V.empezar(2)){traducir(m,API,S,V.eventosNuevos());S.tv.terminado=true;return true}S.parte=2;S.tv.partes[2]=V.t()}
+  if(half===1&&S.parte===0){V.empezar(1);S.parte=1;S.tv.partes[1]=V.t();S.hist.push({t:V.t(),minute:0,lbl:'0',st:{}})}
+  else if(half===2&&S.parte===1){if(!V.empezar(2)){traducir(m,API,S,V.eventosNuevos());S.tv.terminado=true;return true}S.parte=2;S.tv.partes[2]=V.t();S.hist.push({t:V.t(),minute:45,lbl:'45',st:{}})}   // el reloj del 2º tiempo arranca en 45 (no en el descuento del 1º)
  }
  sincronizar(m,S);
  const fin=V.minuto();

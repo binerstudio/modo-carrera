@@ -1266,8 +1266,10 @@ P.armar=function(tipo,e,x,y,extra){
   datos.radio=9.15;datos.fueraArea=true;
   /* todos afuera del área, en la medialuna no */
   const otros=this.A.filter(j=>j!==ej&&!(j.gk&&j.eq===1-e));let k=0;
-  for(const j of otros){if(j.gk){pon(j,10,34);continue}const yy=34+((k%8)-3.5)*4.2+(k%8>=4?0:0);k++;
-   const [wx,wy]=this.toW(e,PW-AREA_X-1-(k%3)*1.5,yy<26||yy>42?yy:(yy<34?24:44));plan.set(j.id,[wx,wy])}
+  /* cada uno con un lugar propio (a 4 m del de al lado, en dos filas): si dos compartían lugar no llegaban nunca y había que acomodarlos de golpe */
+  const YS=[24,44,20,48,16,52,12,56,8,60];
+  for(const j of otros){if(j.gk){pon(j,10,34);continue}const fila=MATH.floor(k/YS.length),yy=YS[k%YS.length];k++;
+   const [wx,wy]=this.toW(e,PW-AREA_X-1-fila*2.5,yy);plan.set(j.id,[wx,wy])}
   const gkD=O[0];if(gkD)ponD(gkD,.3,34);
  }else if(tipo==='tiro_libre'){
   const dg=hyp(PW-ax,34-ay);
