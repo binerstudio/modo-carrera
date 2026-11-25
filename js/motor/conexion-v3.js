@@ -31,6 +31,7 @@ function preparar(m){
   arbitro:arb?{severidad:arb.severidad,precision:arb.precision}:undefined,dtExterno:[true,true],alCuadro:(t,f)=>{TV.cuadros.push({t,d:Int16Array.from(f)})}});
  TV.puestos=vivo.puestos();TV.formato=vivo.formato();
  const S={vivo,eOwn,parte:0,finParte1:false,tac:JSON.stringify(tacO),tv:TV};
+ if(m.ver&&m.ver.modo==='mejores')prepararClips(S,m.ver.tipos);
  ESTADO.set(m,S);m.v3={version:V3.VERSION,local:eOwn===0?'propio':'rival'};
  return S;
 }
@@ -88,8 +89,9 @@ function minuto(m,API,S){
  const rj=V.reloj();c.base=rj.base;c.x=rj.extra;m.minute=c.base+c.x;m.moments++;m.tick++;if(API.label)m.lbl=API.label(m);
  if(rj.descuento!=null)m.extra[half]=rj.descuento;
  traducir(m,API,S,V.eventosNuevos());
- S.tv.tMotor=V.t();if(fin){S.tv.fin[half]=V.t();if(V.terminado)S.tv.terminado=true}
- if(S.tv.cuadros.length>6000)S.tv.cuadros.splice(0,S.tv.cuadros.length-3000);   // en memoria solo los últimos minutos
+ S.tv.tMotor=V.t();if(fin){S.tv.fin[half]=V.t();if(V.terminado){S.tv.terminado=true;if(S.tv.clipsPend)armarClips(S,true)}}
+ if(S.tv.clipsPend)armarClips(S,false);
+ if(S.tv.cuadros.length>15000)S.tv.cuadros.splice(0,S.tv.cuadros.length-12000);   // en memoria solo los últimos minutos (el 2D va hasta 15 min atrás del motor)
  actualizarStats(m,S);
  /* minutos jugados */
  for(const side of ['o','r'])for(const e of listaDe(m,side)){const st=API.ps(m,e,side);if(st)st.on++}
@@ -113,7 +115,7 @@ function actualizarStats(m,S){
 
 function traducir(m,API,S,evs){
  for(const x of evs){
-  S.tv.eventos.push(x);
+  S.tv.eventos.push(x);if(S.tv.clipsPend)marcarClip(S,x);
   const n0=m.events.length;try{traducir1(m,API,S,x)}finally{for(let k=n0;k<m.events.length;k++)if(m.events[k].t3==null)m.events[k].t3=x.t}   // t3: cuándo pasó en la cancha (el 2D lo muestra recién ahí)
  }
 }
@@ -149,8 +151,40 @@ function traducir1(m,API,S,x){
   }
  }
 }
+/* ---------- "Mejores jugadas": mientras se simula, se guardan solo los recortes de la cinta de las jugadas elegidas ----------
+   tipos: goles, penales, tirosLibres, corners, peligro (remates con xG ≥ 0,12), atajadas, faltas (tarjetas y faltas
+   graves), cambios (lesiones y cambios). Cada recorte lleva sus cuadros, sus eventos y quién ocupaba cada puesto. */
+function prepararClips(S,tipos){const T=S.tv;T.clips=[];T.clipsPend=[];T.tipos=new Set(tipos||[]);T.pend={};T.slots={slot:T.puestos.map(p=>p.clave),sal:[null,null,null],hist:[]}}
+function marcarClip(S,x){const T=S.tv,ty=T.tipos,P=T.pend,add=(a,b,tipo)=>{const L=T.clipsPend[T.clipsPend.length-1];
+  if(L&&a<=L.b+20){L.b=Math.max(L.b,b);if(ORDEN.indexOf(tipo)<ORDEN.indexOf(L.tipo)){L.tipo=tipo;L.t=x.t}return}
+  T.clipsPend.push({a,b,tipo,t:x.t,slot:T.slots.slot.slice(),sal:T.slots.sal.slice()})};
+ /* quién ocupa cada puesto (para dibujar el recorte con los jugadores correctos) */
+ if(P.libre&&x.equipo===P.libre.e&&x.t>P.libre.t&&/^(pase|remate|jugada_ensayada|corner_ejecutado)$/.test(x.tipo)){add(x.t-30,x.t+60,P.libre.tipo);P.libre=null}
+ switch(x.tipo){
+  case 'gol':if(ty.has('goles'))add(x.t-120,x.t+(x.festejo||40)+10,'goles');break;
+  case 'penal':P.penal=x.t;break;
+  case 'remate':if(x.penal&&P.penal!=null){if(ty.has('penales'))add(P.penal-10,x.t+40,'penales');P.penal=null}else if(x.xg>=.12&&ty.has('peligro'))add(x.t-80,x.t+25,'peligro');break;
+  case 'atajada':if(!x.penal&&ty.has('atajadas'))add(x.t-60,x.t+25,'atajadas');break;
+  case 'tiro_libre':if(x.modo&&x.modo!=='pase'&&ty.has('tirosLibres'))P.libre={e:x.equipo,t:x.t,tipo:'tirosLibres'};break;
+  case 'corner':if(ty.has('corners'))P.libre={e:x.equipo,t:x.t,tipo:'corners'};break;
+  case 'amarilla':case 'roja':if(ty.has('faltas'))add(x.t-60,x.t+40,'faltas');break;
+  case 'falta':if(x.gravedad&&x.gravedad!=='normal'&&ty.has('faltas'))add(x.t-30,x.t+30,'faltas');break;
+  case 'lesion':if(ty.has('cambios'))add(x.t-30,x.t+70,'cambios');break;
+  case 'cambio':if(ty.has('cambios'))add(x.t-10,x.t+90,'cambios');break;
+ }
+ if(x.tipo==='cambio'){if(x.salienteSlot>=0)T.slots.sal[x.salienteSlot]=x.saleClave;T.slots.slot[x.sid]=x.clave}   // después: el recorte arranca con el que sale
+}
+const ORDEN=['goles','penales','peligro','atajadas','tirosLibres','corners','faltas','cambios'];
+function armarClips(S,todo){const T=S.tv,c=T.cuadros,lim=todo?1e12:T.tMotor;
+ while(T.clipsPend.length&&(T.clipsPend[0].b<=lim||todo)){const P=T.clipsPend.shift();
+  const cu=c.filter(q=>q.t>=P.a&&q.t<=P.b);if(cu.length<10)continue;
+  const ev=T.eventos.filter(e=>e.t>=P.a&&e.t<=P.b);
+  const h=T.partes[2]!=null&&P.t>=T.partes[2]?2:1,k=Math.floor((P.t-(T.partes[h]||0))/600),min=k<45?String((h===1?0:45)+k+1):((h===1?45:90)+'+'+(k-44));
+  T.clips.push({a:cu[0].t,b:cu[cu.length-1].t,tipo:P.tipo,min,cuadros:cu,eventos:ev,slot:P.slot,sal:P.sal})}}
 /* para el 2D: la cinta en vivo del partido v3 (o null si el partido no es v3) */
-window.MCV3TV={de:m=>{const S=m&&m.v3?ESTADO.get(m):null;return S?S.tv:null}};
+window.MCV3TV={de:m=>{const S=m&&m.v3?ESTADO.get(m):null;return S?S.tv:null},
+ /* el menú elige "Mejores jugadas" antes de simular: desde ahí se guardan los recortes */
+ mejores:(m,tipos)=>{const S=m&&m.v3?ESTADO.get(m):null;if(!S)return false;prepararClips(S,tipos);return true}};
 
 /* ---------- Configuración: agregar el v3 a "Motor de partidos" ---------- */
 try{

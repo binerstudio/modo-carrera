@@ -1,4 +1,6 @@
 name: Pruebas de regresión
+# En cada push corren solo las pruebas livianas (~20 min). Las pesadas (1000 partidos, calibración de 3000+3600,
+# partido completo de 15 min) se corren a mano: Actions → "Pruebas de regresión" → Run workflow.
 on:
   push:
   workflow_dispatch:
@@ -21,10 +23,10 @@ jobs:
           mkdir -p /tmp/srvroot && ln -sfn "$PWD/_base" /tmp/srvroot/app
           (cd /tmp/srvroot && python3 -m http.server 8081 >/dev/null 2>&1 &)
           sleep 2
-      - name: Motor v2 · validación masiva (miles de partidos)
-        run: node tests/motor.mjs 1000
-      - name: Motor v3 · etapas 1-6 (1000 partidos de liga calibrados, fuerza, local, en vivo, sin saltos, festejos, arquero, táctica, reglas)
-        run: node tests/motor-v3.mjs 1000
+      - name: Motor v2 · validación masiva (1000 partidos a mano; 300 en cada push)
+        run: node tests/motor.mjs ${{ github.event_name == 'workflow_dispatch' && 1000 || 300 }}
+      - name: Motor v3 · etapas 1-6 (1000 partidos a mano; 300 en cada push · fuerza, local, en vivo, sin saltos, festejos, cierre, arquero, táctica, reglas)
+        run: node tests/motor-v3.mjs ${{ github.event_name == 'workflow_dispatch' && 1000 || 300 }}
       - name: Jugar temporadas con semilla fija
         run: node tests/regresion.mjs http://localhost:8080/index.html ${{ github.ref_name }}
       - name: Auditoría de eventos del motor v2 (30 partidos)
@@ -35,8 +37,11 @@ jobs:
         run: node tests/v3html.mjs http://localhost:8080/v3.html
       - name: Motor v3 en el juego (Ajustes, partido en vivo, cambios, fechas, guardado, vuelta a v2)
         run: node tests/v3juego.mjs http://localhost:8080/index.html
-      - name: 2D del motor v3 (dibuja la cinta real, 0 saltos, festejo, repetición, duración Corto ~3 min a x1, pantalla completa, capturas)
+      - name: 2D del motor v3 · menú (partido completo 3 min a x1, mejores jugadas, simular), cinta real, 0 saltos, cortes, cierre, capturas
         run: node tests/v3tv.mjs http://localhost:8080/index.html
+      - name: 2D del motor v3 · partido completo de 15 minutos (solo a mano; se mide a x4)
+        if: github.event_name == 'workflow_dispatch'
+        run: node tests/v3tv.mjs http://localhost:8080/index.html largo
       - name: Tres temporadas sin intervención (IA y mercado)
         run: node tests/temporadas.mjs http://localhost:8080/index.html 3
       - name: Carrera guardada con la 12.2.2 se abre con esta versión
@@ -52,6 +57,7 @@ jobs:
           git -c user.name=ci -c user.email=ci@local add -A && git -c user.name=ci -c user.email=ci@local commit -q -m "capturas ${{ github.ref_name }} ${{ github.sha }}" || exit 0
           git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" capturas-ci
   calibracion-v3:
+    if: github.event_name == 'workflow_dispatch'
     # Calibración del motor v3: 3.000 partidos de liga + pares por fuerza, en paralelo (un hilo por núcleo). Con 10.000 el runner pasaba los 90 minutos.
     runs-on: ubuntu-latest
     timeout-minutes: 60

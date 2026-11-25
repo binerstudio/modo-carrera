@@ -77,7 +77,7 @@ function portero(s){const own=dirOf(s.team)>0?0:PW,dir=dirOf(s.team),b=S.ball||{
                         pide · atajando · estirada · saque · tarjeta
    táctico:             atacando · defendiendo · presionando · marcando · desmarcandose · apoyo                  */
 const ACC_D={volea:.42,proteccion:.6,pasando:.32,rematando:.38,cabeceando:.55,saltando:.5,controlando:.3,entrada:.55,barrida:.75,cayendo:.9,levantandose:.6,
- desequilibrio:.45,amague:.4,celebrando:2.4,abrazo:1.6,protesta:1.3,lamento:2,pide:.8,atajando:.6,estirada:.95,saque:.45,tarjeta:1.4};
+ desequilibrio:.45,amague:.4,aplauso:1.4,piso:3,cabeza:2,saludo:1.1,celebrando:2.4,abrazo:1.6,protesta:1.3,lamento:2,pide:.8,atajando:.6,estirada:.95,saque:.45,tarjeta:1.4};
 function accion(s,a,d){if(!s)return;s.pose=a;s.poseT=0;s.poseD=d||ACC_D[a]||.5}
 const BLOQUEA=a=>a==='cayendo'||a==='estirada'||a==='barrida'||a==='levantandose';
 function step(s,dt){
@@ -373,6 +373,7 @@ function proj(x,y,z){const r=projBase(x,y,z),T=S.camT;if(!T)return r;
  return[S.w/2+(r[0]-S.w/2)*T.Z,S.h/2+(r[1]-T.Yf)*T.Z,r[2]*T.Z]}
 /* cámara de TV: zoom y centro vertical, sin mostrar nunca fuera del estadio */
 function camara(real){const c=S.cam;if(c==='cen'||c==='tac'){S.camT=null;return}
+ if(Q.on)return camaraV3(real);
  const b=S.rep&&S.rep.b?S.rep.b:(Q.on&&Q.rep?Q.rep.R.ball:S.ball),o=(S.rep||(Q.on&&Q.rep))?null:S.owner,f=b.fly;
  /* anticipación: hacia donde va la pelota (destino del pase/remate o un poco adelante del que conduce) */
  let ax=b.x,ay=b.y;if(Q.on){if(!Q.rep&&Q.foco){ax=Q.foco[0];ay=Q.foco[1]}else if(!Q.rep&&Q.fut){ax=lerp(b.x,Q.fut[0],.6);ay=lerp(b.y,Q.fut[1],.6)}}else if(f){ax=lerp(b.x,f.x1,.55);ay=lerp(b.y,f.y1,.55)}else if(o){ax=o.x+dirOf(o.team)*4+o.vx*.4;ay=o.y+o.vy*.4}
@@ -384,13 +385,33 @@ function camara(real){const c=S.cam;if(c==='cen'||c==='tac'){S.camT=null;return}
  S.zoom=(S.zoom||1)+(Zt-(S.zoom||1))*Math.min(1,real*1.1);const Z=S.zoom,h=S.h;
  const yT=Q.on?projBase(S.camX,-17,9)[1]:projBase(S.camX,0,0)[1]-10,yB=projBase(S.camX,PH,0)[1]+6,lo=yT+h/(2*Z),hi=yB-h/(2*Z);
  const want=projBase(S.camX,S.camY,0)[1];S.camT={Z,Yf:lo<hi?clamp(want,lo,hi):(lo+hi)/2}}
+/* v3: cámara de transmisión. Mira hacia donde va la pelota pero se mueve como un camarógrafo: tiene una zona muerta
+   (no se mueve por cada toque), velocidad y aceleración limitadas, y el zoom cambia despacio. Solo corta de golpe en un
+   corte de fase o en la repetición. */
+function camaraV3(real){const c=S.cam,R=Q.hl?Q.hl.R:Q.rep?Q.rep.R:Q.live;if(!R)return;const b=R.ball,rep=!!Q.rep;
+ let ax=b.x,ay=b.y;if(!rep&&!Q.hl&&Q.foco){ax=Q.foco[0];ay=Q.foco[1]}else if(!rep&&!Q.hl&&Q.fut){ax=lerp(b.x,Q.fut[0],.45);ay=lerp(b.y,Q.fut[1],.45)}
+ const peligro=!Q.hl&&Q.live&&enPeligro(Q.live.tp),cercaArco=Math.min(b.x,PW-b.x)<26;
+ const Zt=rep?1.6:c==='seg'?1.35:(peligro&&cercaArco)?1.42:1.28;
+ if(Q.camSnap){S.zoom=Zt}else S.zoom=(S.zoom||1.28)+(Zt-(S.zoom||1.28))*Math.min(1,real*.45);
+ const Z=S.zoom,ancho=(c==='seg'?28:44)/Z,half=ancho/2,objX=clamp(ax,half-4,PW-half+4);
+ const objY=clamp(lerp(ay,24,.3),4,64);   // un poco hacia la tribuna de enfrente: se ve el público
+ const x0=S.camX;
+ if(Q.camSnap){S.camX=objX;S.camY=objY;S.camVX=0;Q.camSnap=false}
+ else{const e=objX-S.camX,dz=ancho*.14,vmax=(c==='seg'?9:6.5)*(rep?.7:1)*Math.max(1,speed()),
+   v=Math.abs(e)<dz?0:clamp((e-Math.sign(e)*dz)*.9,-vmax,vmax);
+  S.camVX=(S.camVX||0)+(v-(S.camVX||0))*Math.min(1,real*1.8);S.camX+=S.camVX*real;
+  S.camY+=(objY-S.camY)*Math.min(1,real*.7);
+  /* control de calidad: la cámara nunca salta (fuera de los cortes) */
+  const d=Math.abs(S.camX-x0);if(d>1.5)Q.camSaltos=(Q.camSaltos||0)+1;if(real>0&&d/real>(Q.camVel||0))Q.camVel=d/real}
+ const h=S.h,yT=projBase(S.camX,-17,9)[1],yB=projBase(S.camX,PH,0)[1]+6,lo=yT+h/(2*Z),hi=yB-h/(2*Z);
+ const want=projBase(S.camX,S.camY,0)[1];S.camT={Z,Yf:lo<hi?clamp(want,lo,hi):(lo+hi)/2}}
 function projBase(x,y,z){const c=S.cam,w=S.w,h=S.h;
  if(c==='cen'||c==='tac'){const s=Math.min((w-16)/PW,(h-14)/PH);return[w/2+(x-52.5)*s,h/2+(y-34)*s-(z||0)*s*.6,s]}
- const viewW=c==='seg'?28:(Q.on?50:42),dc=70,hc=30,top=-6,bot=h+4;
+ const viewW=c==='seg'?28:(Q.on?44:42),dc=70,hc=30,top=-6,bot=h+4;
  const k1=1/dc,k0=1/(dc+PH),F=(bot-top)/(hc*(k1-k0)),hz=top-hc*F*k0;
  const d=dc+(PH-y),s=F/d,sx=w/(viewW*(F/dc))*s;
  return[w/2+(x-S.camX)*sx,hz+(hc-(z||0))*s,sx]}
-function drawPitch(ctx){const w=S.w,h=S.h;if(Q.on)drawStadium(ctx);else{ctx.fillStyle='#0b1a10';ctx.fillRect(0,0,w,h)}
+function drawPitch(ctx){FIG=Q.on?2.6:2.1;const w=S.w,h=S.h;if(Q.on)drawStadium(ctx);else{ctx.fillStyle='#0b1a10';ctx.fillRect(0,0,w,h)}
  const strips=14;for(let i=0;i<strips;i++){const x0=i*PW/strips,x1=(i+1)*PW/strips;const a=proj(x0,0),b=proj(x1,0),c=proj(x1,PH),d=proj(x0,PH);
   ctx.fillStyle=i%2?'#2e8a3c':'#349544';ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.lineTo(c[0],c[1]);ctx.lineTo(d[0],d[1]);ctx.closePath();ctx.fill()}
  /* corte del pasto en damero (v3): franjas a lo ancho más claras */
@@ -421,7 +442,7 @@ function torso(ctx,k,x,y,w,h){ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.c
  ctx.restore()}
 function seg(ctx,x0,y0,x1,y1,c,wd){ctx.strokeStyle=c;ctx.lineWidth=wd;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke()}
 /* figura de cuerpo entero: piernas, brazos, torso y cabeza animados según la acción */
-const FIG=2.1;/* las figuras se dibujan más grandes que la escala real, como en las transmisiones de juegos */
+let FIG=2.1;/* las figuras se dibujan más grandes que la escala real, como en las transmisiones de juegos (v3: más grandes todavía) */
 /* ---------- esqueleto 2D ----------
    Cada futbolista se arma con articulaciones: pelvis, torso (con inclinación), cuello y cabeza; hombro → codo → mano;
    cadera → rodilla → tobillo → botín. Los ángulos salen de la marcha (según velocidad y estado) o de la acción.
@@ -464,6 +485,10 @@ function postura(s,sp){const g=marcha(s,sp),pz=s.pose,pt=s.poseD?clamp(s.poseT/s
   case'protesta':g.lu=-1.8;g.ru=1.8;g.le=g.re=.6;break;
   case'lamento':if((r.var%2)===0){g.lu=g.ru=-2.9;g.le=g.re=2.3;g.la=g.ra=0;g.lk=g.rk=0}else{g.lean=.6;g.lk=g.rk=1.4;g.la=g.ra=.6;g.lu=g.ru=.8}break;
   case'pide':g.ru=-2.8;g.re=.2;break;
+  case'aplauso':{const k=Math.sin(pt*Math.PI*10);g.lu=-1.25+.18*k;g.ru=-1.25-.18*k;g.le=g.re=1.25;break}   // aplaude a la tribuna
+  case'piso':g.rot=1.5;g.lk=g.rk=.3;g.lu=-2.2;g.ru=-.6;g.lift=0;break;                                      // tirado en el piso
+  case'cabeza':g.lu=g.ru=-2.9;g.le=g.re=2.4;g.lean=.08;break;                                                // se agarra la cabeza
+  case'saludo':g.ru=-1.5;g.re=.25;g.lu=.3;break;                                                              // le da la mano al rival
   case'atajando':g.lu=g.ru=1.6;g.le=g.re=.3;g.lk=g.rk=.6;break;
   case'estirada':g.rot=(s.vy>0?1:-1)*1.25*Math.min(1,pt*3);g.lift=.3*Math.sin(Math.min(1,pt*1.6)*Math.PI);g.lu=g.ru=-2.9;g.le=g.re=0;g.la=.1;g.ra=-.3;break;
   case'saque':g.lu=g.ru=-3;g.le=g.re=.4;g.lean=-.15;break;
@@ -551,7 +576,8 @@ function draw(){const ctx=S.cx,dpr=S.dpr;ctx.setTransform(dpr,0,0,dpr,0,0);drawP
   ctx.fillStyle='#fff';ctx.fillText(mn,105,17.5);ctx.restore();bY=30}
  if(S.banner){ctx.font='800 italic 12px "Barlow Semi Condensed",Arial';const t=S.banner.txt,tw=ctx.measureText(t).width+18;ctx.fillStyle='rgba(4,8,20,.85)';ctx.fillRect(8,bY,tw,20);ctx.fillStyle=S.banner.col;ctx.fillRect(8,bY,3,20);ctx.fillStyle='#fff';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(t,16,bY+10.5)}
  if(S.big){const k=1-S.big.t/S.big.d,sc=1+Math.min(.25,k*.6);ctx.save();ctx.translate(S.w/2,S.h*.42);ctx.scale(sc,sc);ctx.font=`900 italic ${Math.round(S.h*.2)}px "Barlow Semi Condensed",Arial`;ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.globalAlpha=Math.min(1,S.big.t*2);ctx.lineWidth=5;ctx.strokeStyle='rgba(4,8,20,.85)';ctx.strokeText(S.big.txt,0,0);ctx.fillStyle=S.big.col;ctx.fillText(S.big.txt,0,0);ctx.restore();ctx.globalAlpha=1}}
+  ctx.globalAlpha=Math.min(1,S.big.t*2);ctx.lineWidth=5;ctx.strokeStyle='rgba(4,8,20,.85)';ctx.strokeText(S.big.txt,0,0);ctx.fillStyle=S.big.col;ctx.fillText(S.big.txt,0,0);ctx.restore();ctx.globalAlpha=1}
+ if(Q.on)capaV3(ctx)}
 
 /* ---------- bucle ---------- */
 function speed(){let v=1;try{v=matchSpeed||1}catch(e){}return v}
@@ -602,7 +628,8 @@ function dibujarRepeticion(){const R=S.rep,L=R.L;let i=0;while(i<L.length-2&&L[i
   ctx.fillStyle='rgba(255,255,255,.75)';ctx.fillRect(x,y+23,tw*clamp((R.t-L[0].t)/(R.fin-L[0].t),0,1),2);ctx.restore()}
  finally{S.sp.forEach((s,j)=>Object.assign(s,guard[j]));if(gref)Object.assign(S.ref,gref);Object.assign(S.ball,gb);S.owner=go;S.camX=gcx;S.camY=gcy;S.banner=gbn;S.big=gbig}}
 
-function ritmoV2(){return{quick:4,normal:2.4,long:1.2}[largoPartido()]||2.4}
+function ritmoV2(){const v=S.m&&S.m.ver;if(v&&v.min)return clamp(720/(v.min*60),.8,4);   // v1/v2: el 2D actúa el relato; con los minutos elegidos se ajusta su ritmo
+ return{quick:4,normal:2.4,long:1.2}[largoPartido()]||2.4}
 function dibujarRepV3(){const R=Q.rep.R,g={sp:S.sp,ball:S.ball,ref:S.ref,owner:S.owner,banner:S.banner,big:S.big};
  S.sp=R.list;S.ball=R.ball;S.ref=R.ref;S.owner=null;S.banner=null;S.big=null;
  try{draw();const ctx=S.cx;ctx.save();ctx.font='900 italic 13px "Barlow Semi Condensed",Arial';const t='REPETICIÓN',tw=ctx.measureText(t).width+22,x=(S.w-tw)/2,y=42;
@@ -655,33 +682,35 @@ const AREA=(x,y,der)=>(der?x>105-16.5:x<16.5)&&y>13.84&&y<54.16;
 /* eventos de la cancha → poses, carteles, cambios de quién ocupa cada puesto */
 function aplicarEvento(R,ev){
  const sj=id=>{if(id==null||id<0)return null;const k=R.slot[id];return k!=null?spriteDe(R,k,id):null};
- const j=sj(ev.jid),vivo=R.vivo,nom=ev.jugador?corto(ev.jugador):'';
+ const j=sj(ev.jid),vivo=R.vivo,cart=R.vivo||R.carteles,nom=ev.jugador?corto(ev.jugador):'';
  switch(ev.tipo){
   case 'cambio':{if(ev.salienteSlot!=null&&ev.salienteSlot>=0)R.sal[ev.salienteSlot]=ev.saleClave;R.slot[ev.sid]=ev.clave;
    if(vivo){Q.hist.push({t:ev.t,slot:R.slot.slice(),sal:R.sal.slice()});banner(`🔁 Cambio · entra ${corto(ev.entra)}, sale ${corto(ev.sale)}`,'#7fd3ff',2.6)}break}
   case 'pase':if(j)accion(j,'pasando');break;
   case 'remate':if(j)accion(j,ev.cabeza?'cabeceando':(R.ball.z>.8?'volea':'rematando'));break;
-  case 'atajada':if(j)accion(j,ev.retenida?'atajando':'estirada');if(vivo&&!ev.penal)banner(`🧤 ${nom}`,'#ffffff',1.6);if(vivo&&ev.penal)bigTxt('¡ATAJÓ!','#e2bd70',1.4);break;
+  case 'atajada':if(j)accion(j,ev.retenida?'atajando':'estirada');if(cart&&!ev.penal)banner(`🧤 ${nom}`,'#ffffff',1.6);if(cart&&ev.penal)bigTxt('¡ATAJÓ!','#e2bd70',1.4);break;
   case 'quite':if(j)accion(j,'entrada');break;
   case 'intercepcion':if(j)accion(j,'controlando');break;
   case 'gambeta':if(j&&ev.ok)accion(j,'amague');break;
   case 'falta':{if(j)accion(j,ev.gravedad&&ev.gravedad!=='normal'&&ev.gravedad!=='mano'?'barrida':'entrada');const v=sj(ev.sid);if(v)accion(v,'cayendo');
-   if(vivo)banner(ev.gravedad==='mano'?`✋ Mano · ${nom}`:`Falta de ${nom}`,'#ffffff',1.8);break}
+   if(cart)banner(ev.gravedad==='mano'?`✋ Mano · ${nom}`:`Falta de ${nom}`,'#ffffff',1.8);break}
   case 'amarilla':case 'roja':{if(j){j.card=ev.tipo==='roja'?'red':'yellow';j.cardT=2.2}accion(R.ref,'tarjeta');
-   if(vivo)banner(`${ev.tipo==='roja'?'🟥 Roja':'🟨 Amarilla'} · ${nom}`,ev.tipo==='roja'?'#ff4d4d':'#ffd400',2.6);break}
-  case 'lesion':if(j)accion(j,'cayendo',2.6);if(vivo)banner(`✚ Lesión · ${nom}`,'#ff6b5b',2.2);break;
-  case 'corner':if(vivo)banner('🚩 Córner','#e2bd70',2);break;
-  case 'penal':if(vivo){bigTxt('¡PENAL!','#ff6b5b',1.3);banner(`⚠ Penal · patea ${nom}`,'#ff6b5b',2.4)}break;
-  case 'tiro_libre':if(vivo)banner(ev.modo==='directo'||ev.modo==='ensayada'?`Tiro libre peligroso${ev.barrera?' · barrera de '+ev.barrera:''}`:'Tiro libre','#e2bd70',2);break;
-  case 'offside':if(vivo)banner(`🚩 Offside · ${nom}`,'#ffffff',1.8);break;
+   if(cart)banner(`${ev.tipo==='roja'?'🟥 Roja':'🟨 Amarilla'} · ${nom}`,ev.tipo==='roja'?'#ff4d4d':'#ffd400',2.6);break}
+  case 'lesion':if(j)accion(j,'cayendo',2.6);if(cart)banner(`✚ Lesión · ${nom}`,'#ff6b5b',2.2);break;
+  case 'corner':if(cart)banner('🚩 Córner','#e2bd70',2);break;
+  case 'penal':if(cart){bigTxt('¡PENAL!','#ff6b5b',1.3);banner(`⚠ Penal · patea ${nom}`,'#ff6b5b',2.4)}break;
+  case 'tiro_libre':if(cart)banner(ev.modo==='directo'||ev.modo==='ensayada'?`Tiro libre peligroso${ev.barrera?' · barrera de '+ev.barrera:''}`:'Tiro libre','#e2bd70',2);break;
+  case 'offside':if(cart)banner(`🚩 Offside · ${nom}`,'#ffffff',1.8);break;
   case 'lateral':if(j)accion(j,'saque');break;
-  case 'palo':if(vivo)banner('¡Al palo!','#ffffff',1.6);break;
+  case 'palo':if(cart)banner('¡Al palo!','#ffffff',1.6);break;
   case 'descuento':if(vivo){Q.desc[ev.parte]=ev.minutos;banner(`⏱ +${ev.minutos} de descuento`,'#e2bd70',2.2)}break;
   case 'gol':{R.fest=ev.festejo?{t0:ev.t,hasta:ev.t+ev.festejo,clave:R.slot[ev.jid],eq:ev.equipo,team:j?j.team:null}:null;
-   if(vivo){bigTxt('¡GOL!','#e2bd70',1.8);banner(`⚽ ${nom}${ev.enContra?' (en contra)':''}`,'#e2bd70',3);
-    if(!Q.repPend)Q.repPend={tg:ev.t,at:ev.t+(ev.festejo?ev.festejo+20:25),origen:ev.origen||'',der:ev.x>52.5}}break}
+   if(cart){bigTxt('¡GOL!','#e2bd70',1.8);banner(`⚽ ${nom}${ev.enContra?' (en contra)':''}`,'#e2bd70',3)}
+   if(vivo){
+    if(!Q.repPend)Q.repPend={tg:ev.t,at:ev.t+(ev.festejo||30),origen:ev.origen||'',der:ev.x>52.5}}break}
   case 'entretiempo':if(vivo)bigTxt('ENTRETIEMPO','#e2bd70',1.8);break;
-  case 'final':if(vivo)bigTxt('FINAL','#e2bd70',2);break;
+  case 'final':if(cart)bigTxt('FINAL','#e2bd70',2);break;
+  case 'cierre':R.cierreEv={t0:ev.t,hasta:ev.hasta||ev.t+160,roles:ev.roles||{},gan:ev.ganador};break;
  }
 }
 /* actualiza el reproductor al instante R.tp (ticks): posiciones interpoladas y animación */
@@ -691,7 +720,7 @@ function actualizarRep(R,dtGame){
  const usados=new Set();
  const pon=(s,ia)=>{const ax=A.d[ia],ay=A.d[ia+1],bx=B.d[ia],by=B.d[ia+1];if(ax===-32768||bx===-32768)return;
   const x=lerp(ax,bx,f)/10,y=lerp(ay,by,f)/10;s.vx=(bx-ax)/10*vt;s.vy=(by-ay)/10*vt;s.x=x;s.y=y;usados.add(s)};
- for(let j=0;j<nJ;j++){const k=R.slot[j];if(k==null)continue;pon(spriteDe(R,k,j),5+j*2)}
+ for(let j=0;j<nJ;j++){const k=R.slot[j];if(k==null)continue;const s=spriteDe(R,k,j);s.sid=j;pon(s,5+j*2)}
  for(let q=0;q<(F.nSalientes||0);q++){const k=R.sal[q];if(k==null)continue;const s=spriteDe(R,k,q);if(usados.has(s))continue;pon(s,F.salientes+q*2)}
  /* pelota y árbitro */
  const b=R.ball;b.x=lerp(A.d[0],B.d[0],f)/10;b.y=lerp(A.d[1],B.d[1],f)/10;b.z=Math.max(0,lerp(A.d[2],B.d[2],f)/10);b.fly=null;
@@ -707,9 +736,21 @@ function actualizarRep(R,dtGame){
    if(s===aut){if(sp<1.4&&s.pose!=='celebrando'){s.celeb=(rasgos(s).var+Math.floor(Fe.t0/7))%4;accion(s,'celebrando',1.6);if(R.vivo)Q.festVisto++}}
    else if(aut&&s.team===aut.team&&!s.gk&&Math.hypot(s.x-aut.x,s.y-aut.y)<1.9&&s.pose!=='abrazo'){accion(s,'abrazo',1.2);if(R.vivo)Q.abrazoVisto++}
    else if(aut&&s.team!==aut.team&&sp<1&&R.tp<Fe.t0+90&&s.pose==='run'&&(s.lamT||0)<Fe.t0){s.lamT=Fe.t0;accion(s,'lamento',2);if(R.vivo)Q.lamentoVisto++}}
+  if(R.cierreEv&&R.tp>=R.cierreEv.t0&&s.alpha>0)poseCierre(R,s,sp);
   animar(s,dtGame)}
  S.half=Q.tv&&Q.tv.partes[2]!=null&&R.tp>=Q.tv.partes[2]?2:1;
  return true}
+/* escena de cierre: cada uno hace su papel (lo decidió el motor) cuando ya está quieto o caminando */
+function poseCierre(R,s,sp){const C=R.cierreEv,rol=C.roles[s.sid];if(!rol)return;const t=R.tp-C.t0,libre=!s.pose||s.pose==='run';
+ if(rol==='festeja'&&sp<1.3&&libre){const par=R.list.find(o=>o!==s&&o.team===s.team&&o.alpha>0&&C.roles[o.sid]==='festeja'&&Math.hypot(o.x-s.x,o.y-s.y)<1.5);
+  if(par&&(s.sid+Math.floor(t/12))%3===0)accion(s,'abrazo',1.2);else{s.celeb=(s.sid+Math.floor(t/15))%4===2?0:(s.sid+Math.floor(t/15))%4;accion(s,'celebrando',1.2)}}
+ else if(rol==='aplaude'&&sp<.7&&libre)accion(s,'aplauso',1.4);
+ else if(rol==='piso'&&t>6&&s.pose!=='piso'&&s.pose!=='cayendo')accion(s,t<12?'cayendo':'piso',t<12?.9:3);
+ else if(rol==='piso'&&s.pose==='cayendo'&&s.poseT>=s.poseD*.9)accion(s,'piso',3);
+ else if(rol==='cabeza'&&sp<.8&&libre)accion(s,'cabeza',2);
+ else if(rol==='saludo'&&libre&&sp<1.6&&R.list.some(o=>o.team!==s.team&&o.alpha>0&&C.roles[o.sid]==='saludo'&&Math.hypot(o.x-s.x,o.y-s.y)<2.4))accion(s,'saludo',1.1);
+ /* control de calidad: nadie corriendo sin sentido (pasado el primer segundo y medio, cuando frenan) */
+ if(R.vivo&&t>15){Q.cierre.muestras++;const p=s.pose||'run';Q.cierre.poses[p]=(Q.cierre.poses[p]||0)+1;if(sp>4&&p!=='celebrando'&&p!=='abrazo'){Q.cierre.corriendo++;Q.cierre.log={jugador:s.name,vel:+sp.toFixed(2),rol}}}}
 /* animación de un sprite según su velocidad real (de la cinta) y su pose */
 function animar(s,dt){
  if(s.pose&&s.pose!=='run'){s.poseT+=dt;if(s.poseT>=s.poseD){const prev=s.pose;s.pose='run';if(prev==='cayendo')accion(s,'levantandose')}}
@@ -719,31 +760,50 @@ function animar(s,dt){
  s.back=false;s.lat=sp>.8&&Math.abs(s.vy)>1.8*Math.abs(s.vx);if(s.lat&&s.estado==='trotando')s.estado='lateral';
  s.espera=!!(s.gk&&b&&Math.min(Math.abs(b.x),Math.abs(PW-b.x))<35&&Math.abs(b.x-s.x)<40);
  if(s.cardT>0)s.cardT-=dt;else s.card=null}
-/* ventanas de peligro (en ticks): remates, goles, penales, córners, tiros libres peligrosos y tarjetas */
-function ventanas(){const E=Q.tv.eventos,W=Q.win;
- const add=(a,b)=>{const L=W[W.length-1];if(L&&a<=L[1])L[1]=Math.max(L[1],b);else W.push([a,b])};
+/* ---------- "Partido completo": velocidad real y cortes de fase ----------
+   Cada cosa importante que pasó en la cancha es un "momento" (una ventana de tiempo) con un puntaje. Según los minutos
+   elegidos (3 a 15) se muestran los momentos de más puntaje que entran; entre uno y otro la calma se SALTEA con un corte
+   (fundido breve y el reloj avanza). Lo que se ve va siempre a velocidad real: nunca se acelera el movimiento
+   (x2 y x4 solo si el usuario los elige). Cuantos más minutos, más jugadas (y más previa de cada una).               */
+const CAT={inicio:[1000,2,6],fin:[1000,2,20],gol:[1000,2.7,34],penal:[1000,.33,15],roja:[80,.16,11],grande:[70,3,9],palo:[65,.8,9],
+ atajada:[60,7,9],libre:[50,1.5,10],corner:[45,10,10],remate:[40,7,9],amarilla:[30,4,10],lesion:[25,.6,10],chico:[20,15,9],cambio:[15,8.5,10]};
+function verCfg(){const m=S.m,v=(m&&m.ver)||{};const min=clamp(+v.min||({quick:3,normal:5,long:10}[largoPartido()]||5),3,15);return{modo:v.modo||'completo',T:min*60,min}}
+function momentos(){const E=Q.tv.eventos,M=Q.mom,add=(a,b,cat,t)=>M.push({a,b,cat,s:CAT[cat][0],t});
  for(;Q.evw<E.length;Q.evw++){const e=E[Q.evw];
-  if(Q.pendTL&&e.equipo===Q.pendTL.e&&(e.tipo==='pase'||e.tipo==='remate'||e.tipo==='jugada_ensayada')){add(e.t-30,e.t+50);Q.pendTL=null}
+  if(Q.pendTL&&e.equipo===Q.pendTL.e&&e.t>Q.pendTL.t&&(e.tipo==='pase'||e.tipo==='remate'||e.tipo==='jugada_ensayada'||e.tipo==='corner_ejecutado')){add(e.t-40,e.t+60,Q.pendTL.cat,e.t);Q.pendTL=null}
   switch(e.tipo){
-   case 'remate':if(e.penal&&Q.pendPen!=null){add(Q.pendPen,e.t+30);Q.pendPen=null}else add(e.t-50,e.t+20);break;
-   case 'gol':add(e.t-80,e.t+(e.festejo||40));break;
+   case 'inicio':case 'segundo_tiempo':add(e.t,e.t+60,'inicio',e.t);break;
+   case 'entretiempo':add(e.t-80,e.t,'fin',e.t);break;
+   case 'final':add(e.t-80,e.t+5,'fin',e.t);break;
+   case 'cierre':add(e.t-5,(e.hasta||e.t+160)+20,'fin',e.t);break;
+   case 'remate':if(e.penal&&Q.pendPen!=null){add(Q.pendPen,e.t+40,'penal',e.t);Q.pendPen=null}else add(e.t-70,e.t+20,e.xg>=.3?'grande':e.xg>=.12?'remate':'chico',e.t);break;
+   case 'gol':add(e.t-90,e.t+(e.festejo||40)+5,'gol',e.t);break;
+   case 'palo':add(e.t-60,e.t+30,'palo',e.t);break;
+   case 'atajada':if(!e.penal)add(e.t-60,e.t+30,'atajada',e.t);break;
    case 'penal':Q.pendPen=e.t;break;
-   case 'corner':Q.pendTL={e:e.equipo,t:e.t};break;
-   case 'tiro_libre':if(e.modo&&e.modo!=='pase')Q.pendTL={e:e.equipo,t:e.t};break;
-   case 'amarilla':case 'roja':add(e.t-15,e.t+25);break;
+   case 'corner':Q.pendTL={e:e.equipo,t:e.t,cat:'corner'};break;
+   case 'tiro_libre':if(e.modo&&e.modo!=='pase')Q.pendTL={e:e.equipo,t:e.t,cat:'libre'};break;
+   case 'roja':add(e.t-60,e.t+50,'roja',e.t);break;
+   case 'amarilla':add(e.t-60,e.t+40,'amarilla',e.t);break;
+   case 'lesion':add(e.t-40,e.t+60,'lesion',e.t);break;
+   case 'cambio':add(e.t-20,e.t+80,'cambio',e.t);break;
   }}}
-function enPeligroEntre(a,b){const W=Q.win;for(let i=Q.wi;i<W.length&&W[i][0]<=b;i++)if(W[i][1]>=a)return true;return false}
-function enPeligro(t){const W=Q.win;while(Q.wi<W.length&&W[Q.wi][1]<t)Q.wi++;const w=W[Q.wi];return !!(w&&w[0]<=t&&t<=w[1])}
+/* el puntaje mínimo que entra en el tiempo real que queda; lo que sobra alarga la previa de cada jugada elegida */
+function umbral(){const {T}=verCfg(),Brem=Math.max(4,T-Q.realT)*1.08,r=clamp(restoTicks()/57000,0,1);
+ /* siempre entran: los saques del medio, el final de cada tiempo, los goles (con su festejo y repetición) y los penales */
+ const L=Object.entries(CAT).sort((a,b)=>b[1][0]-a[1][0]);let E=0,n=0,th=1000;
+ for(const [k,[s,c,d]] of L){const fijo=k==='inicio'||k==='fin',e=(fijo?1:r)*c*d;if(s<1000&&E+e>Brem)break;E+=e;if(!fijo)n+=r*c;if(s<1000)th=s}
+ Q.th=th;Q.extra=clamp((Brem-E)/Math.max(1,n),0,45)*10;Q.pred={T,Brem:+Brem.toFixed(1),E:+E.toFixed(1),umbral:th,previa:+(Q.extra/10).toFixed(1)}}
+const desde=m=>m.cat==='inicio'||m.cat==='fin'?m.a:m.a-Q.extra;
+function enVentana(t){for(const m of Q.mom)if(m.s>=Q.th&&t>=desde(m)&&t<=m.b)return m;return null}
+function proximaVentana(t){let best=null;for(const m of Q.mom)if(m.s>=Q.th&&m.b>t){const a=desde(m);if(a>t&&(!best||a<desde(best)))best=m}return best}
+function enPeligro(t){const m=Q.on&&Q.mom?enVentana(t):null;return !!(m&&m.s<1000)}
 /* ticks que faltan jugar (estimado con el descuento cuando ya se conoce) */
 function restoTicks(){const tv=Q.tv,t=Q.live?Q.live.tp:0,h=tv.partes[2]!=null&&t>=tv.partes[2]?2:1,t0=tv.partes[h]!=null?tv.partes[h]:t;
  const des=Q.desc[h]!=null?Q.desc[h]:(h===1?2:4);let r=Math.max(200,t0+(45+des)*600+200-t);if(h===1)r+=(45+4)*600+200;return r}
-/* velocidad de reproducción (ticks por segundo real) para terminar en la duración elegida */
-function ritmoV3(peligro){const T=DUR[largoPartido()],Trem=Math.max(8,T-Q.realT),G=restoTicks();
- /* la calma va K veces más rápido que el peligro; con lo que falta (en tiempo real y de partido) sale la velocidad base */
- const K=10,fD=(Q.dObs+.045*6000)/(Q.tObs+6000),D=G*fD,C=G-D,rd=clamp((D+C/K)/Trem,8,120);Q.pred={Trem:+Trem.toFixed(1),G:Math.round(G),fD:+fD.toFixed(3),rd:+rd.toFixed(1)};return peligro?rd:Math.min(2500,rd*K)}
 function ultimoT(){const c=Q.tv.cuadros;return c.length?c[c.length-1].t:-1}
 /* repetición: recorte de la cinta alrededor del gol, en cámara lenta */
-function armarRepeticion(P){const c=Q.tv.cuadros,L={quick:45,normal:60,long:80}[largoPartido()],t0=P.tg-L,t1=P.tg+15;
+function armarRepeticion(P){const c=Q.tv.cuadros,min=verCfg().min,L=min>=10?80:min>=5?60:45,t0=P.tg-L,t1=P.tg+15;
  const clip=c.filter(q=>q.t>=t0&&q.t<=t1);if(clip.length<20)return false;
  let snap=Q.hist[0];for(const h of Q.hist)if(h.t<=t0)snap=h;
  const evs=Q.tv.eventos.filter(e=>e.t>=t0&&e.t<=t1&&e.tipo!=='gol'&&e.tipo!=='cambio');
@@ -751,42 +811,93 @@ function armarRepeticion(P){const c=Q.tv.cuadros,L={quick:45,normal:60,long:80}[
  /* control: cuántos jugadores hay en el área del arco del gol durante la repetición */
  let maxA=0;const nJ=Q.tv.formato.jugadores;for(const q of clip){let n=0;for(let j=0;j<nJ;j++){const x=q.d[5+j*2]/10,y=q.d[6+j*2]/10;if(AREA(x,y,P.der))n++}if(n>maxA)maxA=n}
  Q.repStats.push({origen:P.origen,maxEnArea:maxA,cuadros:clip.length});
- actualizarRep(R,0);Q.rep={R,fin:clip[clip.length-1].t,v:{quick:5.5,normal:4.5,long:4}[largoPartido()]};S.repN=(S.repN||0)+1;S.zoom=1.5;return true}
+ actualizarRep(R,0);Q.rep={R,fin:clip[clip.length-1].t,v:5};S.repN=(S.repN||0)+1;S.zoom=1.55;Q.camSnap=true;return true}
+/* corte de fase: fundido a negro, el reloj avanza, fundido de vuelta */
+const FUNDIDO=.32;
+/* reloj del presupuesto: se cuenta "a x1" (con x2/x4 se ven las mismas jugadas en menos tiempo); realW es el tiempo real */
+function sumaT(r){Q.realT+=r*speed();Q.realW=(Q.realW||0)+r}
+function cortarA(t){const tv=Q.tv,R=Q.live;Q.corte={fase:'sale',k:0,a:t,de:R.tp};Q.cortes++}
+function avanzarCorte(real){const C=Q.corte,R=Q.live,tv=Q.tv;C.k+=real;
+ if(C.fase==='sale'&&C.k>=FUNDIDO){const p2=tv.partes[2];saltarV3(C.a);if(p2!=null&&C.a>=p2)Q.cruzo=true;Q.mitad=true;Q.camSnap=true;
+  Q.corteTxt='⏩ '+minutoV3(C.a).txt+"'";C.fase='entra';C.k=0;if(Q.capturaCorte!==false)Q.ultimoCorte={de:+(C.de/600).toFixed(1),a:+(C.a/600).toFixed(1)}}
+ else if(C.fase==='entra'&&C.k>=FUNDIDO){Q.corte=null}}
 /* un cuadro del modo v3 */
 function frameV3(real,crudo){real=Math.min(.3,crudo||real);
- const m=S.m,tv=Q.tv,R=Q.live;refrescarEntradas(m);ventanas();
- if(Q.rep){const P=Q.rep;P.R.tp+=real*P.v*speed();if(P.R.tp>=P.fin){Q.rep=null;S.zoom=1.1}else actualizarRep(P.R,real*P.v*speed()/10);Q.repReal+=real;Q.realT+=real;return}
+ const m=S.m,tv=Q.tv,R=Q.live;refrescarEntradas(m);momentos();
+ if(Q.hl){frameMejores(real);return}
+ if(Q.rep){const P=Q.rep;P.R.tp+=real*P.v*speed();if(P.R.tp>=P.fin){Q.rep=null;S.zoom=1.25;Q.camSnap=true}else actualizarRep(P.R,real*P.v*speed()/10);Q.repReal+=real;sumaT(real);return}
  let pausa=false;try{pausa=!!matchPaused}catch(e){}
  if(R.c.length&&R.tp<R.c[0].t)saltarV3(R.c[0].t);
  revisarCinta();
+ Q.umbT=(Q.umbT||0)-real;if(Q.umbT<=0){Q.umbT=.5;umbral()}
  const tMax=ultimoT();let dtG=0;
- if(!pausa&&tMax>=0){
-  /* mira un poco adelante: frena ANTES de que empiece la jugada (si no, a velocidad alta se la pasaría de largo) */
-  const pel=enPeligro(R.tp)||enPeligroEntre(R.tp,R.tp+Q.rate*.3),objetivo=ritmoV3(pel);if(objetivo<Q.rate)Q.rate=objetivo;else Q.rate+=(objetivo-Q.rate)*Math.min(1,real*2);
-  let nt=R.tp+real*Q.rate*speed();
-  /* entretiempo: se espera a que el 2º tiempo exista; nunca se pasa de lo que ya simuló el motor */
+ if(Q.corte){avanzarCorte(real);sumaT(real);Q.corteReal+=real}
+ else if(!pausa&&tMax>=0){
   const f1=tv.fin[1],p2=tv.partes[2];
-  if(f1!=null&&!Q.cruzo&&nt>f1-1){if(p2==null||tMax<p2+2)nt=f1-1;   // fin del 1º tiempo: se espera el 2º
-   else{/* entretiempo: se pasa al saque del 2º tiempo sin interpolar (no es un salto) */R.tp=p2;Q.cruzo=true;Q.mitad=true;nt=p2}}
-  const lim=tv.terminado?tMax:tMax-1;if(nt>lim)nt=Math.max(R.tp,lim);
-  if(Q.mitad){dtG=0}
-  else{dtG=(nt-R.tp)/10;if(nt>R.tp){Q.realT+=real;Q.tObs+=nt-R.tp;if(pel){Q.dObs+=nt-R.tp;Q.peligroReal+=real}else Q.calmaReal+=real}else Q.esperaReal+=real;R.tp=nt}}
+  /* fuera de una jugada elegida: corte hasta la próxima (si ya se sabe; si no, se espera al motor) */
+  let espera=false;
+  if(!enVentana(R.tp)){const nx=proximaVentana(R.tp);
+   if(nx){let a=desde(nx);if(f1!=null&&!Q.cruzo&&a>f1&&(p2==null||a<p2))a=p2!=null?p2:f1-1;
+    if(a-R.tp>25){if(a<=tMax){cortarA(a);sumaT(real)}else espera=true}}
+   else if(!tv.terminado)espera=true}   // todavía no se sabe cuál es la próxima: se espera al motor
+  if(espera)Q.esperaReal+=real;
+  else if(!Q.corte){
+   let nt=R.tp+real*10*speed();   // velocidad real
+   if(f1!=null&&!Q.cruzo&&nt>f1-1){if(p2==null||tMax<p2+2){nt=f1-1;
+     /* entretiempo: el partido sigue solo con el 2º tiempo */
+     if(R.tp>=f1-2){Q.htT=(Q.htT||0)+real;if(Q.htT>1.2&&!Q.htPedido){Q.htPedido=true;try{if(match&&match===m&&match.phase==='ht')mcMainAction()}catch(e){}}}}
+    else{R.tp=p2;Q.cruzo=true;Q.mitad=true;nt=p2;Q.camSnap=true}}
+   const lim=tv.terminado?tMax:tMax-1;if(nt>lim)nt=Math.max(R.tp,lim);
+   if(Q.mitad){dtG=0}
+   else{dtG=(nt-R.tp)/10;if(nt>R.tp){sumaT(real);Q.tObs+=nt-R.tp;if(enPeligro(R.tp)){Q.dObs+=nt-R.tp;Q.peligroReal+=real}else Q.calmaReal+=real;
+     const vel=(nt-R.tp)/10/real;if(vel>Q.velMax)Q.velMax=vel}else Q.esperaReal+=real;R.tp=nt}
+   /* final: termina la escena de cierre y pasa a la pantalla de resultado */
+   if(tv.terminado&&R.tp>=tMax-.5){Q.finT=(Q.finT||0)+real;if(Q.finT>1&&!Q.resultado){Q.resultado=true;Q.duracion=+(Q.realW||0).toFixed(1);mostrarResultado()}}}}
  const prev=new Map(R.list.map(s=>[s,[s.x,s.y,s.alpha]])),pb=[R.ball.x,R.ball.y];
  actualizarRep(R,dtG);
  /* control de calidad: lo dibujado no salta (más rápido que lo que permite la cinta) y coincide con la cinta */
  if(dtG>0&&!Q.mitad){const lim=dtG*11+.6;for(const s of R.list){const p=prev.get(s);if(!p||p[2]<=0||s.alpha<=0)continue;const d=Math.hypot(s.x-p[0],s.y-p[1]);if(d>lim){Q.saltos.dibujo++;Q.saltos.log={jugador:s.name,d:+d.toFixed(2),lim:+lim.toFixed(2),t:R.tp}}}
   const db=Math.hypot(R.ball.x-pb[0],R.ball.y-pb[1]);if(db>dtG*48+.6){Q.saltos.dibujo++;Q.saltos.log={pelota:true,d:+db.toFixed(2),t:R.tp}}}
  Q.mitad=false;
- if(Q.repPend&&R.tp>=Q.repPend.at){const P=Q.repPend;Q.repPend=null;if(visible())armarRepeticion(P)}
+ if(Q.repPend&&R.tp>=Q.repPend.at&&!Q.corte){const P=Q.repPend;Q.repPend=null;if(visible())armarRepeticion(P)}
  /* recorte de memoria: se guardan los últimos 30 s ya vistos */
  const c=tv.cuadros;if(c.length&&c[0].t<R.tp-300){let k=0;while(k<c.length&&c[k].t<R.tp-300)k++;c.splice(0,k)}
  S.ball=R.ball;S.ref=R.ref;S.owner=R.owner;S.sp=R.list;
  /* relato, marcador y reloj: lo que ya se vio en la cancha */
  const n=corteV3(m);if(n!==Q.ultCorte){Q.ultCorte=n;S.shown=n;contar();pedirRender()}
  const mn=minutoV3();if(mn.txt!==Q.ultMin){Q.ultMin=mn.txt;pedirRender()}}
+function mostrarResultado(){Q.saltado=true;try{if(window.MC12&&MC12.mTab)MC12.mTab('stats');else pedirRender();setTimeout(()=>{const t=document.querySelector('#m12M .tbs');if(t&&!document.body.classList.contains('m2d-full'))t.scrollIntoView({behavior:'smooth',block:'start'})},200)}catch(e){}}
+/* ---------- "Mejores jugadas": solo los momentos elegidos, uno tras otro, con su minuto y el marcador ---------- */
+const TIT={goles:'⚽ GOL',penales:'⚠ PENAL',tirosLibres:'TIRO LIBRE',corners:'🚩 CÓRNER',peligro:'¡QUÉ JUGADA!',atajadas:'🧤 ATAJADA',faltas:'🟨 FALTA Y TARJETA',cambios:'🔁 LESIÓN / CAMBIO'};
+function golesHasta(t){const g=[0,0];for(const e of Q.tv.eventos){if(e.t>t)break;if(e.tipo==='gol')g[e.equipo===Q.tv.eOwn?0:1]++}return g}
+function iniciarMejores(){const clips=Q.tv.clips||[];Q.hl={clips,i:-1,fase:'titulo',k:0,R:null,vistos:[]};Q.saltado=false;siguienteClip()}
+function siguienteClip(){const H=Q.hl;H.i++;H.k=0;if(H.i>=H.clips.length){H.fase='final';H.R=null;S.goles=golesHasta(1e12);return}
+ const C=H.clips[H.i];H.R=nuevoRep({cuadros:C.cuadros,fmt:Q.tv.formato,eventos:C.eventos,slot:C.slot,sal:C.sal,t0:C.a});H.R.carteles=true;
+ actualizarRep(H.R,0);H.fase='titulo';Q.camSnap=true;S.goles=golesHasta(C.a);H.vistos.push({tipo:C.tipo,min:C.min,eventos:C.eventos.map(e=>e.tipo)})}
+function frameMejores(real){const H=Q.hl;H.k+=real;
+ if(H.fase==='titulo'){if(H.k>=1.6){H.fase='clip';H.k=0}}
+ else if(H.fase==='clip'){const R=H.R,C=H.clips[H.i];const dt=real*speed();R.tp=Math.min(C.b,R.tp+dt*10);actualizarRep(R,dt);S.goles=golesHasta(R.tp);if(R.tp>=C.b){H.fase='sale';H.k=0}}
+ else if(H.fase==='sale'){if(H.k>=FUNDIDO)siguienteClip()}
+ else if(H.fase==='final'){if(H.k>=3&&!H.fin){H.fin=true;mostrarResultado()}}
+ const R=H.R;if(R){S.ball=R.ball;S.ref=R.ref;S.owner=R.owner;S.sp=R.list}
+ const n=corteV3(S.m);if(n!==Q.ultCorte){Q.ultCorte=n;S.shown=n;pedirRender()}
+ const mn=minutoV3();if(mn.txt!==Q.ultMin){Q.ultMin=mn.txt;pedirRender()}}
+/* capa del modo v3: fundido de los cortes, carteles de "Mejores jugadas" y el resultado final */
+function capaV3(ctx){const w=S.w,h=S.h;let a=0,txt=null,sub=null;
+ if(Q.corte){a=Q.corte.fase==='sale'?Q.corte.k/FUNDIDO:1-Q.corte.k/FUNDIDO;txt=Q.corte.fase==='entra'?Q.corteTxt:null}
+ const H=Q.hl;if(H){const C=H.clips[H.i];
+  if(H.fase==='titulo'&&C){a=.62;const g=golesHasta(C.a),ab=abrev();txt=`${C.min}' · ${TIT[C.tipo]||C.tipo}`;sub=`${ab[0]} ${g[0]} - ${g[1]} ${ab[1]}`}
+  else if(H.fase==='sale')a=H.k/FUNDIDO;
+  else if(H.fase==='final'){a=.8;const g=golesHasta(1e12),ab=abrev();txt='FINAL';sub=`${ab[0]} ${g[0]} - ${g[1]} ${ab[1]}`}}
+ if(a<=0)return;ctx.save();ctx.globalAlpha=clamp(a,0,1);ctx.fillStyle='#050912';ctx.fillRect(0,0,w,h);ctx.globalAlpha=1;
+ if(txt){ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`900 italic ${Math.round(Math.min(h*.13,42))}px "Barlow Semi Condensed",Arial`;ctx.fillStyle='#e2bd70';ctx.fillText(txt,w/2,h/2-(sub?14:0));
+  if(sub){ctx.font=`800 ${Math.round(Math.min(h*.08,24))}px "Barlow Semi Condensed",Arial`;ctx.fillStyle='#fff';ctx.fillText(sub,w/2,h/2+Math.min(h*.1,30))}}
+ ctx.restore()}
+function abrev(){const m=S.m||{},ab=n=>String(n||'').replace(/^(Club |CA |CD |FC |AC |SS |RC |Real |Atlético |Deportivo )/i,'').slice(0,3).toUpperCase();return[ab(m.home),ab(m.away)]}
 let renderT=0;function pedirRender(){const now=performance.now();if(now-renderT<350){clearTimeout(pedirRender.t);pedirRender.t=setTimeout(pedirRender,360);return}renderT=now;try{window.renderMatch&&renderMatch()}catch(e){}}
-function corteV3(m){const E=m.events||[],tp=Q.live?Q.live.tp:0;let n=0;for(;n<E.length;n++){const e=E[n];if(e.t3==null)e.t3=Q.tv.tMotor;if(e.t3>tp)break}return n}
-function minutoV3(){const tv=Q.tv,t=Q.live?Q.live.tp:0,h=tv.partes[2]!=null&&t>=tv.partes[2]?2:1,t0=tv.partes[h];
+function tVisto(){return Q.hl?(Q.hl.R?Q.hl.R.tp:1e12):(Q.live?Q.live.tp:0)}
+function corteV3(m){const E=m.events||[],tp=tVisto();let n=0;for(;n<E.length;n++){const e=E[n];if(e.t3==null)e.t3=Q.tv.tMotor;if(e.t3>tp)break}return n}
+function minutoV3(tt){const tv=Q.tv,t=tt!=null?tt:tVisto();if(t>=1e12)return{txt:'90',min:90};const h=tv.partes[2]!=null&&t>=tv.partes[2]?2:1,t0=tv.partes[h];
  if(t0==null)return{txt:'0',min:0};const k=Math.floor((t-t0)/600),base=h===1?0:45;
  return k<45?{txt:String(base+k+1),min:base+k+1}:{txt:(base+45)+'+'+(k-44),min:base+45}}
 /* prueba de la cinta en sí (lo que llega del motor): saltos cuadro a cuadro por jugador */
@@ -797,7 +908,7 @@ function revisarCinta(){const c=Q.tv.cuadros,F=Q.tv.formato;if(!F)return;Q.rc=Q.
    for(let j=0;j<F.jugadores;j++){if(st.cambio&&st.cambio.has(j))continue;const d=Math.hypot(q.d[5+j*2]-p.d[5+j*2],q.d[6+j*2]-p.d[6+j*2])/10;if(d>1.5){Q.saltos.cinta++;Q.saltos.log={slot:j,d:+d.toFixed(2),t:q.t}}}
    const db=Math.hypot(q.d[0]-p.d[0],q.d[1]-p.d[1])/10;if(db>5){Q.saltos.pelota++;Q.saltos.log={pelota:true,d:+db.toFixed(2),t:q.t}}}
   st.prev=q;st.t=q.t}}
-function initV3(m,tv){Q.on=true;Q.saltado=false;Q.tv=tv;Q.ent=new Map();refrescarEntradas(m);Q.win=[];Q.wi=0;Q.evw=0;Q.pendTL=null;Q.pendPen=null;Q.desc={};Q.repPend=null;Q.rep=null;
+function initV3(m,tv){Q.on=true;Q.saltado=false;Q.tv=tv;Q.ent=new Map();refrescarEntradas(m);Q.mom=[];Q.th=1000;Q.extra=0;Q.evw=0;Q.cortes=0;Q.corteReal=0;Q.velMax=0;Q.resultado=false;Q.finT=0;Q.htT=0;Q.htPedido=false;Q.hl=null;Q.corte=null;Q.umbT=0;Q.duracion=null;Q.ultimoCorte=null;Q.realW=0;Q.camSaltos=0;Q.camVel=0;Q.cierre={muestras:0,corriendo:0,poses:{},log:null};Q.pendTL=null;Q.pendPen=null;Q.desc={};Q.repPend=null;Q.rep=null;
  Q.saltos={cinta:0,pelota:0,dibujo:0,log:null};Q.festVisto=0;Q.abrazoVisto=0;Q.lamentoVisto=0;Q.repStats=[];Q.esperaReal=0;Q.peligroReal=0;Q.calmaReal=0;Q.repReal=0;Q.rc=null;
  const slot=tv.puestos.map(p=>p.clave),sal=[null,null,null];Q.hist=[{t:-1,slot:slot.slice(),sal:sal.slice()}];
  const t0=tv.cuadros.length?Math.max(tv.cuadros[0].t,(tv.partes[1]!=null?tv.partes[1]:0)):0;
@@ -877,9 +988,9 @@ const API={
   S.host=host;if(document.body.classList.contains('m2d-full')){host.innerHTML=''}else{host.innerHTML='';host.appendChild(S.wrap)}S.cam=S.cam||camPref;S.w=0;resize();if(!S.raf)S.raf=requestAnimationFrame(frame)},
  /* el reloj del motor espera mientras se muestra una jugada (o hay eventos sin mostrar) */
  retener(m){if(!m||m!==S.m||m.done||!visible())return false;
-  if(Q.on)return Q.tv.tMotor-Q.live.tp>900;   // v3: el motor va hasta 90 s adelante de lo que se ve
+  if(Q.on)return !Q.hl&&Q.tv.tMotor-Q.live.tp>9000&&!!proximaVentana(Q.live.tp);   // v3: el motor va hasta 15 min adelante (y sigue si todavía no apareció la próxima jugada)
   return!!S.rep||!!(S.play&&!S.play.filler)||S.shown<(m.events||[]).length},
- corte(m){if(Q.on&&m===S.m&&visible()&&Q.live&&!Q.saltado)return Math.min(corteV3(m),(m.events||[]).length);
+ corte(m){if(Q.on&&m===S.m&&visible()&&(Q.live||Q.hl)&&!Q.saltado)return Math.min(corteV3(m),(m.events||[]).length);
   if(!m||m!==S.m||!visible()||m.done)return(m&&m.events||[]).length;return Math.min(S.shown,(m.events||[]).length)},
  marcador(m){if(Q.on&&m===S.m&&visible()&&!Q.saltado)return S.goles;if(!m||m!==S.m||!visible()||m.done)return[m.h,m.a];return S.goles},
  /* control de calidad (v3): lo dibujado es exactamente la cinta interpolada en el instante que se ve */
@@ -887,9 +998,12 @@ const API={
   for(let j=0;j<Q.tv.formato.jugadores;j++){const k=R.slot[j],s=k!=null?R.sp.get(k):null;if(!s||A.d[5+j*2]===-32768)continue;const x=lerp(A.d[5+j*2],B.d[5+j*2],f)/10,y=lerp(A.d[6+j*2],B.d[6+j*2],f)/10;max=Math.max(max,Math.hypot(s.x-x,s.y-y));n++}
   const bx=lerp(A.d[0],B.d[0],f)/10,by=lerp(A.d[1],B.d[1],f)/10;max=Math.max(max,Math.hypot(S.ball.x-bx,S.ball.y-by));
   const ia=Q.tv.formato.arbitro,rx=lerp(A.d[ia],B.d[ia],f)/10;return{difMax:+max.toFixed(4),jugadores:n,arbitroDif:+Math.abs(S.ref.x-rx).toFixed(4),dibujados:S.sp.filter(s=>s.alpha>0).length}},
+ /* "Mejores jugadas" (v3): después de simular, se muestran solo las jugadas elegidas */
+ mejores(m){if(!m||m!==S.m||!Q.on)return false;const tv=v3de(m);if(!tv||!tv.clips)return false;iniciarMejores();return true},
+ etiqueta(m){return Q.on&&m===S.m&&Q.hl&&!Q.hl.fin?'Mejores jugadas':null},
  /* minuto que se está viendo (v3); null = el del motor */
- minuto(m){if(Q.on&&m===S.m&&visible()&&Q.live&&!Q.saltado)return minutoV3().txt;return null},
- saltar(){if(!S.m)return;if(Q.on){Q.saltado=true;saltarV3(ultimoT());return}S.rep=null;S.golT=null;S.play=null;S.queue=[];S.shown=(S.m.events||[]).length;contar();S.owner=null;S.phase=S.m.done?'done':S.phase},
+ minuto(m){if(Q.on&&m===S.m&&visible()&&(Q.live||Q.hl)&&!Q.saltado)return minutoV3().txt;return null},
+ saltar(){if(!S.m)return;if(Q.on){Q.saltado=true;Q.hl=null;Q.corte=null;saltarV3(ultimoT());return}S.rep=null;S.golT=null;S.play=null;S.queue=[];S.shown=(S.m.events||[]).length;contar();S.owner=null;S.phase=S.m.done?'done':S.phase},
  /* control de calidad: dibuja todas las poses con las camisetas de dos clubes (no participa del partido) */
  hojaPoses(cv,local,visita){local=local||'River Plate';visita=visita||'Boca Juniors';const ctx=cv.getContext('2d'),pk=S.kits,pm=S.m,pc=S.cam,pT=S.camT;
   try{S.kits=window.MCCamisetas?MCCamisetas.partido(local,visita):null;S.m={venue:'h'};S.cam='tv';S.camT=null;
@@ -914,8 +1028,9 @@ const API={
     const g=S.sp.find(s=>s.team===t&&s.gk&&!s.out);if(g)med['arq'+t]=+Math.abs(g.x-(dirOf(t)>0?0:PW)).toFixed(1)});med.suelta=!!S.chaser;med.sueltaMax=+(S.sueltaMax||0).toFixed(1);med.enJugada=!!(S.play&&!S.play.filler)}
   const rend=S.perf&&S.perf.n?{msPromedio:+(S.perf.tot/S.perf.n).toFixed(2),msMax:+S.perf.max.toFixed(1),cuadros:S.perf.n,msCuadroTotal:+(S.perf.frame/S.perf.n).toFixed(2),fps:+(S.perf.n/Math.max(1,S.perf.real)).toFixed(0),cuadrosLentos:S.perf.lentos,tiempoJuego:+S.t.toFixed(0),tiempoReal:+S.perf.real.toFixed(0)}:null;
   const v3=Q.on?{tp:Q.live?+Q.live.tp.toFixed(1):null,tMotor:Q.tv.tMotor,ritmo:+Q.rate.toFixed(1),saltosCinta:Q.saltos.cinta,saltosPelota:Q.saltos.pelota,saltosDibujo:Q.saltos.dibujo,saltoLog:Q.saltos.log,
-   festejos:Q.festVisto,abrazos:Q.abrazoVisto,lamentos:Q.lamentoVisto,repeticiones:Q.repStats,enRepeticion:!!Q.rep,tiempoReal:{viendo:+Q.realT.toFixed(1),peligro:+Q.peligroReal.toFixed(1),calma:+Q.calmaReal.toFixed(1),repeticion:+Q.repReal.toFixed(1),esperando:+Q.esperaReal.toFixed(1)},
-   minuto:minutoV3().txt,duracion:largoPartido(),pred:Q.pred,cartel:S.banner?S.banner.txt:null,grande:S.big?S.big.txt:null,festejoActivo:!!(Q.live&&Q.live.fest&&Q.live.tp>=Q.live.fest.t0&&Q.live.tp<=Q.live.fest.hasta),cuadrosEnMemoria:Q.tv.cuadros.length,arbitro:S.ref?[+S.ref.x.toFixed(1),+S.ref.y.toFixed(1)]:null}:null;
+   festejos:Q.festVisto,abrazos:Q.abrazoVisto,lamentos:Q.lamentoVisto,repeticiones:Q.repStats,enRepeticion:!!Q.rep,tiempoReal:{pared:+(Q.realW||0).toFixed(1),viendo:+Q.realT.toFixed(1),peligro:+Q.peligroReal.toFixed(1),calma:+Q.calmaReal.toFixed(1),repeticion:+Q.repReal.toFixed(1),esperando:+Q.esperaReal.toFixed(1)},
+   minuto:minutoV3().txt,ver:verCfg(),pred:Q.pred,cortes:Q.cortes,ultimoCorte:Q.ultimoCorte,camara:{saltos:Q.camSaltos||0,velMax:+(Q.camVel||0).toFixed(2)},enCorte:!!Q.corte,velMax:+(Q.velMax||0).toFixed(3),duracion:Q.duracion,resultado:!!Q.resultado,cierre:Q.cierre,
+   mejores:Q.hl?{clips:Q.hl.clips.map(c=>({tipo:c.tipo,min:c.min,a:c.a,b:c.b})),i:Q.hl.i,fase:Q.hl.fase,vistos:Q.hl.vistos,fin:!!Q.hl.fin}:null,cartel:S.banner?S.banner.txt:null,grande:S.big?S.big.txt:null,festejoActivo:!!(Q.live&&Q.live.fest&&Q.live.tp>=Q.live.fest.t0&&Q.live.tp<=Q.live.fest.hasta),cuadrosEnMemoria:Q.tv.cuadros.length,arbitro:S.ref?[+S.ref.x.toFixed(1),+S.ref.y.toFixed(1)]:null}:null;
   return{v3,rend,repeticiones:S.repN||0,enRepeticion:!!S.rep,zoom:+(S.zoom||1).toFixed(2),med,saltosJugadores:S.ptele||0,saltoLog:S.pteleLog||null,jugada:S.play?S.play.label:null,mostrados:S.shown,eventos:S.m?(S.m.events||[]).length:0,camara:S.cam,jugadores:S.sp.filter(s=>!s.out).length,goles:S.goles.slice(),cuadros:S.t,teletransportes:S.tele,teleLog:S.teleLog||null,estados:est,tacticos:tac,acciones:acc,posesionId:S.posId}}
 };
 /* pantalla completa: Fullscreen API cuando existe; en iPhone (Safari no la permite para esto) una capa fija que ocupa toda la pantalla */

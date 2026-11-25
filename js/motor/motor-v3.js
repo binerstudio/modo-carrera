@@ -62,7 +62,8 @@ const CAL={
  costoPase:.0015,          // costo fijo de cada pase frente a seguir con la pelota (ritmo de pases)
  local:.12,
  errorAtajable:.8,
- festejo:150,               // ticks de festejo después de un gol (15 s) antes de volver caminando         // para el informe: un gol con chance de atajarlo de 80% o más es error del arquero
+ festejo:150,
+ cierre:160,                // ticks de la escena de cierre después del pitazo final (16 s)               // ticks de festejo después de un gol (15 s) antes de volver caminando         // para el informe: un gol con chance de atajarlo de 80% o más es error del arquero
                 // local: algo más de confianza (menos error al ejecutar) e intensidad (se cansa menos)
 };
 /* ---------- táctica y formación ---------- */
@@ -155,7 +156,7 @@ function Partido(loc,vis,R,opt){
  this.cinta=opt.cinta===false&&!opt.alCuadro?null:{t:[],d:[]};
  /* árbitro (se mueve siguiendo la jugada; no usa el azar, así no cambia ningún partido) y jugadores que salen caminando */
  this.arbitro={x:52.5-6,y:34+9,vx:0,vy:0};
- this.salientes=[null,null,null];this.festejo=null;this.forzados=0;
+ this.salientes=[null,null,null];this.festejo=null;this.forzados=0;this.cerrado=false;this.roles=null;
 }
 const P=Partido.prototype;
 
@@ -999,6 +1000,7 @@ P.moverSalientes=function(){
 P.moverArbitro=function(){
  const A=this.arbitro,B=this.B,r=this.estado==='parado'?this.rean:null;let tx,ty,urg=.75;
  if(r&&r.tipo!=='saque_centro'){tx=r.x+(r.x<52.5?7:-7);ty=r.y+(r.y<34?6:-6)}
+ else if(this.estado==='cierre'){tx=52.5;ty=34+4;urg=.25}
  else if(r){tx=52.5+6;ty=34+9;urg=.45}
  else{tx=B.x*.82+52.5*.18;ty=B.y+(B.y<34?12:-12)}
  tx=clamp(tx,3,PW-3);ty=clamp(ty,3,PH-3);
@@ -1520,6 +1522,53 @@ P.jugar=function(){
   this.cerrarParte(parte);
  }
  if(this.suspendido&&!this.eventos.some(e=>e.tipo==='final'))this.ev('final',-1,null,{marcador:this.goles.slice(),suspendido:true});
+ else this.cierre();
+};
+/* escena de cierre después del pitazo final: los que ganaron festejan (en grupo, abrazos, aplauden a la tribuna), los que
+   perdieron se tiran al piso o se agarran la cabeza, y muchos se saludan entre rivales y caminan hacia el centro.
+   Con empate: saludos. Nadie corre: caminan o trotan suave. No cambia nada del partido (ni resultado ni estadísticas)
+   y no usa el azar: los papeles salen del número de cada jugador. */
+P.cierre=function(){
+ if(this.cerrado||this.suspendido)return;this.cerrado=true;
+ const g=this.goles,gan=g[0]>g[1]?0:g[1]>g[0]?1:-1,hs=(id,k)=>((MATH.imul(id+1,2654435761)^MATH.imul(k,40503))>>>0)%100;
+ const B=this.B;B.dueno=null;B.vx=B.vy=B.vz=0;B.tiro=null;this.estado='cierre';this.rean=null;this.festejo=null;
+ for(const j of this.A){j.accion=null;j.orden=null;j.manos=false;j.superado=0;j.enBarrera=false}
+ const R={};
+ for(const j of this.A){let rol;
+  if(gan<0)rol=j.gk?'camina':'saludo';
+  else if(j.eq===gan){const h=hs(j.id,1);rol=j.gk?'festeja':h<55?'festeja':h<78?'aplaude':'saludo'}
+  else{const h=hs(j.id,2);rol=j.gk?'cabeza':h<28?'piso':h<58?'cabeza':'saludo'}
+  R[j.id]={rol,x0:j.x,y0:j.y,par:null}}
+ /* parejas para saludarse: cada uno con el rival más cercano que también saluda */
+ const sal=this.A.filter(j=>R[j.id].rol==='saludo');
+ for(const j of sal){if(R[j.id].par!=null)continue;let best=null,bd=1e9;
+  for(const o of sal){if(o.eq===j.eq||R[o.id].par!=null)continue;const d=hyp(o.x-j.x,o.y-j.y);if(d<bd){bd=d;best=o}}
+  if(best){R[j.id].par=best.id;R[best.id].par=j.id}else R[j.id].rol='camina'}
+ /* grupos de festejo: dos rondas alrededor de los ganadores */
+ if(gan>=0){const W=this.A.filter(j=>R[j.id].rol==='festeja');const cx=W.reduce((a,j)=>a+j.x,0)/(W.length||1),cy=W.reduce((a,j)=>a+j.y,0)/(W.length||1);
+  W.forEach((j,i)=>{const gx=clamp(cx+(i%2?-5:5),8,PW-8),gy=clamp(cy,8,PH-8),k=MATH.floor(i/2),an=k*1.3;R[j.id].grupo=[gx+MATH.cos(an)*(.9+.2*k),gy+MATH.sin(an)*(.9+.2*k)]})}
+ this.roles=R;
+ const ids={};for(const j of this.A)ids[j.id]=R[j.id].rol;
+ this.ev('cierre',-1,null,{ganador:gan,roles:ids,hasta:this.t+CAL.cierre});
+ const dist=this.J.map(j=>j.s.distancia),en=this.J.map(j=>j.energia);
+ for(let k=0;k<CAL.cierre;k++)this.tickCierre(k);
+ this.J.forEach((j,i)=>{j.s.distancia=dist[i];j.energia=en[i]});   // las estadísticas del partido no cambian
+};
+P.tickCierre=function(k){
+ const R=this.roles;
+ for(const j of this.A){const r=R[j.id];if(!r)continue;const lento=MATH.min(.4,2.4/j.vmax),camina=MATH.min(.25,1.5/j.vmax);
+  switch(r.rol){
+   case 'festeja':{const p=r.grupo||[j.x,j.y];j.tx=p[0];j.ty=p[1];j.urg=lento;break}
+   case 'aplaude':{j.tx=clamp(r.x0,6,PW-6);j.ty=r.y0<34?2.5:PH-2.5;j.urg=camina;break}
+   case 'piso':case 'cabeza':j.tx=j.x;j.ty=j.y;j.urg=.1;break;
+   case 'saludo':{const o=r.par!=null?this.J[r.par]:null;
+    if(o&&!r.junto){j.tx=(j.x+o.x)/2+(j.eq?.45:-.45);j.ty=(j.y+o.y)/2;j.urg=camina;if(hyp(j.x-o.x,j.y-o.y)<1.3){r.junto=k;R[o.id].junto=k}}
+    else{const c=r.junto!=null&&k-r.junto<25;j.tx=c?j.x:52.5+((j.id%6)-2.5)*2.2+(j.eq?.5:-.5);j.ty=c?j.y:34+((j.id%5)-2)*2.4;j.urg=camina}break}
+   default:{j.tx=52.5+((j.id%6)-2.5)*2.4;j.ty=34+((j.id%4)-1.5)*3;j.urg=camina}
+  }}
+ this.mover();this.moverSalientes();this.moverArbitro();
+ if(this.cinta&&this.t%this.cada===0)this.muestrear();
+ this.t++;
 };
 /* cambio de táctica durante el partido (si cambia la formación, cada jugador toma el puesto que le toca en el orden) */
 P.cambiarTactica=function(e,tac){
@@ -1575,7 +1624,7 @@ function enVivo(loc,vis,opt){
   /* avanza hasta el próximo minuto de juego; devuelve true cuando terminó el tiempo en curso */
   minuto(){if(!enCurso)return true;const obj=(MATH.floor(p.tParte/600)+1)*600;let fin=false;
    while(p.tParte<obj){if(p.paso()){fin=true;break}}
-   if(fin){p.cerrarParte(p.parte);enCurso=false;if(p.parte===2||p.fin){terminado=true;if(p.suspendido&&!p.eventos.some(e=>e.tipo==='final'))p.ev('final',-1,null,{marcador:p.goles.slice(),suspendido:true})}}
+   if(fin){p.cerrarParte(p.parte);enCurso=false;if(p.parte===2||p.fin){if(p.parte===2&&!p.suspendido)p.cierre();terminado=true;if(p.suspendido&&!p.eventos.some(e=>e.tipo==='final'))p.ev('final',-1,null,{marcador:p.goles.slice(),suspendido:true})}}
    return fin},
   /* minuto de juego en curso (como el reloj: 1-45 y descuento) */
   reloj(){const k=MATH.floor(p.tParte/600);return{parte:p.parte,base:(p.parte===1?0:45)+MATH.min(k,45),extra:MATH.max(0,k-45),descuento:p.anadido[p.parte-1]}},

@@ -42,6 +42,7 @@ const CORE=[
   'js/ia/partidos-ia.js',
   'js/partido2d/camisetas.js',
   'js/partido2d/vista2d.js',
+  'js/partido2d/ver-partido.js',
   'js/mc10-datos.js',
   'js/mc10-liga.js',
   'js/mc10-mundo.js',
