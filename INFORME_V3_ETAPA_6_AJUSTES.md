@@ -59,8 +59,8 @@ o trotan suave. No cambia nada del partido (ni resultado ni estadísticas). Desp
 Locales también: v3 en el juego ✅, 2D v2 ✅, temporadas ✅, huella con `file://` igual que antes.
 
 ## CI
-- **En cada push** corren solo las pruebas livianas (motor v2 300, motor v3 300, huella, auditoría, 2D v2, v3.html,
-  v3 en el juego, este menú con el partido de 3 min, temporadas, actualización desde 12.2.2).
+- **En cada push** corren solo las pruebas livianas (~15 min: motor v2 300, motor v3 300, huella, auditoría, 2D v2,
+  v3.html, v3 en el juego, este menú con el partido de 3 min, temporadas, actualización desde 12.2.2).
 - **A mano** (Actions → "Pruebas de regresión" → Run workflow): además 1000 partidos v2 y v3, calibración 3000+3600 y
   el partido completo de 15 minutos.
 - Resultados: ver la sección final.
@@ -70,4 +70,13 @@ Locales también: v3 en el juego ✅, 2D v2 ✅, temporadas ✅, huella con `fil
 `v3tv-mejores-jugadas.png`, `v3tv-escena-final.png`, `v3tv-resultado.png`.
 
 ## Resultados de CI
-(se completa con la corrida)
+**Liviano (corrida 96, sobre `83e333c`): todo en verde.**
+- Motor v2 (300) ✅ · Motor v3 (300 + etapa 6 con cierre) ✅ · Temporadas con semilla fija (huella) ✅ · Auditoría ✅
+- 2D v2 ✅ (3-1, 4 repeticiones) · `v3.html` ✅ · v3 en el juego ✅ · Temporadas sin intervención ✅ · Actualización desde 12.2.2 ✅
+- **Ver el partido (v3) ✅: partido completo de 3 min = 177 s reales a x1, velocidad máxima 1x, 11 cortes, cámara sin
+  saltos, escena final 0 corriendo de 155.342 muestras, mejores jugadas 16 recortes, simular directo a estadísticas.**
+
+En el camino apareció y se arregló una falla del 2D **v2** que venía de la entrega anterior: con la duración corta la
+repetición de los goles no salía (en la corrida pesada de anoche ese paso había dado rojo). Ahora graba en cada sub-paso.
+
+**Pesado (a mano):** ver abajo.
