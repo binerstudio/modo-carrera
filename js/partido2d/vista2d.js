@@ -505,7 +505,7 @@ function postura(s,sp){const g=marcha(s,sp),L0=Q.on?{la:g.la,ra:g.ra,lk:g.lk,rk:
  return g}
 /* v3: los cambios de pose se mezclan en 0,12 s (sin saltos de brazos y piernas) y se mide la marcha:
    largo de cada paso (velocidad / cadencia), patinaje (moverse sin dar pasos), saltos de pose y pelota-pie en conducción */
-const PATADA=new Set(['pasando','rematando','volea','pasando-primera','controlando','entrada','barrida','cabeceando','saltando','amague','proteccion','cayendo','levantandose']);
+const PATADA=new Set(['pasando','rematando','volea','pasando-primera','controlando','entrada','barrida','cabeceando','saltando','amague','proteccion','cayendo','levantandose','estirada','atajando']);   // acciones del cuerpo: no son patinar
 const PCAMPOS=['la','ra','lk','rk','lu','ru','le','re','lean','rot','lift'];
 function mezclaPose(s,g,sp){const t=S.t,pz=(s.pose||'run')+'|'+(s.celeb||0)+'|'+(sp>.9&&POSE_BRAZOS.has(s.pose)?1:0);   // pique, paso lateral y guardia del arquero: los suaviza el filtro corto (si reiniciaran la mezcla a cada rato, las piernas quedarían congeladas)
  if(s._g&&(s._pz!==pz||(s.poseT||0)+1e-6<(s._ptp||0))){s._de=s._g;s._bt=t}s._pz=pz;s._ptp=s.poseT||0;
