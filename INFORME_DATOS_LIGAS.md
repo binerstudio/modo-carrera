@@ -91,7 +91,7 @@ Cada club tiene 25 jugadores: 3 arqueros, 8 defensores, 8 mediocampistas y 6 del
 | Actualización desde la **12.2.2** (`tests/actualizacion.mjs`) | **OK** · campos distintos 0, pasa al v3, copia "Antes de actualizar a la versión 12.10.0 (venía de 12.2)" |
 | Actualización desde la 12.6.0 (v1, v2 y v3) | **OK** |
 | Motor v3 (300), v3 en el juego, ficha, rotación, mercado, auditoría de eventos | **OK** |
-| Marcador y reloj del 2D (`tests/v3marcador.mjs`) | MARCADOR_RES |
+| Marcador y reloj del 2D (`tests/v3marcador.mjs`) | **OK** al repetirla con la máquina libre (rama y main). La primera vez, corriendo en paralelo con otras pruebas, marcó un salto de velocidad en una repetición del 2D de la copa; no la toca esta etapa (no cambié el 2D ni el motor) y repetida dio bien en las dos versiones: es la falla intermitente por carga de la máquina |
 
 Las dos pruebas nuevas quedaron en el CI liviano (corren en cada push); las pesadas siguen solo a mano.
 
