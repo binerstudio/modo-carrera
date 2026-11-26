@@ -160,7 +160,25 @@ Corrí 4 temporadas con River (en el CI corren 3).
 
 ### Resto del CI liviano, corrido acá
 
-Motor v3 en el juego: OK. Marcador, ficha, rotación, auditoría de eventos y motor v3: RESULTADOS_RESTO. Las pruebas pesadas no se corrieron: quedan para correr a mano.
+| Prueba | Resultado |
+|---|---|
+| Motor v3 en el juego | OK |
+| Marcador, localía y reloj | OK |
+| Ficha del jugador y del club | OK |
+| Rotación automática | OK |
+| Auditoría de eventos (10 v3 + 30 v2) | OK |
+| Motor v3 (300 partidos, determinismo) | OK |
+
+Las pruebas pesadas no se corrieron: quedan para correr a mano.
+
+**Una falla intermitente:** corrí la prueba de 3 temporadas 4 veces, más una de 4 temporadas. En 1 de las 4 apareció **1 lesionado de un club de la IA en un once** en la T2. En las otras 4 corridas hubo 0.
+- Con la misma semilla las corridas no salen idénticas, así que no se puede reproducir a pedido.
+- El armado del once de la IA (`js/ia/estado-ia.js`, Etapa 4) no se tocó en esta etapa.
+- Su regla de "nunca menos de 11" completa con el lesionado de baja más corta cuando no alcanzan los sanos. Si la Etapa 5 achicara de más algún plantel, eso podría pasar más seguido.
+- Le agregué a la prueba el detalle del caso (club, jugador, fechas de baja y sanos en el plantel) para que, si vuelve a pasar en el CI, quede escrito por qué.
+- Comparación con la Etapa 4 sin mis cambios: RESULTADO_E4.
+
+**Corregido durante las pruebas:** en `mercado-ia.js` le había puesto a una función nueva el nombre `mcIAPlantel`, que ya existía en `estado-ia.js`. Como `estado-ia.js` carga después, los partidos seguían usando la de la Etapa 4 y no se afectaron. La mía pasó a llamarse `mcIAPlantelMercado`.
 
 ## 4. Archivos
 
