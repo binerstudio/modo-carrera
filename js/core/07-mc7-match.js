@@ -16,8 +16,9 @@ window.createMatch=function(){
  const opp=opponent();if(!opp){match=null;return false}
  const groups=slotGroups(career.formation),co=positions(career.formation),rc=positions('4-3-3');
  const venue=window.mcVenue?mcVenue():'h';
- let rr=padRoster(rosterFor(opp).map(r=>[r[0],r[1],r[2],r[3],r[4],r[5]]),opp);
- const mk=(r,i)=>({name:r[0],pos:r[1],r:r[2],g:r[1],key:'r'+r[0],role:i<11?slotPos({pos:r[1]},rc[i]||[50,50]):null});
+ /* 12.8: el rival llega con sus lesionados afuera y su estado físico de la fecha anterior (js/ia/estado-ia.js) */
+ let rr=padRoster((window.mcIAPlantel?mcIAPlantel(opp,rosterFor(opp)):rosterFor(opp)).map(r=>[r[0],r[1],r[2],r[3],r[4],r[5],r.fit]),opp);
+ const mk=(r,i)=>({name:r[0],pos:r[1],r:r[2],g:r[1],key:'r'+r[0],role:i<11?slotPos({pos:r[1]},rc[i]||[50,50]):null,fit:r[6]==null?undefined:r[6]});
  const riv=rr.slice(0,11).map(mk),rivBench=rr.slice(11,11+7).map((r,i)=>mk(r,11+i));
  /* 6.3: un lesionado o suspendido nunca sale a la cancha */
  const own=career.players.slice(0,11).map((p,i)=>({p,g:groups[i],key:'o'+p.id,role:slotPos({pos:groups[i]},co[i]||[50,50])})).filter(e=>!mcUnavailable(e.p));
@@ -135,7 +136,7 @@ function injure(m,side,pre){
   const sub=bestBenchFor(m,e.g);
   if(sub&&m.subsOwn<5)doSubOwn(m,i,sub,'lesión');
   else{L.splice(i,1);m.ownPlayers=m.own.map(x=>x.p);ev(m,'🩹 SIN CAMBIOS',`${club} ya no tiene cambios disponibles y queda con ${L.length} jugadores.`,true,'o')}}
- else{ev(m,'🩹 LESIÓN',`${n} (${club}) ${how}: no puede continuar.`,true,'r');if(!doSubRival(m,true,e)){L.splice(i,1);ev(m,'🩹 SIN CAMBIOS',`${club} queda con ${L.length} jugadores.`,true,'r')}}
+ else{(m.injRiv=m.injRiv||[]).push([e.name,w]);ev(m,'🩹 LESIÓN',`${n} (${club}) ${how}: no puede continuar.`,true,'r');if(!doSubRival(m,true,e)){L.splice(i,1);ev(m,'🩹 SIN CAMBIOS',`${club} queda con ${L.length} jugadores.`,true,'r')}}
 }
 /* ===== MOTOR DE PARTIDOS (js/motor/motor-v2.js y, para el partido del usuario, js/motor/conexion-v3.js) =====
    Cada minuto lo calcula MCMotor.minuto con estas funciones de relato y registro de este archivo. */

@@ -65,6 +65,10 @@ for (const a of antes.carreras) {
     const abre = mcActivate(id, false); if (!abre) return { abre };
     const c = career, r = { abre, id: c.id, motor: c.motor, v3: c.v3, motorAnterior: c.motorAnterior, schema: c.schema, round: c.round, points: c.points, gf: c.gf, ga: c.ga,
       squad: c.players.map(p => p.name).join('|'), budget: c.budget, transfers: (c.transferHistory || []).length, enMemoria: JSON.stringify(c) };
+    /* 12.8 (Etapa 4): la rotación arranca apagada, la ficha nueva abre y la ficha del club también */
+    r.rotacion = !!c.rotacion; r.fijos = c.players.filter(p => p.fijo).length;
+    try { openPlayer(0); const box = document.getElementById('playerProfile'); r.fichaAtributos = box.querySelectorAll('.mc4-atr [data-attr]').length; r.fichaEstimado = !!box.querySelector('.mc4-est'); } catch (e) { r.fichaError = e.message; }
+    try { const otro = (c.league ? c.league.teams : []).find(t => t !== c.club); r.fichaClub = !!otro && /FICHA DEL CLUB/.test(mcFichaClubHTML(otro)); } catch (e) { r.fichaError = e.message; }
     const r0 = c.round; openMatch(); r.partidoV3 = !!(match && match.v3); r.aviso2 = !!(match && match.events.some(e => /MOTOR v2/.test(e.title)));
     mcSimEnd(); const m = match, gol = side => m.events.filter(e => e.gol && e.side === side).length;
     r.termino = m.done; r.marcadorOk = m.h === gol('o') && m.a === gol('r'); m.finished = true; save();
@@ -88,6 +92,8 @@ for (const a of antes.carreras) {
   ok(d.motor === 'v2' && d.v3 === true, `${tag}: no pasó al v3 (motor ${d.motor}, v3 ${d.v3})`);
   ok(d.motorAnterior === esperado, `${tag}: motorAnterior ${d.motorAnterior} (se esperaba ${esperado})`);
   ok(d.partidoV3 && !d.aviso2 && d.termino && d.marcadorOk && d.avanzo && d.guardadoV3, `${tag}: el partido siguiente no se jugó bien con el v3 ${JSON.stringify({ partidoV3: d.partidoV3, termino: d.termino, marcadorOk: d.marcadorOk, guardadoV3: d.guardadoV3 })}`);
+  ok(!d.rotacion && !d.fijos, `${tag}: la rotación automática no arrancó apagada (rotacion ${d.rotacion}, fijos ${d.fijos})`);
+  ok(d.fichaAtributos === 30 && d.fichaEstimado && d.fichaClub && !d.fichaError, `${tag}: la ficha nueva no abrió bien ${JSON.stringify({ atributos: d.fichaAtributos, estimado: d.fichaEstimado, club: d.fichaClub, error: d.fichaError })}`);
   delete d.enMemoria; despues.push({ elegido: a.elegido, antes: { motor: a.motor, v3: a.v3 }, ...d, squad: d.squad ? d.squad.split('|').length + ' jugadores' : null, camposDistintos: distintos });
 }
 await browser.close();

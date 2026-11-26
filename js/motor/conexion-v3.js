@@ -17,7 +17,7 @@ window.mcEsV3=esV3;
 
 /* ---------- armado de los equipos para la cancha ---------- */
 const crudoPropio=p=>({name:p.name,pos:p.pos,grl:+p.rating||+p.grl||60,age:p.age,fit:p.fitness==null?90:p.fitness,atributos:p.atributos,clave:'o'+p.id});
-const crudoRival=e=>({name:e.name,pos:e.pos,grl:+e.r||60,age:e.age,clave:e.key});
+const crudoRival=e=>({name:e.name,pos:e.pos,grl:+e.r||60,age:e.age,fit:e.fit,clave:e.key});   // 12.8: estado físico del rival (si no hay dato, el v3 usa 95 como antes)
 const crudoDe=(e,side)=>side==='o'?crudoPropio(e.p):crudoRival(e);
 function preparar(m){
  const eOwn=m.venue==='a'?1:0,tacO=window.mcOwnTac?mcOwnTac():{};

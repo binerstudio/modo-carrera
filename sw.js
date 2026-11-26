@@ -4,7 +4,7 @@
    - Imágenes: primero la copia guardada (rápido); si no está, la red.
    NO toca las partidas: viven en localStorage/IndexedDB, no en esta caché.
    Al publicar una versión nueva, cambiar VERSION para renovar la caché. */
-const VERSION='mc-12.7.0';
+const VERSION='mc-12.8.0';
 const CORE=[
   './',
   'index.html',
@@ -40,6 +40,9 @@ const CORE=[
   'js/motor/conexion-v3.js',
   'js/ia/mercado-ia.js',
   'js/ia/partidos-ia.js',
+  'js/ia/estado-ia.js',
+  'js/plantel/rotacion.js',
+  'js/plantel/ficha.js',
   'js/partido2d/camisetas.js',
   'js/partido2d/vista2d.js',
   'js/partido2d/ver-partido.js',

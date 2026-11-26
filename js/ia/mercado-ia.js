@@ -62,21 +62,23 @@ function fin(o,s){const w=W(),n=o._n||fold(o.name),h=hash('ctr'+n),a=+o.age||26;
  const e0=w.ctr[n]!=null?w.ctr[n]:BASE+1+(a>=31?h%2:h%4),p=2+(h%3);
  if(s<=e0)return e0;return e0+Math.ceil((s-e0)/p)*p}
 /* ---------- mercado de una temporada ---------- */
-function mercado(s){
- const c=career,w=W(),R=rng(hash('ia'+s+c.id)),moves=[],by=plantel();
+/* inv=true: mercado de invierno (12.8). A mitad de temporada: sin libres ni vuelta de préstamos, menos traspasos
+   (1 compra y 1 venta por club, 60 en total) y préstamos que vuelven al terminar esta misma temporada. */
+function mercado(s,inv){
+ const c=career,w=W(),R=rng(hash((inv?'iaInv':'ia')+s+c.id)),moves=[],by=plantel(),hasta=inv?s:s+1;
  const clubs=[...by.keys()],lvl=new Map(clubs.map(k=>[k,nivel(by.get(k))]));
  const where=new Map();by.forEach((a,k)=>a.forEach(o=>where.set(o._n||fold(o.name),k)));
  const mover=(o,from,to,fee,tipo)=>{const n=o._n||fold(o.name);w.moves[n]=to;
   const A=by.get(from);if(A){const i=A.indexOf(o);if(i>=0)A.splice(i,1)}let B=by.get(to);if(!B)by.set(to,B=[]);B.push(o);where.set(n,to);
   moves.push([o.name,from,to,+fee.toFixed(2),tipo])};
  /* 0) préstamos que vuelven */
- w.loansIA=w.loansIA.filter(l=>{if(l.until>s)return true;const n=fold(l.name);const now=where.get(n);
+ if(!inv)w.loansIA=w.loansIA.filter(l=>{if(l.until>s)return true;const n=fold(l.name);const now=where.get(n);
   if(now&&now===l.to&&by.has(l.from)){const o=by.get(now).find(x=>(x._n||fold(x.name))===n);if(o)mover(o,now,l.from,0,'vuelve de préstamo')}return false});
  const inicio=new Map();by.forEach((a,k)=>{const o={};for(const g in XI)o[g]=sigue(a,g);inicio.set(k,o)});
  /* 1) contratos que vencen esta temporada: los titulares jóvenes renuevan (el ciclo sigue solo);
        los demás pueden quedar libres (se evalúan los de mejor nivel, con tope) */
  const libres=[];
- by.forEach((a,k)=>a.forEach(o=>{if(fin(o,s)!==s)return;if(titular(a,o)&&o.age<=32)return;if(o.rating>=58)libres.push([o,k])}));
+ if(!inv)by.forEach((a,k)=>a.forEach(o=>{if(fin(o,s)!==s)return;if(titular(a,o)&&o.age<=32)return;if(o.rating>=58)libres.push([o,k])}));
  libres.sort((x,y)=>y[0].rating-x[0].rating);libres.length=Math.min(libres.length,400);
  /* 2) necesidades por puesto */
  const necesidad=(k)=>{const a=by.get(k)||[],L=lvl.get(k),out=[];
@@ -84,7 +86,7 @@ function mercado(s){
    if(cnt<MIN[g])out.push([g,3,L-4]);
    else{const weak=P[XI[g]-1];if(weak&&weak.rating<L-5)out.push([g,2,weak.rating+2])}}
   return out.sort((x,y)=>y[1]-x[1])};
- const compras=new Map(),ventas=new Map(),LIM=320,TOPE={libre:140,traspaso:240};let nLib=0,nTr=0;
+ const compras=new Map(),ventas=new Map(),LIM=320,TOPE={libre:140,traspaso:inv?60:240},XC=inv?1:3;let nLib=0,nTr=0;
  /* índice de jugadores por puesto, ordenado por GRL */
  const pool={POR:[],DEF:[],MED:[],DEL:[]};by.forEach((a,k)=>a.forEach(o=>{if(pool[o.pos])pool[o.pos].push(o)}));for(const g in pool)pool[g].sort((x,y)=>x.rating-y.rating);
  const banda=(g,lo,hi)=>{const P=pool[g];let i=0,j=P.length;while(i<j){const m=(i+j)>>1;if(P[m].rating<lo)i=m+1;else j=m}const out=[];for(let k=i;k<P.length&&P[k].rating<=hi;k++)out.push(P[k]);return out};
@@ -98,10 +100,10 @@ function mercado(s){
  /* 2b) compras: los clubes con más presupuesto eligen primero */
  const orden=clubs.map(k=>[k,eco(k,by.get(k),s).b]).sort((x,y)=>y[1]-x[1]);
  for(const [k] of orden){if(nTr>=TOPE.traspaso)break;const E=eco(k,by.get(k),s),L=lvl.get(k);
-  for(const [g,pri,lo] of necesidad(k)){if((compras.get(k)||0)>=3||E.b<=0.05)break;
+  for(const [g,pri,lo] of necesidad(k)){if((compras.get(k)||0)>=XC||E.b<=0.05)break;
    const C=banda(g,Math.max(lo,L-6),L+6).filter(o=>{const from=where.get(o._n||fold(o.name));return from&&from!==k&&o.age<=32&&(lvl.get(from)||0)<=L+3});
    for(let t=0;t<14&&C.length;t++){const o=C.splice(Math.floor(R()*C.length),1)[0],n=o._n||fold(o.name),from=where.get(n),A=by.get(from)||[];
-    if((ventas.get(from)||0)>=3)continue;
+    if((ventas.get(from)||0)>=XC)continue;
     if(sigue(A,g)<=MIN[g])continue;                                 /* el vendedor necesita a su jugador */
     const left=fin(o,s)-s,f=(left<=1?.65:left===2?.9:1)*(1+(L-(lvl.get(from)||L))*.01)*(.9+R()*.3);
     const fee=Math.max(0,(+o.value||0)*f);if(fee>E.b*.6)continue;   /* no puede pagarlo */
@@ -111,10 +113,10 @@ function mercado(s){
     compras.set(k,(compras.get(k)||0)+1);ventas.set(from,(ventas.get(from)||0)+1);break}}}
  /* 3) préstamos de juveniles sin lugar */
  let nPr=0;
- for(const k of clubs){if(nPr>=50)break;const a=by.get(k),L=lvl.get(k);if(L<72)continue;
+ for(const k of clubs){if(nPr>=(inv?15:50))break;const a=by.get(k),L=lvl.get(k);if(L<72)continue;
   const jov=a.filter(o=>o.age<=21&&!titular(a,o)&&o.rating<=L-8).sort((x,y)=>y.rating-x.rating).slice(0,2);
   for(const o of jov){if(sigue(a,o.pos)<=MIN[o.pos])continue;const dest=clubs.filter(x=>x!==k&&Math.abs((lvl.get(x)||0)-o.rating)<=3&&(by.get(x)||[]).filter(y=>y.pos===o.pos).length<MIN[o.pos]+2);
-   if(!dest.length)continue;const to=dest[Math.floor(R()*Math.min(dest.length,10))];w.loansIA.push({name:o.name,from:k,to,until:s+1});mover(o,k,to,0,'préstamo');nPr++}}
+   if(!dest.length)continue;const to=dest[Math.floor(R()*Math.min(dest.length,10))];w.loansIA.push({name:o.name,from:k,to,until:hasta});mover(o,k,to,0,'préstamo');nPr++}}
  /* 4) emergencia: si este mercado dejó a un club sin lo necesario para su once (arquero incluido), se lo repone a préstamo */
  for(const k of clubs){const a=by.get(k);if(!a)continue;
   const ini=inicio.get(k)||{};
@@ -122,17 +124,25 @@ function mercado(s){
    while(falta>0&&guard++<4){const L=lvl.get(k)||60;
     const don=clubs.filter(x=>x!==k&&sigue(by.get(x)||[],g)>MIN[g]).map(x=>[x,(by.get(x)||[]).filter(o=>o.pos===g&&(+o.age||0)<36&&!titular(by.get(x),o)).sort((p,q)=>Math.abs(p.rating-L)-Math.abs(q.rating-L))[0]]).filter(x=>x[1]);
     if(!don.length)break;don.sort((p,q)=>Math.abs(p[1].rating-L)-Math.abs(q[1].rating-L));const [from,o]=don[0];
-    w.loansIA.push({name:o.name,from,to:k,until:s+1});mover(o,from,k,0,'préstamo');falta--}}}
+    w.loansIA.push({name:o.name,from,to:k,until:hasta});mover(o,from,k,0,'préstamo');falta--}}}
  /* registro */
- const rel=moves.slice().sort((x,y)=>(y[4]==='traspaso')-(x[4]==='traspaso')||y[3]-x[3]).slice(0,220);
+ const rel=moves.slice().sort((x,y)=>(y[4]==='traspaso')-(x[4]==='traspaso')||y[3]-x[3]).slice(0,inv?80:220);   /* invierno: solo los 80 más importantes (peso de la partida) */
  const tipos={};moves.forEach(m=>{tipos[m[4]]=(tipos[m[4]]||0)+1});
- w.aiMoves=w.aiMoves||[];w.aiMoves.unshift({season:s,moves:rel,total:moves.length,tipos,ia:'v2'});if(w.aiMoves.length>4)w.aiMoves.length=4;
+ w.aiMoves=w.aiMoves||[];w.aiMoves.unshift(Object.assign({season:s,moves:rel,total:moves.length,tipos,ia:'v2'},inv?{ventana:'invierno'}:{}));/* se guardan los últimos 4 veranos (como antes) y los últimos 2 inviernos */
+ {let ve=0,iv=0;w.aiMoves=w.aiMoves.filter(x=>x.ventana==='invierno'?++iv<=2:++ve<=4)}
  w.mv=(w.mv||0)+1;try{if(window.mcMovePlayer&&moves.length){const m=moves.find(x=>x[2]!=='Retiro');if(m)mcMovePlayer(m[0],m[2])}}catch(e){}
  try{window.mcClearGRL&&mcClearGRL()}catch(e){}
  const cnt=t=>moves.filter(m=>m[4]===t).length,dinero=moves.reduce((x,m)=>x+m[3],0);
- c.inbox.unshift(`🔁 Mercado de pases: ${cnt('traspaso')} traspasos (${window.mcMoney?mcMoney(dinero):dinero.toFixed(1)+'M'}), ${cnt('libre')} libres, ${cnt('préstamo')} préstamos, ${cnt('retiro')} retiros. Ver Mundo › Traspasos.`);
+ c.inbox.unshift(`🔁 ${inv?'Mercado de invierno':'Mercado de pases'}: ${cnt('traspaso')} traspasos (${window.mcMoney?mcMoney(dinero):dinero.toFixed(1)+'M'}), ${cnt('libre')} libres, ${cnt('préstamo')} préstamos, ${cnt('retiro')} retiros. Ver Mundo › Traspasos.`);
  return moves}
 window.mcIAMercado=function(s){if(typeof career==='undefined'||!career||iaDe(career)!=='v2')return null;try{return mercado(s)}catch(e){console.warn('MC IA mercado',e);return null}};
+/* mercado de invierno: una vez por temporada, cuando tu liga pasa la mitad de sus fechas */
+window.mcIAMercadoInvierno=function(){const c=(typeof career!=='undefined')?career:null;if(!c||iaDe(c)!=='v2')return null;const w=W();
+ if(w.invierno===c.season)return null;w.invierno=c.season;
+ try{return mercado(c.season,true)}catch(e){console.warn('MC IA mercado de invierno',e);return null}};
+(function(){const o=window.mcAfterRound;window.mcAfterRound=function(c,L){const r=typeof o==='function'?o.apply(this,arguments):undefined;
+ try{const tot=Math.max(L.total||0,L.rounds.length);if(tot&&c.round/tot>=.5)window.mcIAMercadoInvierno()}catch(e){console.warn('MC IA mercado de invierno',e)}
+ return r}})();
 window.mcIAEco=function(club){const by=plantel(),e=eco(club,by.get(club)||[],career.season);return{b:e.b,s:e.s}};
 
 /* ---------- Configuración: Mercado e IA ---------- */

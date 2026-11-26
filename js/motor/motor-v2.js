@@ -282,14 +282,19 @@ const HL={
  foul(){},
  yellow(m,v,side){const st=HL.ps(m,v,side);st.y++;if(side==='o')m.yH++;else m.yA++;if(st.y>=2)HL.red(m,v,side,'doble amarilla')},
  red(m,v,side){const L=side==='o'?m.own:m.riv,i=L.indexOf(v);HL.ps(m,v,side).r=1;if(side==='o')m.rH++;else m.rA++;if(i>=0)L.splice(i,1)},
- injure(m,side,e){m.v2.lesiones=(m.v2.lesiones||0)+1;HL.sub(m,side,e,true)},
+ injure(m,side,e){m.v2.lesiones=(m.v2.lesiones||0)+1;(m._les=m._les||[]).push([side,nm(e)]);HL.sub(m,side,e,true)},
  sub(m,side,outE,forced){const L=side==='o'?m.own:m.riv,B=side==='o'?m.ownBench:m.rivBench,n=side==='o'?'subsO':'subsR';
   const out=outE||L.filter(e=>e.g!=='POR').sort((a,b)=>energia(a)-energia(b))[0];if(!out)return;
   const i=L.indexOf(out);if(i<0)return;
   if((m[n]||0)>=5||!B.length){if(forced)L.splice(i,1);return}
-  let j=B.findIndex(b=>b.pos===out.g);if(j<0)j=0;const inE=B.splice(j,1)[0];inE.g=out.g;inE.role=out.role;inE.key=inE.key+'*';L[i]=inE;m[n]=(m[n]||0)+1},
+  let j=B.findIndex(b=>b.pos===out.g);if(j<0)j=0;const inE=B.splice(j,1)[0];inE.g=out.g;inE.role=out.role;inE.key=inE.key+'*';L[i]=inE;m[n]=(m[n]||0)+1;(m._subs=m._subs||[]).push([side,nm(out),nm(inE),m.minute||0])},
  subR(m){HL.sub(m,'r')},subO(m){HL.sub(m,'o')}
 };
+/* 12.8: minutos jugados por cada jugador [lado, nombre, minutos] (titulares 90 salvo que salgan; los que entran, desde su minuto) */
+function minutos(m,loc,vis){const out=new Map(),fin=Math.max(90,m.minute||90);
+ loc.players.slice(0,11).forEach(p=>out.set('o|'+p.name,['o',p.name,fin]));vis.players.slice(0,11).forEach(p=>out.set('r|'+p.name,['r',p.name,fin]));
+ (m._subs||[]).forEach(([sd,o,i,mi])=>{const a=out.get(sd+'|'+o);if(a)a[2]=Math.max(0,a[2]-(fin-mi));out.set(sd+'|'+i,[sd,i,Math.max(1,fin-mi)])});
+ return[...out.values()]}
 /* equipo = {name, players:[{name,pos,grl,age,role?}...] (11 titulares + suplentes), tac?, dt?, quimica?} */
 function simular(loc,vis,opt){
  opt=opt||{};const prevR=R;if(opt.rng)R=opt.rng;
@@ -304,7 +309,9 @@ function simular(loc,vis,opt){
   for(const h of [1,2]){m.clock={half:h,limit:h===1?45:90,base:h===1?0:45,x:0};let g=0;while(!minuto(m,HL)&&g++<200);}
   return{h:m.h,a:m.a,shots:[m.shotsH,m.shotsA],on:[m.onH,m.onA],corners:[m.cornersH,m.cornersA],fouls:[m.foulsH,m.foulsA],yellows:[m.yH,m.yA],reds:[m.rH,m.rA],
    offsides:[m.offH,m.offA],xg:[+m.xgH.toFixed(2),+m.xgA.toFixed(2)],pos:Math.round(m.pos),
-   v2:{clima:m.v2.clima,cesped:m.v2.cesped,var:m.v2.var,errores:m.v2.errores,arbitrales:m.v2.arbitrales,rebotes:m.v2.rebotes,lesiones:m.v2.lesiones||0,penales:m.v2.penalesTotal||0}};
+   v2:{clima:m.v2.clima,cesped:m.v2.cesped,var:m.v2.var,errores:m.v2.errores,arbitrales:m.v2.arbitrales,rebotes:m.v2.rebotes,lesiones:m.v2.lesiones||0,penales:m.v2.penalesTotal||0},
+   /* 12.8: quién jugó y cuántos minutos, y quién se lesionó (para el estado físico de los clubes de la IA). No usa azar. */
+   jug:minutos(m,loc,vis),les:(m._les||[]).slice()};
  }finally{R=prevR}
 }
 

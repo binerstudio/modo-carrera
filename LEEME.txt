@@ -1,3 +1,14 @@
+MODO CARRERA 12.8.0 · ETAPA 4: FICHA, ROTACIÓN E IA (todo lo anterior se conserva)
+==================================================================================
+Detalle: INFORME_ETAPA_4.md
+- Ficha del jugador con los 25 atributos de campo (técnicos, mentales y físicos) y los 5 de arquero, marcados "estimado",
+  y sus PlayStyles con ícono y explicación. Abre para cualquier jugador (tu plantel y cualquier otro club).
+- Rotación automática (Configuración → Partido, APAGADA por defecto): antes de cada partido cambia a los cansados o
+  lesionados. No toca a los jugadores marcados "Fijo" (botón en la ficha). Nunca deja al equipo sin arquero ni con menos de 11.
+- IA: el cansancio y las lesiones de los clubes de la IA siguen de un partido al otro; mercado de invierno de la IA a mitad
+  de temporada; presupuesto de cada club en su ficha (Mundo → Clubes, o tocando un club en la tabla).
+- Al abrir la 12.8.0 se hace la copia automática "Antes de actualizar a la versión 12.8.0".
+
 MODO CARRERA 12.7.0 · LIMPIEZA DE MOTORES (todo lo demás se conserva)
 =====================================================================
 Detalle: INFORME_LIMPIEZA_MOTORES.md
