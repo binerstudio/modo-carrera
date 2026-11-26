@@ -25,7 +25,7 @@ const XI=RG.XI;
 /* fuerza del plantel del usuario en la misma escala que mcClubStrength (promedio de los 14 mejores) */
 function nivelUsuario(){const a=(C().players||[]).map(p=>+p.rating||0).sort((x,y)=>y-x).slice(0,14);return a.length?a.reduce((s,x)=>s+x,0)/a.length:60}
 const nivelClub=k=>window.mcClubStrength?mcClubStrength(k):60;
-function plantelDe(k){try{if(window.mcIAPlantel){const a=mcIAPlantel(k);if(a.length)return a}}catch(e){}try{return mcDB().list.filter(x=>x.club===k)}catch(e){return[]}}
+function plantelDe(k){try{if(window.mcIAPlantelMercado){const a=mcIAPlantelMercado(k);if(a.length)return a}}catch(e){}try{return mcDB().list.filter(x=>x.club===k)}catch(e){return[]}}
 function anosRestantes(p){const c=C();try{if(c.ia==='v2'&&window.mcIAContratoFin){const f=mcIAContratoFin(p);if(isFinite(f))return clamp(f-c.season,1,6)}}catch(e){}return clamp(+p.contract||2,1,6)}
 function ecoDe(k){try{const e=mcIAEco(k);return{b:+e.b||0,sv:+e.sv||0}}catch(e){return{b:10,sv:50}}}
 /* contexto del club vendedor */

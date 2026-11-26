@@ -178,7 +178,7 @@ window.mcIAEco=function(club){const by=plantel(),e=eco(club,by.get(club)||[],car
 window.mcIAEcoAjustar=function(club,delta){if(!club||!isFinite(+delta))return null;const by=plantel(),e=eco(club,by.get(club)||[],career.season);e.b=+(e.b+(+delta)).toFixed(2);e.guardar();return e.b};
 /* Etapa 5: año de vencimiento estimado del contrato de un jugador de la IA, plantel y nivel de un club */
 window.mcIAContratoFin=function(o){return fin(o,career.season)};
-window.mcIAPlantel=function(club){return(plantel().get(club)||[]).slice()};
+window.mcIAPlantelMercado=function(club){return(plantel().get(club)||[]).slice()};   /* ojo: mcIAPlantel (sin "Mercado") es el de js/ia/estado-ia.js */
 /* Etapa 5 (pruebas y pantalla): presupuesto, valor del plantel y deuda en cuotas de cada club con economía guardada, en una pasada */
 window.mcIAEcoResumen=function(){const by=plantel(),w=W();return Object.keys(w.eco).map(k=>{const a=by.get(k)||[],e=eco(k,a,career.season);return{club:k,b:e.b,sv:+valorPlantel(a).toFixed(2),deuda:+pendienteIA(k).toFixed(2)}})};
 window.mcIANivel=function(club){return nivel(plantel().get(club)||[])};

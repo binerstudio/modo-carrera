@@ -170,7 +170,7 @@ Motor v3 en el juego: OK. Marcador, ficha, rotación, auditoría de eventos y mo
 - `INFORME_ETAPA_5.md`
 
 **Modificados:**
-- `js/ia/mercado-ia.js`: negociación, cláusula, comisión, cuotas y bonos de la IA. También expone `mcIAEcoAjustar`, `mcIAContratoFin`, `mcIAPlantel` y `mcIAEcoResumen`.
+- `js/ia/mercado-ia.js`: negociación, cláusula, comisión, cuotas y bonos de la IA. También expone `mcIAEcoAjustar`, `mcIAContratoFin`, `mcIAPlantelMercado` y `mcIAEcoResumen`.
 - `js/mc12-diseno.js`: una línea, para que las barras de probabilidad de la pantalla de Negociaciones usen las reglas nuevas.
 - `index.html`, `sw.js`, `js/core/05-mc9-datos.js`: versión 12.9.0.
 - `tests/temporadas.mjs`, `tests/actualizacion.mjs`, CI (`tests/mercado.mjs` en las livianas), `LEEME.txt`, `.gitignore`.

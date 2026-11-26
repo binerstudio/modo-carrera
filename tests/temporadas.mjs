@@ -34,7 +34,7 @@ for (let t = 0; t < N; t++) {
     const oSim = window.MCMotor.simular; window.MCMotor.simular = function (H, A) { ia.partidosIA++;
       for (const T of [H, A]) { const xi = T.players.slice(0, 11), st = mcIAEstado(T.name);
         if (xi.length < 11 || xi.filter(p => p.pos === 'POR').length < 1) ia.onceIAmal++;
-        xi.forEach(p => { const x = st[String(p.name).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim()]; if (x && x.l > 0) ia.lesionadosEnCancha++; }); }
+        xi.forEach(p => { const x = st[String(p.name).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim()]; if (x && x.l > 0) { ia.lesionadosEnCancha++; if ((ia.ejLes = ia.ejLes || []).length < 3) ia.ejLes.push(`${T.name}: ${p.name} (${x.l} fechas de baja; sanos en el plantel ${T.players.filter(q => { const y = st[String(q.name).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim()]; return !(y && y.l > 0) }).length} de ${T.players.length})`); } }); }
       return oSim.apply(this, arguments) };
     while (!mcSeasonOver() && g++ < 140) { openMatch(); if (!match) break; if (match.v3) v3++;
       const riv = match.riv; if (riv.some(e => e.fit != null)) ia.rivalesConFisico++; if (!riv.some(e => e.pos === 'POR')) ia.rivalesSinArquero++; if (riv.length < 11) ia.rivalesMenos11++;
@@ -113,7 +113,7 @@ temporadas.forEach((t, i) => {
   if (!(a.rivalesConFisico > 0)) fallas.push(`T${i + 1}: los rivales nunca llegaron con su estado físico`);
   if (a.rivalesSinArquero || a.rivalesMenos11) fallas.push(`T${i + 1}: rival sin arquero (${a.rivalesSinArquero}) o con menos de 11 (${a.rivalesMenos11})`);
   if (a.onceIAmal) fallas.push(`T${i + 1}: ${a.onceIAmal} onces de la IA sin arquero o con menos de 11`);
-  if (a.lesionadosEnCancha) fallas.push(`T${i + 1}: ${a.lesionadosEnCancha} lesionados de la IA en el once`);
+  if (a.lesionadosEnCancha) fallas.push(`T${i + 1}: ${a.lesionadosEnCancha} lesionados de la IA en el once (${(a.ejLes || []).join(' | ')})`);
   if (!(a.maxLesionados > 0)) fallas.push(`T${i + 1}: las lesiones de la IA no persisten entre partidos`);
   if (!(a.fitMin < 90)) fallas.push(`T${i + 1}: el cansancio de la IA no persiste entre partidos`);
 });
