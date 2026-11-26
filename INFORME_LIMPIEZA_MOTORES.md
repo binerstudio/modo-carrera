@@ -21,4 +21,25 @@
    automática "Antes de actualizar a la versión 12.7.0".
 
 ## Pruebas (CI liviano en cada push; lo pesado, solo a mano)
-RESULTADOS_CI
+**CI liviano: corridas 125 (`8e17e94`) y 126 (`f9c09af`), las dos en verde.** Publicación de la vista previa: OK.
+- Motor v3 (300 partidos, etapas 1-6) ✅
+- v3 en el juego ✅: carrera nueva en v3 sin elegir nada, Configuración sin "Motor de partidos", partido en vivo con
+  cambio, 5 fechas más con v3, guardado y recarga. Forzando que el v3 no se pueda armar: se juega con el v2, sale el
+  aviso, no se muestra el 2D y el partido siguiente vuelve al v3.
+- Marcador, localía y reloj ✅ (liga de local, de visitante, copa y neutral).
+- Tres temporadas sin intervención ✅: 107/107 partidos del usuario con el v3, liga 2,48-2,68 goles por partido.
+- Auditoría de eventos ✅: 10 partidos con el v3 (ids, minutos, marcador = goles del relato, goleadores del equipo
+  correcto) y 30 con el v2 de reserva (auditoría completa de las jugadas escritas, 716 jugadas, aviso en todos).
+- Actualización ✅, comparando campo por campo lo guardado (solo se permiten datos agregados y dos contadores que
+  suben solos al abrir, igual que en la 12.6.0):
+  - 12.2.2 (v1): se abre, 0 datos distintos, pasa a v3 (`motorAnterior: 'v1'`) y el partido siguiente es v3.
+  - 12.6.0, una carrera con cada motor (v1, v2 y v3): las tres se abren, 0 datos distintos, las tres en v3.
+  - Copia automática "Antes de actualizar a la versión 12.7.0" en los dos casos.
+- A mano (acá, fuera del CI): el 2D completo (v3tv: 3 min a x1, 0 saltos de cámara, escena final sin nadie corriendo,
+  mejores jugadas, simular) ✅ y la pantalla completa en iPhone ✅.
+
+## Lo que quedó igual a propósito
+- Las otras ligas y las copas se simulan con el modelo rápido de resultados de siempre: no es el v1. El v2 solo
+  simula los partidos de la IA de tu liga. Pasar ligas y copas al v2 cambiaría la calibración y el tiempo de cada
+  fecha en el teléfono; si lo querés, es otro paso.
+- La IA del mercado (Clásica/Avanzada) sigue en Configuración: no es un motor de partidos.
