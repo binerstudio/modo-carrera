@@ -686,7 +686,7 @@ function suggestions(){const c=C();const k=c.club+'|'+c.budget+'|'+c.players.len
  const sq=new Set(c.players.map(p=>p.name)),gone=(c.mkt&&c.mkt.gone)||{};let L=[];try{L=mcDB().list}catch(e){}
  SUG=L.filter(p=>p.club!==c.club&&!gone[p.id]&&!sq.has(p.name)&&p.value<=c.budget&&p.value>0).sort((a,b)=>b.rating-a.rating||a.value-b.value).slice(0,5);SUGK=k;return SUG}
 function targets(){const c=C(),sq=new Set(c.players.map(p=>p.name));const seg=segGet().map(findP).filter(p=>p&&!sq.has(p.name));return{seg,list:seg.length?seg.slice(0,5):suggestions(),fromSeg:seg.length>0}}
-function chance(p,fee,wage){const c=C();const fr=fee/Math.max(.5,p.value),wr=wage/Math.max(.1,p.wage);
+function chance(p,fee,wage){if(window.MCE5&&MCE5.chance)return MCE5.chance(p,fee,wage);/* 12.9: reglas de la Etapa 5 */const c=C();const fr=fee/Math.max(.5,p.value),wr=wage/Math.max(.1,p.wage);
  const ch=Math.max(.04,Math.min(.96,.24+Math.max(0,fr-.8)*.45+Math.max(0,wr-.8)*.24+(c.board-50)/300-(p.age<21?.03:0)-(p.rating>=88?.12:0)));
  return{ch,club:Math.max(0,Math.min(1,(fr-.8)/.5)),pl:Math.max(0,Math.min(1,(wr-.8)/.6+(c.board-50)/200))}}
 const sh=n=>{n=String(nm(n)||'').trim().split(/\s+/);return n.length>1?n[0][0]+'. '+n.slice(1).join(' '):n[0]};

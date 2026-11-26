@@ -1,5 +1,5 @@
 name: Pruebas de regresión
-# En cada push corren solo las pruebas livianas: motor v3, v3 en el juego, marcador, temporadas, ficha y rotación (Etapa 4), auditoría de eventos y
+# En cada push corren solo las pruebas livianas: motor v3, v3 en el juego, marcador, temporadas, ficha y rotación (Etapa 4), mercado del usuario (Etapa 5), auditoría de eventos y
 # actualización desde la 12.2.2 y desde la 12.6.0. Las pesadas (motores con 1000 partidos, regresión con semilla fija,
 # v3.html, cómo se ve el partido en el 2D, pantalla completa, partido de 15 min y calibración) se corren a mano:
 # Actions → "Pruebas de regresión" → Run workflow.
@@ -36,12 +36,14 @@ jobs:
         run: node tests/v3juego.mjs http://localhost:8080/index.html
       - name: Un solo marcador (encabezado, gráfica de TV, eventos), local del mismo lado y reloj que espera al 2D (liga local/visitante, copa, neutral)
         run: node tests/v3marcador.mjs http://localhost:8080/index.html
-      - name: Tres temporadas sin intervención (v3, IA y mercado; Etapa 4 · mercado de invierno, cansancio y lesiones de la IA)
+      - name: Tres temporadas sin intervención (v3, IA y mercado; Etapa 4 · invierno, cansancio y lesiones; Etapa 5 · cuotas, comisiones y cláusulas de la IA, sin bancarrotas)
         run: node tests/temporadas.mjs http://localhost:8080/index.html 3
       - name: Etapa 4 · ficha del jugador para los 51.893 jugadores de la base, tu plantel, otros clubes y ficha del club
         run: node tests/ficha.mjs http://localhost:8080/index.html 400
       - name: Etapa 4 · rotación automática (apagada por defecto, nunca sin arquero ni con menos de 11, fijos sin tocar, temporada con y sin)
         run: node tests/rotacion.mjs http://localhost:8080/index.html
+      - name: Etapa 5 · mercado del usuario (negociación en 3 rondas, cuotas y bonos en su temporada, cláusula que obliga a vender, agente y jugador, ventas con futura venta y recompra)
+        run: node tests/mercado.mjs http://localhost:8080/index.html
       - name: Auditoría de eventos (10 partidos con el v3 y 30 con el v2 de reserva)
         run: node tests/eventos.mjs http://localhost:8080/index.html 30 10
       - name: Carrera guardada con la 12.2.2 se abre con esta versión y pasa al v3

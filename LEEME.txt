@@ -1,3 +1,18 @@
+MODO CARRERA 12.9.0 · ETAPA 5: MERCADO DEL USUARIO (todo lo anterior se conserva)
+==================================================================================
+Detalle: INFORME_ETAPA_5.md
+- Ofertas con negociación: el club vendedor acepta, rechaza o contraoferta según el valor del jugador, su contrato,
+  su importancia en el plantel y la economía del club. Máximo 3 rondas; si corta, hasta la temporada que viene.
+- Formas de pago: contado, 2 o 3 cuotas (una por temporada) y bonos por goles, partidos o títulos que se pagan
+  solo si se cumplen.
+- Cláusulas: cláusula de rescisión en los contratos (si se paga, el club no puede negarse; la IA también puede pagar
+  la de tus jugadores), porcentaje de futura venta y opción de recompra al vender.
+- Agente y jugador: comisión del agente al firmar; el jugador negocia sueldo, años y cláusula aparte y puede
+  rechazar (club chico, poca titularidad, sueldo bajo).
+- Finanzas → "Compromisos del mercado": cuotas por temporada, bonos, cláusulas y movimientos.
+- La IA usa las mismas reglas (rondas, cuotas, comisión, cláusula y bonos). Las cláusulas de la IA son estimadas.
+- Al abrir la 12.9.0 se hace la copia automática "Antes de actualizar a la versión 12.9.0".
+
 MODO CARRERA 12.8.0 · ETAPA 4: FICHA, ROTACIÓN E IA (todo lo anterior se conserva)
 ==================================================================================
 Detalle: INFORME_ETAPA_4.md

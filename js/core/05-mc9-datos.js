@@ -9,7 +9,7 @@
       una carrera se guarda una copia automática completa (IndexedDB, se conservan las últimas 15). */
 (function(){
 'use strict';
-const APP_VERSION='12.8.0';
+const APP_VERSION='12.9.0';
 const LS=window.localStorage;
 const K={schema:'mc_schema_version',app:'mc_app_version',players:'mc_players_v1',lastExport:'mc_last_export',lastSnap:'mc_last_snapshot'};
 const DATA_RE=/^(mc_|modo_carrera)/;

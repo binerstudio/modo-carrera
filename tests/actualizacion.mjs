@@ -73,6 +73,13 @@ for (const a of antes.carreras) {
     mcSimEnd(); const m = match, gol = side => m.events.filter(e => e.gol && e.side === side).length;
     r.termino = m.done; r.marcadorOk = m.h === gol('o') && m.a === gol('r'); m.finished = true; save();
     r.avanzo = career.round >= r0; r.guardadoV3 = JSON.parse(localStorage.getItem('mc_career_v7_' + id)).v3 === true;
+    /* 12.9 (Etapa 5): al abrirla no se crea nada del mercado nuevo; la pantalla de economía muestra los compromisos
+       y la carrera puede negociar y firmar con las reglas nuevas (oferta al club y contrato con el jugador) */
+    r.e5AlAbrir = 'e5' in c;
+    try { go('board'); renderBoard(); const f = document.getElementById('e5Fin'); r.panelE5 = !!f && /Compromisos del mercado/.test(f.textContent); } catch (e) { r.e5Error = e.message; }
+    try { c.budget = Math.max(c.budget, 60); const d = mcDB(), p = d.list.find(x => x.club !== c.club && x.value >= 1 && x.value <= 8 && x.rating < 76 && !c.players.some(y => y.name === x.name));
+      const cx = MCE5.ctxClub(p); MCE5.pagarClausula(p.id); const k = MCE5.contratoBase(p), pd = MCReglas.pideJugador(p, MCE5.ctxJugador(p)); k.sueldo = pd.sueldo * 1.3; k.anos = pd.anos[0];
+      const rj = MCE5.proponerJugador(p.id, k); r.fichajeE5 = rj.t + (rj.motivo ? ' (' + rj.motivo + ')' : ''); r.firmo = c.players.some(y => y.name === p.name) && !!c.e5; } catch (e) { r.e5Error = e.message; }
     return r;
   }, a.id);
   const viejo = JSON.parse(a.crudo), nuevo = d.enMemoria ? JSON.parse(d.enMemoria) : {};
@@ -94,6 +101,7 @@ for (const a of antes.carreras) {
   ok(d.partidoV3 && !d.aviso2 && d.termino && d.marcadorOk && d.avanzo && d.guardadoV3, `${tag}: el partido siguiente no se jugó bien con el v3 ${JSON.stringify({ partidoV3: d.partidoV3, termino: d.termino, marcadorOk: d.marcadorOk, guardadoV3: d.guardadoV3 })}`);
   ok(!d.rotacion && !d.fijos, `${tag}: la rotación automática no arrancó apagada (rotacion ${d.rotacion}, fijos ${d.fijos})`);
   ok(d.fichaAtributos === 30 && d.fichaEstimado && d.fichaClub && !d.fichaError, `${tag}: la ficha nueva no abrió bien ${JSON.stringify({ atributos: d.fichaAtributos, estimado: d.fichaEstimado, club: d.fichaClub, error: d.fichaError })}`);
+  ok(!d.e5AlAbrir && d.panelE5 && d.firmo && !d.e5Error, `${tag}: mercado de la Etapa 5 ${JSON.stringify({ alAbrir: d.e5AlAbrir, panel: d.panelE5, fichaje: d.fichajeE5, error: d.e5Error })}`);
   delete d.enMemoria; despues.push({ elegido: a.elegido, antes: { motor: a.motor, v3: a.v3 }, ...d, squad: d.squad ? d.squad.split('|').length + ' jugadores' : null, camposDistintos: distintos });
 }
 await browser.close();

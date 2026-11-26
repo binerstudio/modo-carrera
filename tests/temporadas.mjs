@@ -66,7 +66,13 @@ for (let t = 0; t < N; t++) {
       eco: { clubes: eco.length, noNumericos: malos, min: eco[0], mediana: eco[Math.floor(eco.length / 2)], max: eco[eco.length - 1] },
       prestamosActivos: (w.loansIA || []).length, plantelMin: Math.min(...planteles.map(p => p.n)), arquerosMin: Math.min(...planteles.map(p => p.por)),
       defMin: Math.min(...planteles.map(p => p.def)), medMin: Math.min(...planteles.map(p => p.med)), delMin: Math.min(...planteles.map(p => p.del)), enDosClubes: enDos.slice(0, 5), enDosCount: enDos.length,
-      tamanoKB: Math.round(JSON.stringify(career).length * 2 / 1024) };
+      tamanoKB: Math.round(JSON.stringify(career).length * 2 / 1024),
+      /* Etapa 5: negociación, cuotas, comisiones, cláusulas y bonos de la IA; ningún club en bancarrota absurda */
+      e5: (() => { const R = mcIAEcoResumen(), quiebra = R.filter(x => x.b < -(x.sv * .3) - 1), neg = R.filter(x => x.b < 0);
+        const atrasadas = (w.cuotasIA || []).filter(x => x[3] <= A.season).length, bonosAtrasados = (w.bonosIA || []).filter(x => x[4] <= A.season).length;
+        return { clubes: R.length, negativos: neg.length, quiebra: quiebra.length, peor: R.slice().sort((a, b) => a.b / Math.max(1, a.sv) - b.b / Math.max(1, b.sv)).slice(0, 2).map(x => `${x.club} ${x.b}M (plantel ${x.sv}M)`),
+          deudaMax: Math.max(0, ...R.map(x => x.deuda)), cuotasPendientes: (w.cuotasIA || []).length, atrasadas, bonosAtrasados, pagos: A.pagos || null, com: A.com || 0, enCuotas: A.cuotas || 0, clausulas: A.clausulas || 0,
+          usuario: { budget: career.budget, e5: !!career.e5 } }; })() };
   });
   const toque = await page.evaluate(b => { const antes = new Set(b.split('|')); const M = ((mcWorld().aiMoves || [])[0] || { moves: [] }).moves || [];
     const ahora = new Set(career.players.map(p => p.name)); return { movidos: M.filter(m => antes.has(m[0])).map(m => m[0] + ' → ' + m[2]), salieron: [...antes].filter(n => !ahora.has(n)) }; }, before);
@@ -90,6 +96,14 @@ temporadas.forEach((t, i) => {
   if (!t.plantelUsuarioIntacto) fallas.push(`T${i + 1}: la IA tocó el plantel del usuario`);
   const [ok, tot] = t.golesConDetalle.split('/').map(Number); if (tot && ok !== tot) fallas.push(`T${i + 1}: goles sin autor/asistencia en el relato (${t.golesConDetalle})`);
 });
+temporadas.forEach((t, i) => { const e = t.e5;
+  if (e.quiebra) fallas.push(`T${i + 1}: ${e.quiebra} clubes en bancarrota absurda (${e.peor.join(', ')})`);
+  if (e.atrasadas || e.bonosAtrasados) fallas.push(`T${i + 1}: cuotas (${e.atrasadas}) o bonos (${e.bonosAtrasados}) de la IA sin pagar en su temporada`);
+  if (!(e.com > 0)) fallas.push(`T${i + 1}: la IA no pagó comisiones de agente`);
+  if (i > 0 && !(e.pagos && e.pagos.cuotas >= 0)) fallas.push(`T${i + 1}: no se procesaron los pagos de la IA`);
+  if (e.usuario.e5) fallas.push(`T${i + 1}: sin intervención se crearon datos del mercado del usuario`);
+  if (!Number.isFinite(e.usuario.budget) || e.usuario.budget < 0) fallas.push(`T${i + 1}: tu presupuesto quedó en ${e.usuario.budget}`);
+});
 if (creada.motor !== 'v2' || creada.v3 !== true || creada.ia !== 'v2') fallas.push('La carrera no se creó con v3 (motor v2 por dentro) + IA v2');
 if (creada.rotacion) fallas.push('La rotación automática no arrancó apagada');
 temporadas.forEach((t, i) => {
@@ -108,6 +122,7 @@ const out = { creada: { club: creada.club, motor: creada.motor, v3: creada.v3, i
 mkdirSync('tests/out', { recursive: true }); writeFileSync('tests/out/temporadas.json', JSON.stringify(out, null, 1));
 console.log(`TEMPORADAS SIN INTERVENCIÓN · ${out.ok ? 'OK' : 'FALLÓ'} · ${creada.club} · partido del usuario con el v3 (${creada.v3 ? 'sí' : 'NO'}) · resto de la fecha con el ${creada.motor} · IA ${creada.ia}`);
 temporadas.forEach((t, i) => console.log(`T${i + 1} (${t.season}): ${t.partidosUsuario} partidos, liga ${t.golesLiga} goles/p (${t.partidosLiga} partidos, goleadas5 ${t.goleadas5}), goles con detalle ${t.golesConDetalle} | con el v3 ${t.partidosV3}/${t.partidosUsuario} | mercado: ${t.movimientos} ${JSON.stringify(t.tipos)} ${t.dinero}M | eco ${JSON.stringify(t.eco)} | préstamos activos ${t.prestamosActivos} | mín plantel ${t.plantelMin} POR ${t.arquerosMin} DEF ${t.defMin} MED ${t.medMin} DEL ${t.delMin} | en dos clubes ${t.enDosCount} | usuario intacto ${t.plantelUsuarioIntacto} (salieron por retiro/préstamo: ${t.salieronDelPlantel.length}) | ${t.tamanoKB} KB | ${t.ms} ms\n   ej: ${t.ejemplos.join(' · ')}`));
+temporadas.forEach((t, i) => { const e = t.e5; console.log(`   E5 T${i + 1}: comisiones ${e.com}M · en cuotas ${e.enCuotas} · cláusulas ${e.clausulas} · pagos del cierre ${JSON.stringify(e.pagos)} · cuotas pendientes ${e.cuotasPendientes} (atrasadas ${e.atrasadas}) · clubes con saldo negativo ${e.negativos}/${e.clubes} · bancarrota absurda ${e.quiebra} · peor ${e.peor.join(' | ')}`) });
 temporadas.forEach((t, i) => { const a = t.est; console.log(`   IA T${i + 1}: invierno ${a.invierno ? a.invierno.total + ' movimientos ' + JSON.stringify(a.invierno.tipos) : 'NO'} · rivales con su físico ${a.rivalesConFisico}/${t.partidosUsuario} · lesionados IA a la vez (máx) ${a.maxLesionados} · físico mínimo IA ${a.fitMin} · partidos IA v2 ${a.partidosIA} · onces IA mal ${a.onceIAmal} · lesionados en cancha ${a.lesionadosEnCancha}`) });
 errors.slice(0, 10).forEach(e => console.log('  ', e.slice(0, 300)));
 fallas.forEach(f => console.log('FALLA:', f));

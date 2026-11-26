@@ -10,3 +10,4 @@ tests/out/v3-juego-partido.png
 tests/out/ficha.json
 tests/out/rotacion.json
 node_modules
+tests/out/mercado*
