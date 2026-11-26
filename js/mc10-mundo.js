@@ -15,7 +15,7 @@ const W=()=>{if(!career.world)career.world={};const w=career.world;
  w.moves=w.moves||{};w.retired=w.retired||{};w.coaches=w.coaches||{};w.coachPool=w.coachPool||null;w.coachLog=w.coachLog||[];
  w.coef=w.coef||{};w.ctry=w.ctry||null;w.hist=w.hist||[];w.nt=w.nt||null;w.ntHist=w.ntHist||[];w.stats=w.stats||{};w.finals=w.finals||{};w.comps=w.comps||null;w.loans=w.loans||[];w.v=1;return w};
 window.mcWorld=()=>career?W():null;
-const countryOfClub=(()=>{let m=null;return c=>{if(!m){m=new Map();for(const k in CLUBS)CLUBS[k].forEach(x=>{if(!m.has(x))m.set(x,k)})}return m.get(c)||null}})();
+const countryOfClub=(()=>{let m=null,v=-1;return c=>{if(!m||v!==(window.MC_DIV_VER|0)){v=window.MC_DIV_VER|0;m=new Map();for(const k in CLUBS)CLUBS[k].forEach(x=>{if(!m.has(x))m.set(x,k)})}return m.get(c)||null}})();
 window.mcCountryOf=countryOfClub;
 /* =========================================================
    1) BASE GLOBAL POR CARRERA: traspasos, edad, evolución y retiros
@@ -72,7 +72,7 @@ window.rosterFor=function(club){try{const a=index().get(club);if(a)return a.map(
    ========================================================= */
 const FT={};
 function finalTable(country,season,frac){const key=(career?career.id:'')+'|'+country+'|'+season+'|'+(frac||1);if(FT[key])return FT[key];
- const teams=(CLUBS[country]||[]).slice();if(teams.length<2)return[];
+ const teams=(window.mcTeamsOf?mcTeamsOf(country,season):CLUBS[country]||[]).slice();if(teams.length<2)return[];
  const R=rng(hash(country+season+(career?career.id:'')));const f=window.mcLeagueFmt(country);const days=rr(teams,teams[0],f.apcl?f.legs*2:f.legs,0);
  const lim=Math.round(days.length*(frac==null?1:frac));
  const T=new Map(teams.map(t=>[t,{name:t,pj:0,pts:0,gf:0,gc:0,g:0,e:0,p:0}]));
@@ -189,7 +189,7 @@ function makeComp(d,kind,season){const R=rng(hash(d.id+season+(career?career.id:
  const c={id:d.id,kind,name:d.name,short:d.short,conf:d.conf||null,country:d.country||null,season,teams:d.teams.slice(),fmt:d.fmt,plan,pi:0,stages:[],si:0,champ:null,runner:null,lvl:d.lvl||1};
  const st=firstStage(d,R,plan);c.pi=st.type==='ko'?st.legs:st.mds;c.stages.push(st);return c}
 /* copa nacional: eliminación directa a partido único (final en cancha neutral) */
-function makeCup(country,season,name,idx){const teams=(CLUBS[country]||[]).slice();if(career.country===country&&!teams.includes(career.club))teams.push(career.club);
+function makeCup(country,season,name,idx){const teams=(window.mcCupTeams?mcCupTeams(country):CLUBS[country]||[]).slice();if(career.country===country&&!teams.includes(career.club))teams.push(career.club);
  const R=rng(hash(country+name+season+career.id));const ord=teams.slice().sort((a,b)=>window.mcTeamGRL(b)-window.mcTeamGRL(a));
  let P=1;while(P*2<=ord.length)P*=2;const rounds=Math.log2(P)+(P<ord.length?1:0);
  const span=leagueSpan(),start=Math.max(career.round||0,Math.round(span*(.12+idx*.03))),end=Math.max(start+1,Math.round(span*(.9-idx*.03)));
@@ -210,8 +210,8 @@ function nextStage(c){const st=c.stages[c.si];const R=rng(hash(c.id+c.season+c.s
   if(st.direct){w=st.direct.concat(w)}
   if(c.waitTop){const top=c.waitTop;c.waitTop=null;const ties=top.map((t,i)=>({a:t,b:w[i]||w[0],legs:[],w:null}));c.stages.push({type:'ko',name:'Octavos de final',legs:2,at:at(2),ties});c.si++;return true}
   if(w.length===1){c.champ=w[0];const last=st.ties[0];c.runner=last.a===c.champ?last.b:last.a;return false}
-  q=w;const isFinal=q.length===2,legs=c.kind==='cup'||isFinal?1:2;
-  c.stages.push({type:'ko',name:koName(q.length),legs,at:at(legs),ties:chunk(c.kind==='cup'?shuffle(q,R):q).map(([a,b])=>({a,b,legs:[],w:null})),neutral:isFinal});c.si++;return true}
+  q=w;const isFinal=q.length===2,legs=c.kind==='asc'?((c.legsR&&c.legsR[c.si+1])||(isFinal?1:2)):c.kind==='cup'||isFinal?1:2;
+  c.stages.push({type:'ko',name:c.kind==='asc'&&isFinal?'Final':koName(q.length),legs,at:at(legs),ties:chunk(c.kind==='cup'?shuffle(q,R):q).map(([a,b])=>({a,b,legs:[],w:null})),neutral:isFinal&&legs===1&&c.kind!=='asc'||isFinal&&legs===1&&!!c.neutralF});c.si++;return true}
  if(q.length){c.stages.push({type:'ko',name:koName(q.length),legs:2,at:at(2),ties:chunk(q,true).map(([a,b])=>({a,b,legs:[],w:null}))});c.si++;return true}
  return false}
 function chunk(a,cross){const out=[];if(cross){for(let i=0;i<a.length/2;i++)out.push([a[i],a[a.length-1-i]])}else for(let i=0;i<a.length;i+=2)out.push([a[i],a[i+1]]);return out}

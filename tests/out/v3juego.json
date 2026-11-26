@@ -1,16 +1,12 @@
 {
  "ok": true,
- "activacion": {
+ "carrera": {
   "motor": "v2",
   "v3": true,
-  "opciones": [
-   "v1",
-   "v2",
-   "v3"
-  ],
-  "enAjustes": "v3",
+  "opcionMotor": false,
+  "filaMotor": false,
   "esV3": true,
-  "version": "3.0.0-e3"
+  "version": "3.0.0-e6"
  },
  "previo": {
   "v3": true,
@@ -19,15 +15,15 @@
   "aviso": true
  },
  "vivo": {
-  "minuto": 9,
+  "minuto": 33,
   "fase": "first",
-  "h": 0,
+  "h": 1,
   "a": 0,
   "tiros": [
-   5,
-   0
+   1,
+   1
   ],
-  "pos": 51
+  "pos": 56
  },
  "cambio": {
   "hecho": true,
@@ -36,100 +32,102 @@
  },
  "fin": {
   "done": true,
-  "h": 3,
-  "a": 2,
+  "h": 1,
+  "a": 1,
   "golesRelato": [
-   3,
-   2
+   1,
+   1
   ],
   "tiros": [
-   16,
-   5
+   9,
+   6
   ],
   "alArco": [
-   9,
-   3
+   2,
+   2
   ],
   "pos": 56,
   "ratings": 15,
   "historial": 1,
   "ultimo": {
-   "result": "W",
-   "h": 3,
-   "a": 2,
+   "result": "D",
+   "h": 1,
+   "a": 1,
    "opp": "Platense",
    "venue": "h",
    "season": 2026,
    "round": 1,
    "shots": [
-    16,
-    5
+    9,
+    6
    ],
    "pos": 56
   },
-  "minuto": 97,
+  "minuto": 95,
   "tiposGol": [
-   "en_contra",
-   "area",
-   "corner",
    "area",
    "corner"
   ],
   "entroCambio": true,
-  "eventos": 40
+  "eventos": 27
  },
  "fechas": {
   "res": [
    [
     "River Plate",
     "Defensa y Justicia",
-    1,
-    0
+    2,
+    2
    ],
    [
     "River Plate",
-    "Nacional",
-    0,
-    1
+    "Talleres",
+    1,
+    2
    ],
    [
     "River Plate",
     "Central Córdoba",
-    2,
+    1,
     1
    ],
    [
     "River Plate",
-    "Sarmiento",
-    2,
-    0
+    "Independiente",
+    0,
+    3
    ],
    [
     "River Plate",
     "Lanús",
     1,
-    1
+    0
    ]
   ],
   "v3": 5,
   "round": 4,
   "jugados": 60,
   "porFecha": 15,
-  "id": "cmwuxd62ota0a",
-  "points": 10
+  "id": "cmwxwj9grdn9y",
+  "points": 6
  },
  "recarga": {
-  "id": "cmwuxd62ota0a",
+  "id": "cmwxwj9grdn9y",
   "round": 4,
-  "points": 10,
+  "points": 6,
   "v3": true,
   "motor": "v2"
  },
  "vuelta": {
-  "v3career": false,
-  "motor": "v2",
   "partidoV3": false,
-  "termino": true
+  "v2": true,
+  "aviso": true,
+  "con2D": false,
+  "termino": true,
+  "marcadorOk": true,
+  "siguienteV3": true,
+  "v3career": true,
+  "motor": "v2"
  },
  "errores": [],
  "fallas": []

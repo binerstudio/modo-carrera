@@ -1,5 +1,5 @@
 name: Pruebas de regresión
-# En cada push corren solo las pruebas livianas: motor v3, v3 en el juego, marcador, temporadas, ficha y rotación (Etapa 4), mercado del usuario (Etapa 5), auditoría de eventos y
+# En cada push corren solo las pruebas livianas: motor v3, v3 en el juego, marcador, temporadas, ficha y rotación (Etapa 4), mercado del usuario (Etapa 5), divisiones inferiores y carga en el celular (etapa de datos), auditoría de eventos y
 # actualización desde la 12.2.2 y desde la 12.6.0. Las pesadas (motores con 1000 partidos, regresión con semilla fija,
 # v3.html, cómo se ve el partido en el 2D, pantalla completa, partido de 15 min y calibración) se corren a mano:
 # Actions → "Pruebas de regresión" → Run workflow.
@@ -44,6 +44,10 @@ jobs:
         run: node tests/rotacion.mjs http://localhost:8080/index.html
       - name: Etapa 5 · mercado del usuario (negociación en 3 rondas, cuotas y bonos en su temporada, cláusula que obliga a vender, agente y jugador, ventas con futura venta y recompra)
         run: node tests/mercado.mjs http://localhost:8080/index.html
+      - name: Divisiones inferiores · datos de los 515 clubes, 3 temporadas sin intervención con ascensos y descensos en todas las divisiones, escenarios de ascenso, descenso y playoff
+        run: node tests/divisiones.mjs http://localhost:8080/index.html 3
+      - name: Carga en el celular (iPhone, CPU 4 veces más lenta) · tiempo hasta verse y KB al abrir
+        run: node tests/carga-movil.mjs http://localhost:8080/index.html 9000 5200
       - name: Auditoría de eventos (10 partidos con el v3 y 30 con el v2 de reserva)
         run: node tests/eventos.mjs http://localhost:8080/index.html 30 10
       - name: Carrera guardada con la 12.2.2 se abre con esta versión y pasa al v3

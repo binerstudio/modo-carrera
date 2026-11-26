@@ -1,3 +1,18 @@
+MODO CARRERA 12.10.0 · ETAPA DE DATOS, PARTE 1: LIGAS DE ASCENSO DE EUROPA (todo lo anterior se conserva)
+=====================================================================================================
+Detalle y fuentes: INFORME_DATOS_LIGAS.md
+- 28 divisiones nuevas (515 clubes reales, temporada 2026/27): Inglaterra (Championship, League One, League Two,
+  National League), España (Segunda, Primera Federación 2 grupos, Segunda Federación 5 grupos), Italia (Serie B,
+  Serie C 3 grupos), Alemania (2. Bundesliga, 3. Liga), Francia (Ligue 2, Ligue 3 ex National), Portugal (Liga
+  Portugal 2, Liga 3), Países Bajos (Eerste Divisie), Bélgica (Challenger Pro League), Escocia (Championship,
+  League One) y Turquía (1. Lig). Clubes, estadio y ciudad tomados de Wikipedia (fuente anotada por club).
+- Ascensos y descensos de verdad, conectados con las primeras divisiones del juego, con los playoffs de cada liga.
+  Si tu club juega un playoff, lo jugás vos. Si descendés o ascendés, la carrera sigue en la división nueva.
+- Planteles GENERADOS (no son jugadores reales): 25 por club, marcados "generado".
+- Escudos reales chicos (WebP 64 px, se bajan solo cuando se ven) y genéricos con colores e iniciales si falta.
+- Las ligas que no son la tuya se simulan livianas; la partida guardada casi no crece (unos 2-3 KB por temporada).
+- Al abrir la 12.10.0 se hace la copia automática "Antes de actualizar a la versión 12.10.0".
+
 MODO CARRERA 12.9.0 · ETAPA 5: MERCADO DEL USUARIO (todo lo anterior se conserva)
 ==================================================================================
 Detalle: INFORME_ETAPA_5.md

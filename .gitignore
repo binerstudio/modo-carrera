@@ -11,3 +11,5 @@ tests/out/ficha.json
 tests/out/rotacion.json
 node_modules
 tests/out/mercado*
+tests/out/divisiones.json
+tests/out/carga-movil.json

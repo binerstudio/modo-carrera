@@ -6,7 +6,7 @@ const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'
 let DB=null,pageN=40,sig='';
 window.MC_ADD_PLAYERS=function(rows){(window.MC_EXTRA=window.MC_EXTRA||[]).push(...rows);DB=null};
 window.mcResetDB=function(){DB=null};
-const clubLeague=(()=>{let m=null;return c=>{if(!m){m=new Map();for(const k in CLUBS)CLUBS[k].forEach(x=>m.set(x,k))}return m.get(c)||'Otras ligas'}})();
+const clubLeague=(()=>{let m=null,v=-1;return c=>{if(!m||v!==(window.MC_DIV_VER|0)){v=window.MC_DIV_VER|0;m=new Map();for(const k in CLUBS)CLUBS[k].forEach(x=>m.set(x,k))}return m.get(c)||'Otras ligas'}})();
 function hashN(s){let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return Math.abs(h)}
 function estVal(r,a){const b=Math.pow(Math.max(0,r-60)/30,3.2)*160;return Math.max(.5,Math.round(b*(a<=21?1.35:a<=24?1.12:a>=33?.4:a>=30?.7:1)))}
 function decorate(o){o._n=mcNorm(o.name);o.league=clubLeague(o.club);

@@ -234,7 +234,7 @@ window.mcNewSeason=function(){if(!career)return;const L=ensure();
  save();closeModal();try{renderAll()}catch(e){}go('dashboard')};
 /* ---------- pantalla de competición ---------- */
 const formHTML=f=>f.slice(-5).map(x=>`<i class="mc-f ${x}">${x==='W'?'G':x==='D'?'E':'P'}</i>`).join('');
-function zone(L,i,n){const f=L.fmt;if(f.rel&&i>=n-f.rel)return'rel';if(f.po&&i<f.po)return'po';return''}
+function zone(L,i,n){if(window.mcDivZone){const z=mcDivZone(L,i,n);if(z!=null)return z}const f=L.fmt;if(f.rel&&i>=n-f.rel)return'rel';if(f.po&&i<f.po)return'po';return''}
 function tblHTML(t,L,title,sub){const n=t.length;
  return `<div class="card"><h2>${esc(title)}</h2>${sub?`<p class="tiny">${sub}</p>`:''}<div class="mc-tw"><table class="table mc-tbl"><tr><th>#</th><th class="cl">Club</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>PTS</th></tr>${t.map((r,i)=>`<tr class="${r.name===career.club?'you':''} mc10-z-${zone(L,i,n)}"${r.grp!=null&&i&&t[i-1].grp!==r.grp?' style="border-top:2px solid var(--gold)"':''}><td>${i+1}</td><td class="cl"><span class="mc-cl">${clubBadge(r.name,18)}<span>${esc(r.name)}</span></span></td><td>${r.pj}</td><td>${r.g}</td><td>${r.e}</td><td>${r.p}</td><td>${r.gf}</td><td>${r.gc}</td><td>${r.dg>0?'+':''}${r.dg}</td><td><b>${r.pts}</b></td></tr>`).join('')}</table></div></div>`}
 function poHTML(L){const blocks=[];const all=[];
@@ -251,7 +251,7 @@ function tableView(){const L=ensure(),f=L.fmt,lg=LEAGUES[L.country]||{},prog=`Fe
  else html+=tblHTML(table(L),L,lg.nombre||leagueName(L.country),prog+esc(lg.formato||''));
  html+=poHTML(L);
  const me=table(L).find(x=>x.name===career.club);
- html+=`<div class="card"><p class="tiny">Puntos: 3 por victoria, 1 por empate. Desempate: diferencia de gol y goles a favor.${f.rel?` Zona de descenso: últimos ${f.rel} (los clubes de segunda división se incorporarán cuando estén cargados; mientras tanto la liga mantiene sus participantes).`:' Sin descensos.'}${lg.ok===0?' <b>Formato adaptado para el simulador.</b>':''}</p>${me?`<div class="statsrow"><span>Forma de ${esc(career.club)}</span><span>${formHTML(me.form)||'—'}</span></div>`:''}${L.champs.length?L.champs.map(x=>`<div class="statsrow"><span>🏆 ${esc(x.title)}</span><b class="gold">${esc(x.name)}</b></div>`).join(''):''}</div>`;
+ html+=`<div class="card"><p class="tiny">Puntos: 3 por victoria, 1 por empate. Desempate: diferencia de gol y goles a favor.${window.mcDivNota&&mcDivNota(L.country)!=null?' '+mcDivNota(L.country):f.rel?` Zona de descenso: últimos ${f.rel} (los clubes de segunda división se incorporarán cuando estén cargados; mientras tanto la liga mantiene sus participantes).`:' Sin descensos.'}${lg.ok===0?' <b>Formato adaptado para el simulador.</b>':''}</p>${me?`<div class="statsrow"><span>Forma de ${esc(career.club)}</span><span>${formHTML(me.form)||'—'}</span></div>`:''}${L.champs.length?L.champs.map(x=>`<div class="statsrow"><span>🏆 ${esc(x.title)}</span><b class="gold">${esc(x.name)}</b></div>`).join(''):''}</div>`;
  return html}
 function calView(){const L=ensure(),u=L.teams.indexOf(career.club),cur=career.round,n=L.rounds.length,sel=Math.min(cur,n-1);
  const lab=r=>{const k=L.kinds[r];return k==='P'?'Playoff':k==='G'?'2ª fase':k==='A'?'Apertura':k==='C'?'Clausura':'Fecha'};
