@@ -34,7 +34,6 @@ window.createMatch=function(){
  match.fxO=tacFx(ownTac(),tacR);match.fxR=tacFx(tacR,ownTac());
  return true;
 };
-function fitF(p){return .88+.12*clamp(p.fitness==null?90:p.fitness,30,100)/100}
 /* ===== 6.3 · TÁCTICAS QUE INFLUYEN EN EL PARTIDO ===== */
 function ownTac(){const c=career;return{style:c.style||'Equilibrado',mentality:c.mentality??50,width:c.width??50,
  depth:c.depth??({Baja:20,Media:50,Alta:80}[c.line]||50),pressing:c.pressing??(c.style==='Presión alta'?80:50),
@@ -65,32 +64,12 @@ function tacFx(t,opp){
  return{cr,ex,cv,ocv:Math.max(-.11,ocv),pos:S.pos+P*3+D*2-Q*2+(nM-3)*2+M*2,foul:Math.max(.5,1+S.foul+P*.35),
   fat:Math.max(-.4,S.fat+P*.5+Q*.4),corner:Math.max(.5,1+W*.45+M*.15),offOpp:Math.max(.4,1+D*.8),W}}
 window.mcTacFx=tacFx;
-function strengths(m,side){
- const L=side==='o'?m.own:m.riv,v=e=>side==='o'?effRating(e.p,e.g)*fitF(e.p):e.r*.985;
- const g=k=>{const a=L.filter(e=>e.g===k).map(v);return a.length?a.reduce((x,y)=>x+y,0)/a.length:null};
- const fx=side==='o'?m.fxO:m.fxR,fat=1-(Math.min(m.minute||0,95)/90)*.035*(1+((fx&&fx.fat)||0));
- const all=L.map(v),grl=all.length?all.reduce((x,y)=>x+y,0)/all.length:45;
- const mid=g('MED')??60,att=g('DEL')??(mid-6),def=g('DEF')??60,gk=g('POR')??45;
- return{att:att*fat,mid:mid*fat,def:def*fat,gk,grl:grl*fat,n:L.length}
-}
 function weightedPick(L,wf){const w=L.map(wf),t=w.reduce((a,b)=>a+b,0);if(t<=0)return L[0];let r=R()*t;for(let i=0;i<L.length;i++){r-=w[i];if(r<=0)return L[i]}return L[L.length-1]}
 const nm=(m,e,side)=>side==='o'?e.p.name:e.name;
-const rt=(m,e,side)=>side==='o'?effRating(e.p,e.g):e.r;
 const clubOf=(m,side)=>side==='o'?m.home:m.away;
 /* marcador escrito como local - visitante */
 function scoreTxt(m){return m.venue==='a'?`${m.away} ${m.a}-${m.h} ${m.home}`:`${m.home} ${m.h}-${m.a} ${m.away}`}
 window.mcScoreTxt=scoreTxt;
-/* ---- 6.3 · reparto de goles y asistencias entre todos los jugadores en cancha ---- */
-const WIDE=/^(EI|ED|MI|MD|LI|LD)$/;
-const SHW={DC:1,EI:.78,ED:.78,MI:.5,MD:.5,MC:.42,MCD:.2,LI:.13,LD:.13,DFC:.11,POR:0};
-const HEADW={DC:1,DFC:.75,EI:.3,ED:.3,MC:.3,MI:.2,MD:.2,MCD:.35,LI:.15,LD:.15,POR:0};
-const ASW={MC:.9,MCD:.45,MI:.85,MD:.85,EI:.75,ED:.75,DC:.45,LI:.5,LD:.5,DFC:.12,POR:.03};
-const roleOf=e=>e.role||({POR:'POR',DEF:'DFC',MED:'MC',DEL:'DC'}[e.g]||'MC');
-function quality(m,e,side,attr){const r=rt(m,e,side);let s=r;if(side==='o'&&e.p&&typeof e.p[attr]==='number')s=(r+e.p[attr])/2;return Math.pow(Math.max(5,s-40)/40,1.5)}
-function pickShooter(m,side,mine,kind,F){const L=mine.filter(e=>e.g!=='POR');if(!L.length)return mine[0];const W=(F&&F.W)||0;
- return weightedPick(L,e=>{const ro=roleOf(e),st=m.pst[e.key];return((kind==='corner'?HEADW:SHW)[ro]??.3)*quality(m,e,side,'shooting')*(WIDE.test(ro)?1+.35*W:1)/(1+.4*(st?st.gl:0))})}
-function pickAssist(m,side,mine,sh,F,setPiece){const L=mine.filter(e=>e!==sh&&(setPiece?e.g!=='POR':true));if(!L.length)return null;const W=(F&&F.W)||0;
- return weightedPick(L,e=>{const ro=roleOf(e),st=m.pst[e.key];return(ASW[ro]??.4)*(setPiece&&/^(DFC|POR)$/.test(ro)?.1:1)*quality(m,e,side,'passing')*(WIDE.test(ro)?1+.35*W:1)/(1+.3*(st?st.a:0))})}
 /* ---- 6.3 · relato ---- */
 const P_=a=>a[Math.floor(R()*a.length)];
 function goalText(type,s,a,d,k){
@@ -127,45 +106,6 @@ function goal(m,side,scorer,assist,kind,type,defN,gkN){
  ev(m,local?'⚽ GOL LOCAL':'⚽ GOL VISITANTE',`¡GOOOL de ${club}! ${body}${an&&!body.includes(an)?` (asistencia de ${an})`:''} ${scoreTxt(m)}.`,true,side);
  const GE=m.events[m.events.length-1];if(GE)GE.gol={autor:sn,asist:an||null,tipo:kind==='pen'?'pen':type};
 }
-function resolveAttack(m,side,kind){
- const home=side==='o',mine=home?m.own:m.riv,theirs=home?m.riv:m.own,other=home?'r':'o';
- if(!mine.length||!theirs.length)return;
- const gkE=theirs.find(e=>e.g==='POR')||theirs[0],gkN=nm(m,gkE,other),club=clubOf(m,side);
- const F=(home?m.fxO:m.fxR)||{},FD=(home?m.fxR:m.fxO)||{};
- const SA=strengths(m,side),SD=strengths(m,other),d=SA.grl-SD.grl;
- const dl=theirs.filter(e=>e.g!=='POR'),defE=dl.length?weightedPick(dl,e=>e.g==='DEF'?3:e.g==='MED'?1.5:.5):gkE,defN=nm(m,defE,other);
- if(kind!=='corner'&&R()<.035){// penal
-  const tk=mine.filter(e=>e.g!=='POR');const sh=R()<.7?tk.slice().sort((a,b)=>rt(m,b,side)-rt(m,a,side))[0]:weightedPick(tk,e=>quality(m,e,side,'shooting'));
-  const vic=pickShooter(m,side,mine,'play',F);
-  if(home){m.shotsH++;m.onH++}else{m.shotsA++;m.onA++}
-  ev(m,'⚠ PENAL',`${defN} derriba a ${nm(m,vic,side)} dentro del área y el árbitro no duda: penal para ${club}. ${nm(m,sh,side)} toma la pelota.`,true,side);
-  if(R()<.3){const st=ps(m,defE.key,defN,defE.p?defE.p.pos:defE.pos,defE.g,other);st.y++;if(other==='o')m.yH++;else m.yA++;if(st.y>=2){st.rk='double';card(m,theirs,defE,other,defN,true,'doble amarilla',`${defN} ya tenía amarilla y por el penal ve la segunda.`)}else ev(m,'🟨 TARJETA AMARILLA',`Amarilla para ${defN} (${clubOf(m,other)}) por el penal cometido.`,true,other)}
-  const gp=clamp(.76+(rt(m,sh,side)-rt(m,gkE,other))*.004,.6,.9);
-  if(home)m.xgH+=.76;else m.xgA+=.76;
-  if(R()<gp)goal(m,side,sh,null,'pen','pen',defN,gkN);
-  else{const sv=R()<.6;if(sv){if(home)m.savesA++;else m.savesH++;ps(m,gkE.key,gkN,'POR','POR',other).sv++}
-   ev(m,'PENAL FALLADO',sv?`${gkN} adivina la intención de ${nm(m,sh,side)} y ataja el penal.`:`${nm(m,sh,side)} le pega muy fuerte y la pelota ${P_(['se va por arriba del travesaño','pega en el palo y sale'])}.`,true,side)}
-  return}
- const sh=pickShooter(m,side,mine,kind,F),sn=nm(m,sh,side);
- let as=null,type;
- if(kind==='corner'){as=pickAssist(m,side,mine,sh,F,true);type='corner'}
- else{const r=R();
-  if(r<.06){type='tirolibre'}
-  else if(r<.74){as=pickAssist(m,side,mine,sh,F);const ar=roleOf(as||{}),sr=roleOf(sh);
-   const ct=((home?ownTac():m.tacR).style==='Contraataque')?.32:.12;
-   if(R()<ct)type='contra';else if(WIDE.test(ar))type=(/^(DC|DFC)$/.test(sr)||R()<.35)?'cabezazo':'centro';else type=R()<.45?'filtrado':'area'}
-  else type=P_(['afuera','afuera','individual','individual','rebote'])}
- if(home)m.shotsH++;else m.shotsA++;
- const tOn={filtrado:.15,contra:.1,area:.05,cabezazo:-.06,corner:-.08,afuera:-.12,tirolibre:-.1,individual:0,rebote:.12,centro:0}[type]||0;
- const tCv={filtrado:.12,contra:.08,area:.03,cabezazo:-.02,corner:-.03,afuera:-.09,tirolibre:-.06,individual:0,rebote:.1,centro:.02}[type]||0;
- const pOn=clamp(.43+d*.002+tOn,.2,.75);
- const gp=clamp(.215+(rt(m,sh,side)-rt(m,gkE,other))*.002+d*.003+clamp((F.cv||0)+(FD.ocv||0),-.06,.06)+tCv,.05,.5);
- if(home)m.xgH+=pOn*gp;else m.xgA+=pOn*gp;
- if(R()>pOn){ev(m,'OCASIÓN DE GOL',missText(type,sn,defN,gkN,false),false,side);return}
- if(home)m.onH++;else m.onA++;
- if(R()<gp)goal(m,side,sh,type==='afuera'||type==='individual'||type==='rebote'||type==='tirolibre'?null:as,'play',type,defN,gkN);
- else{if(home)m.savesA++;else m.savesH++;ps(m,gkE.key,gkN,'POR','POR',other).sv++;ev(m,'ATAJADA',missText(type,sn,defN,gkN,true),false,side)}
-}
 function doSubRival(m,forced,outE){
  if(m.subsRiv>=5||!m.rivBench.length)return false;
  const cand=outE?[outE]:m.riv.filter(e=>e.g!=='POR');const out=pick(cand);
@@ -197,9 +137,8 @@ function injure(m,side,pre){
   else{L.splice(i,1);m.ownPlayers=m.own.map(x=>x.p);ev(m,'🩹 SIN CAMBIOS',`${club} ya no tiene cambios disponibles y queda con ${L.length} jugadores.`,true,'o')}}
  else{ev(m,'🩹 LESIÓN',`${n} (${club}) ${how}: no puede continuar.`,true,'r');if(!doSubRival(m,true,e)){L.splice(i,1);ev(m,'🩹 SIN CAMBIOS',`${club} queda con ${L.length} jugadores.`,true,'r')}}
 }
-/* ===== 12.4 · MOTOR v2 (js/motor/motor-v2.js) =====
-   Si el partido es v2 (match.v2), cada minuto lo calcula MCMotor.minuto con estas funciones de relato y
-   registro de este archivo. Si no, todo sigue exactamente igual que en v1. */
+/* ===== MOTOR DE PARTIDOS (js/motor/motor-v2.js y, para el partido del usuario, js/motor/conexion-v3.js) =====
+   Cada minuto lo calcula MCMotor.minuto con estas funciones de relato y registro de este archivo. */
 const OTRO=s=>s==='o'?'r':'o';
 const API2={
  ev:(m,t,msg,key,side)=>ev(m,t,msg,key,side),
@@ -222,52 +161,9 @@ const API2={
 };
 window.mcMatchEv=ev;
 function minuteStep(m){
- if(m.v2&&window.MCMotor)return MCMotor.minuto(m,API2);
- const c=m.clock;if(c.base<c.limit){c.base++;c.x=0}else c.x++;
- m.minute=c.base+c.x;m.lbl=label(m);m.moments++;m.tick++;
- if(!m.tacR)m.tacR=rivalTac(0);
- const TO=ownTac();m.fxO=tacFx(TO,m.tacR);m.fxR=tacFx(m.tacR,TO);
- const SO=strengths(m,'o'),SR=strengths(m,'r'),FO=m.fxO,FR=m.fxR,hb=m.venue==='a'?-1:1,d=SO.grl-SR.grl;
- const tgt=clamp(50+(SO.mid-SR.mid)*.35+d*.25+FO.pos-FR.pos+hb*1.5+(SO.n-SR.n)*4,26,76);m.pos=clamp(m.pos+(tgt-m.pos)*.12+(R()*5-2.5),24,76);
- const pO=m.pos/100,manO=11-SO.n,manR=11-SR.n;
- /* el GRL (promedio de los titulares) es el factor principal; las tácticas lo modulan */
- /* 6.4.1 · las tácticas influyen con un tope (antes se multiplicaban sin límite y daban 7-1, 9-4...) y
-    el que gana por 2 o más baja el ritmo, como en el fútbol real */
- const tcap=t=>0.22*Math.tanh(t/0.22),lead=m.h-m.a,ease=L=>L>=2?Math.exp(-0.38*(L-1)):1;
- const aO=clamp(.106*Math.exp(d*0.03+(SO.att-SR.def)*.005+(m.pos-50)*.004+tcap(FO.cr+FR.ex)+hb*.05-manO*.3+manR*.2)*ease(lead),.02,.22);
- const aR=clamp(.106*Math.exp(-d*0.03+(SR.att-SO.def)*.005-(m.pos-50)*.004+tcap(FR.cr+FO.ex)-hb*.05-manR*.3+manO*.2)*ease(-lead),.02,.22);
- if(R()<aO)resolveAttack(m,'o');
- if(R()<aR)resolveAttack(m,'r');
- // córners (la anchura y la mentalidad generan más)
- if(R()<.055*(FO.corner+FR.corner)/2){const wo=pO*FO.corner,o=R()<wo/(wo+(1-pO)*FR.corner),side=o?'o':'r';if(o)m.cornersH++;else m.cornersA++;
-  if(R()<.32)resolveAttack(m,side,'corner');else if(R()<.35){const dl=(o?m.riv:m.own).filter(e=>e.g==='DEF');ev(m,'TIRO DE ESQUINA',`Córner para ${clubOf(m,side)}; ${dl.length?nm(m,pick(dl),o?'r':'o'):'la defensa'} despeja de cabeza.`,false,side)}}
- // offside (la línea alta del rival provoca más)
- if(R()<.03){const o=R()<FR.offOpp/(FR.offOpp+FO.offOpp),side=o?'o':'r';if(o)m.offH++;else m.offA++;
-  if(R()<.25){const L=(o?m.own:m.riv).filter(e=>e.g==='DEL');if(L.length)ev(m,'OFFSIDE',`${nm(m,pick(L),side)} picó al vacío pero el asistente levanta la bandera: posición adelantada.`,false,side)}}
- // faltas y tarjetas (la presión intensa genera más faltas)
- if(R()<.11*(FO.foul+FR.foul)/2){const wo=FO.foul*(1-pO+.2),o=R()<wo/(wo+FR.foul*(pO+.2)),L=o?m.own:m.riv,side=o?'o':'r',os=o?'r':'o';const cand=L.filter(e=>e.g!=='POR');
-  if(cand.length){const v=weightedPick(cand,e=>e.g==='DEF'?3:e.g==='MED'?2.5:1.2);
-   if(o)m.foulsH++;else m.foulsA++;const n=nm(m,v,side),st=ps(m,v.key,n,v.p?v.p.pos:v.pos,v.g,side);
-   const OL=o?m.riv:m.own,vic=OL.length?nm(m,weightedPick(OL,e=>e.g==='DEL'?3:e.g==='MED'?2:1),os):'un rival';
-   const cr=R();
-   if(cr<.006){st.r=1;st.rk='direct';card(m,L,v,side,n,true,'roja directa',P_(RED)(n,vic))}
-   else if(cr<.23){st.y++;if(o)m.yH++;else m.yA++;
-    if(st.y>=2){st.rk='double';card(m,L,v,side,n,true,'doble amarilla',`${n} vuelve a llegar tarde sobre ${vic} y ve la segunda amarilla.`)}
-    else ev(m,'🟨 TARJETA AMARILLA',`${P_(YEL)(n,vic)} Amarilla para ${n} (${clubOf(m,side)}).`,true,side)}
-   else if(R()<.3)ev(m,'FALTA',P_(FOULS)(n,vic),false,side)}}
- // lesión
- if(R()<.0035*({Baja:.5,Normal:1,Alta:1.8}[$('injuries')?$('injuries').value:'Normal']||1))injure(m,R()<.5?'o':'r');
- // juego en desarrollo
- if(R()<.045){const o=R()<pO,side=o?'o':'r',L=o?m.own:m.riv,mids=L.filter(x=>x.g==='MED'),e=mids.length?pick(mids):L[0];
-  if(e){const n=nm(m,e,side),cl=clubOf(m,side);ev(m,'JUEGO EN DESARROLLO',P_([`${n} maneja los tiempos de ${cl} en mitad de cancha.`,`${cl} hace circular la pelota con paciencia; ${n} busca el hueco entre líneas.`,`${n} recupera en campo propio y ${cl} intenta salir rápido.`,`${cl} adelanta líneas y empuja al rival contra su área.`]),false,side)}}
- // cambios
- if(c.half===2&&c.x===0){
-  if(m.rivSubPlan.length&&c.base>=m.rivSubPlan[0]){m.rivSubPlan.shift();doSubRival(m)}
-  if(m.autoSubs&&m.ownAutoDone<3&&c.base>=m.ownAutoPlan[m.ownAutoDone]){m.ownAutoDone++;autoSubOwn(m)}
- }
- // acumular minutos
- m.own.forEach(e=>{const s=m.pst[e.key];if(s)s.on++});m.riv.forEach(e=>{const s=m.pst[e.key];if(s)s.on++});
- return c.base>=c.limit&&c.x>=m.extra[c.half];
+ /* 12.7: el motor v1 ya no existe. Cada minuto lo calcula el v2 (y, si el partido es v3, la conexión del v3 le pasa la posta) */
+ if(!m.v2)MCMotor.preparar(m,{});   // un partido sin contexto (no debería pasar) se juega igual, con el contexto por defecto
+ return MCMotor.minuto(m,API2);
 }
 function card(m,L,v,side,n,red,why,txt){const o=side==='o';if(o){m.rH++;m.rO=(m.rO||0)+1}else{m.rA++;m.rR=(m.rR||0)+1}
  const st=ps(m,v.key,n,v.p?v.p.pos:v.pos,v.g,side);st.r=1;if(!st.rk)st.rk=why==='roja directa'?'direct':'double';const i=L.indexOf(v);if(i>=0)L.splice(i,1);

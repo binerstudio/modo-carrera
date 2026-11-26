@@ -2,7 +2,8 @@
    1) Partido completo: de 3 a 15 minutos reales (5 por defecto). Todo a velocidad real; la calma se saltea con cortes.
    2) Mejores jugadas (motor v3): se simula entero y se muestran solo los tipos de jugada marcados, una tras otra.
    3) Simular partido: se simula entero sin mostrar nada y va directo al resultado con las estadísticas.
-   Lo elegido se recuerda para el próximo partido. Con v1/v2 la opción 2 no aparece (esos motores no simulan la cancha). */
+   Lo elegido se recuerda para el próximo partido. Si el partido se juega con el v2 (no se pudo armar en la cancha),
+   la opción 2 no aparece (el v2 no simula la cancha). */
 (function(){
 'use strict';
 const CLAVE='mc_ver_partido';

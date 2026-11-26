@@ -31,7 +31,7 @@ window.mcIADe=iaDe;
 const oCreate=window.createCareer;
 if(typeof oCreate==='function')window.createCareer=function(){
  const r=oCreate.apply(this,arguments);
- try{if(typeof career!=='undefined'&&career&&!career.ia){career.ia=window.MC_IA_NUEVAS||(window.MC_MOTOR_NUEVAS==='v1'?'v1':'v2');save()}}catch(e){console.warn('MC IA',e)}
+ try{if(typeof career!=='undefined'&&career&&!career.ia){career.ia=window.MC_IA_NUEVAS||'v2';save()}}catch(e){console.warn('MC IA',e)}
  return r};
 
 /* ---------- planteles actuales (con traspasos, evolución y retiros de la carrera) ---------- */

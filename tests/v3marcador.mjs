@@ -28,7 +28,7 @@ await page.goto(URL, { waitUntil: 'load' }); await page.waitForTimeout(1500);
 await page.evaluate(() => {
   go('newcareer'); const c = document.getElementById('country'); c.value = 'Argentina'; fillClubs();
   document.getElementById('clubChoice').value = 'River Plate'; document.getElementById('manager').value = 'Prueba';
-  window.MC_MOTOR_NUEVAS = 'v2'; createCareer(); sLoad(); draft.motor = 'v3'; sSave();
+  createCareer();
   window.__venueReal = window.mcVenue;
 });
 

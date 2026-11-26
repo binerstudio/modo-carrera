@@ -7,7 +7,7 @@
      completo las jugadas ocupan al menos el doble que la calma; movimiento: pelota-pie < 0,8 m en conducción, largo de
      paso (velocidad/cadencia) entre 0,4 y 2,4 m, sin patinaje ni saltos de pose.
    - Mejores jugadas: solo los tipos marcados, por importancia (máximo 12), en orden de minuto; córners solo con remate. Simular partido: directo al resultado con estadísticas.
-   - v2: el menú sin "Mejores jugadas" y el partido completo funciona.
+   - Si el v3 no se puede armar: se juega con el v2 con aviso, el menú sin "Mejores jugadas" y sin 2D.
    - Capturas: menú, corte de fase, estadio (TV con tribunas), festejo, repetición, mejores jugadas, escena final.
    Uso: node tests/v3tv.mjs <url de index.html> [largo]   ("largo": además, partido completo de 15 min medido a x4)  */
 import { chromium } from 'playwright';
@@ -21,14 +21,14 @@ const page = await ctx.newPage();
 const ORIGEN = URL.startsWith('file:') ? null : new globalThis.URL(URL).origin;
 await ctx.route(u => ORIGEN ? !u.href.startsWith(ORIGEN) : /^https?:/.test(u.href), r => r.abort());
 page.on('pageerror', e => errors.push('pageerror: ' + e.message));
-page.on('console', m => { if ((m.type() === 'error' && !/Failed to load resource/.test(m.text())) || (m.type() === 'warning' && /MC2D|motor v3/i.test(m.text()))) errors.push('console: ' + m.text()); });
+page.on('console', m => { if ((m.type() === 'error' && !/Failed to load resource/.test(m.text())) || (m.type() === 'warning' && /MC2D|motor v3/i.test(m.text()) && !/prueba:/.test(m.text()))) errors.push('console: ' + m.text()); });
 page.on('dialog', d => d.accept()); page.on('crash', () => errors.push('la página se cayó (crash)'));
 await page.goto(URL, { waitUntil: 'load' }); await page.waitForTimeout(1500);
 const cap = async (n, sel) => { for (let k = 0; k < 3; k++) { try { if (sel) { const b = await page.locator(sel).boundingBox(); await page.screenshot({ path: `tests/out/v3tv-${n}.png`, clip: b }); } else await page.screenshot({ path: `tests/out/v3tv-${n}.png` }); return true; } catch (e) { await page.waitForTimeout(150); } } return false; };
 await page.evaluate(() => {
   go('newcareer'); const c = document.getElementById('country'); c.value = 'Argentina'; fillClubs();
   document.getElementById('clubChoice').value = 'River Plate'; document.getElementById('manager').value = 'Prueba';
-  window.MC_MOTOR_NUEVAS = 'v2'; createCareer(); sLoad(); draft.motor = 'v3'; sSave(); openMatch(); go('match');
+  createCareer(); openMatch(); go('match');
 });
 await page.waitForTimeout(600);
 
@@ -134,14 +134,16 @@ if (LARGO) {
   ok(v.saltosDibujo === 0 && v.camara.saltos === 0, `15 min: saltos de dibujo ${v.saltosDibujo}, de cámara ${v.camara.saltos}`);
 }
 
-/* 5) v2: menú sin "Mejores jugadas" y partido completo que funciona */
+/* 5) partido que no se pudo armar en la cancha (se fuerza la falla del v3): se juega con el v2 y se avisa,
+      el menú no ofrece "Mejores jugadas" y el 2D NO se muestra (solo dibuja la cinta del v3) */
 const v2 = await page.evaluate(async () => {
-  sLoad(); draft.motor = 'v2'; sSave(); match.finished = true; openMatch(); go('match');
+  const o = MCMotorV3.enVivo; MCMotorV3.enVivo = () => { throw new Error('prueba: el v3 no se puede armar'); };
+  match.finished = true; openMatch(); MCMotorV3.enVivo = o; go('match');
   mcVerPartido(); const op = [...document.querySelectorAll('.vp-op')].map(x => x.dataset.m); closeModal();
   mcJugarPartido({ modo: 'completo', min: 3 }); mcSpeed(4); await new Promise(r => setTimeout(r, 4000));
-  const e = MC2D.estado(); return { esV3: !!match.v3, opciones: op, minuto: match.minute, jugadores: e.jugadores };
+  return { esV3: !!match.v3, opciones: op, minuto: match.minute, aviso: match.events.some(e => /MOTOR v2/.test(e.title)), con2D: !!document.querySelector('#m2dHost'), tiene: MC2D.tiene(match) };
 });
-ok(!v2.esV3 && v2.opciones.join() === 'completo,simular' && v2.jugadores >= 20 && v2.minuto >= 1, `v2: ${JSON.stringify(v2)}`);
+ok(!v2.esV3 && v2.aviso && v2.opciones.join() === 'completo,simular' && !v2.con2D && !v2.tiene && v2.minuto >= 1, `v2 (no se pudo armar el v3): ${JSON.stringify(v2)}`);
 
 await browser.close();
 const res = { ok: !errors.length && !fallas.length, menu, completo3: { ...c3, v: undefined, duracion: c3.v.duracion, velMax: c3.v.velMax, cortes: c3.v.cortes, camara: c3.v.camara, cierre: c3.v.cierre, repeticiones: c3.v.repeticiones, festejos: c3.v.festejos, golesVistos: c3.v.golesVistos, movimiento: c3.v.movimiento, velocidadVista: c3.v.velocidadVista, carteles: c3.v.carteles, saltos: [c3.v.saltosCinta, c3.v.saltosPelota, c3.v.saltosDibujo], pred: c3.v.pred, tiempo: c3.v.tiempoReal },

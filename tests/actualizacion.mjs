@@ -1,13 +1,19 @@
 /* MODO CARRERA · prueba de actualización
-   1) Con la versión ANTERIOR (carpeta "srv" apuntando a la base) se crea una carrera y se juegan partidos.
+   1) Con la versión ANTERIOR (carpeta "srv" apuntando a la base) se crean carreras y se juegan partidos.
+      - Base 12.2.2: una carrera (motor clásico v1, el único que tenía).
+      - Base 12.6.0 (la versión publicada antes de la limpieza de motores): una carrera con cada motor que se podía
+        elegir: v1 (clásico), v2 (avanzado) y v3 (en cancha).
    2) Se cambia "srv" a la versión NUEVA en la MISMA dirección (mismo almacenamiento del navegador).
-   3) Se recarga y se comprueba: misma carrera, mismos datos, copia automática "Antes de actualizar" y respaldo nuevo.
-   Uso: node tests/actualizacion.mjs <url> <ruta-srv> <dir-base> <dir-nueva>                                   */
+   3) Se recarga y, para cada carrera, se comprueba: se abre, todos sus datos son idénticos (cada campo guardado, salvo
+      el motor que cambia la migración y el número de formato), pasó sola al v3 (motor 'v2' por dentro, v3 = true y el
+      motor que tenía anotado en motorAnterior), hay copia automática "Antes de actualizar", y se sigue jugando: el
+      próximo partido es v3 y termina bien.
+   Uso: node tests/actualizacion.mjs <url> <ruta-srv> <dir-base> <dir-nueva> [12.2.2|actual]                        */
 import { chromium } from 'playwright';
-import { rmSync, symlinkSync } from 'node:fs';
-const [URL, SRV, BASE, NUEVA] = process.argv.slice(2);
+import { rmSync, symlinkSync, mkdirSync, writeFileSync } from 'node:fs';
+const [URL, SRV, BASE, NUEVA, MODO = '12.2.2'] = process.argv.slice(2);
 const link = to => { rmSync(SRV, { force: true }); symlinkSync(to, SRV); };
-const errors = [];
+const errors = [], fallas = [], ok = (c, msg) => { if (!c) fallas.push(msg); };
 const browser = await chromium.launch();
 const ctx = await browser.newContext();
 const page = await ctx.newPage();
@@ -16,32 +22,80 @@ page.on('pageerror', e => errors.push('pageerror: ' + e.message));
 page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('console: ' + m.text()); });
 page.on('dialog', d => d.accept());
 
+/* 1) versión anterior */
 link(BASE);
 await page.goto(URL, { waitUntil: 'load' }); await page.waitForTimeout(1500);
-const antes = await page.evaluate(() => {
-  go('newcareer'); const c = document.getElementById('country'); c.value = 'Argentina'; fillClubs();
-  document.getElementById('clubChoice').value = 'River Plate'; createCareer();
-  for (let i = 0; i < 6; i++) { openMatch(); mcSimEnd(); match.finished = true; }
-  save();
-  return { title: document.title, id: career.id, round: career.round, points: career.points, gf: career.gf, ga: career.ga, squad: career.players.map(p => p.name).join('|'), budget: career.budget, transfers: (career.transferHistory || []).length };
-});
-// cerrar service worker/caché de la versión anterior no aplica (la base no tiene SW)
+const MOTORES = MODO === 'actual' ? ['v1', 'v2', 'v3'] : [null];
+const antes = await page.evaluate(MOTORES => {
+  const out = [];
+  for (const mo of MOTORES) {
+    go('newcareer'); const c = document.getElementById('country'); c.value = 'Argentina'; fillClubs();
+    document.getElementById('clubChoice').value = mo === 'v2' ? 'Boca Juniors' : mo === 'v3' ? 'Racing Club' : 'River Plate';
+    if (mo) window.MC_MOTOR_NUEVAS = mo === 'v1' ? 'v1' : 'v2';
+    createCareer();
+    if (mo === 'v3') { sLoad(); draft.motor = 'v3'; sSave(); }   // así se elegía el v3 en la 12.6.0
+    for (let i = 0; i < 6; i++) { openMatch(); mcSimEnd(); match.finished = true; }
+    save();
+    out.push({ elegido: mo || 'v1 (único)', id: career.id, motor: career.motor || null, v3: career.v3 || null, round: career.round, points: career.points, gf: career.gf, ga: career.ga,
+      squad: career.players.map(p => p.name).join('|'), budget: career.budget, transfers: (career.transferHistory || []).length,
+      crudo: localStorage.getItem('mc_career_v7_' + career.id) });
+  }
+  return { title: document.title, carreras: out, activa: localStorage.getItem('mc_active_v7') };
+}, MOTORES);
+
+/* 2) versión nueva en la misma dirección */
 link(NUEVA);
 await page.reload({ waitUntil: 'load' }); await page.waitForTimeout(2000);
-const despues = await page.evaluate(async () => {
+const boot = await page.evaluate(async () => {
   const snaps = window.MCStore ? await MCStore.listSnapshots() : [];
   const resp = window.MCRespaldo ? await MCRespaldo.ready : null;
-  return { title: document.title, id: career && career.id, round: career && career.round, points: career && career.points, gf: career && career.gf, ga: career && career.ga,
-    squad: career && career.players.map(p => p.name).join('|'), budget: career && career.budget, transfers: career && (career.transferHistory || []).length,
-    snapshot: snaps.map(s => s.reason).filter(r => /Antes de actualizar/.test(r)), respaldo: resp, motor: window.mcMotorDe ? mcMotorDe(career) : 'v1' };
+  return { title: document.title, version: window.MCStore && MCStore.APP_VERSION, snapshot: snaps.map(s => s.reason).filter(r => /Antes de actualizar/.test(r)), respaldo: resp,
+    activa: typeof career !== 'undefined' && career ? career.id : null, motorEnAjustes: typeof OP !== 'undefined' && 'motor' in OP };
 });
-// seguir jugando con la versión nueva
-const sigue = await page.evaluate(() => { const r0 = career.round; openMatch(); mcSimEnd(); match.finished = true; save(); return career.round > r0 || career.round === r0; });
+ok(boot.snapshot.length > 0, 'no se hizo la copia automática "Antes de actualizar"');
+ok(MODO === 'actual' ? ['al-dia', 'copiada'].includes(boot.respaldo) : boot.respaldo === 'copiada', `respaldo: ${boot.respaldo}`);   // la 12.2.2 no tenía respaldo (se copia); la 12.6.0 ya lo tenía (al día, o se copia si no llegó a escribirlo antes de recargar)
+ok(!boot.motorEnAjustes, 'Configuración todavía tiene "Motor de partidos"');
+ok(boot.activa === antes.activa, `la carrera activa cambió (${antes.activa} → ${boot.activa})`);
+
+/* 3) cada carrera: se abre, datos idénticos, pasó al v3 y se sigue jugando */
+const CAMBIAN = new Set(['motor', 'v3', 'motorAnterior', 'schema']);   // lo que cambia la migración de carrera (y su número de formato)
+const despues = [];
+for (const a of antes.carreras) {
+  const d = await page.evaluate(id => {
+    const abre = mcActivate(id, false); if (!abre) return { abre };
+    const c = career, r = { abre, id: c.id, motor: c.motor, v3: c.v3, motorAnterior: c.motorAnterior, schema: c.schema, round: c.round, points: c.points, gf: c.gf, ga: c.ga,
+      squad: c.players.map(p => p.name).join('|'), budget: c.budget, transfers: (c.transferHistory || []).length, enMemoria: JSON.stringify(c) };
+    const r0 = c.round; openMatch(); r.partidoV3 = !!(match && match.v3); r.aviso2 = !!(match && match.events.some(e => /MOTOR v2/.test(e.title)));
+    mcSimEnd(); const m = match, gol = side => m.events.filter(e => e.gol && e.side === side).length;
+    r.termino = m.done; r.marcadorOk = m.h === gol('o') && m.a === gol('r'); m.finished = true; save();
+    r.avanzo = career.round >= r0; r.guardadoV3 = JSON.parse(localStorage.getItem('mc_career_v7_' + id)).v3 === true;
+    return r;
+  }, a.id);
+  const viejo = JSON.parse(a.crudo), nuevo = d.enMemoria ? JSON.parse(d.enMemoria) : {};
+  /* todo dato guardado sigue ahí con el mismo valor (al abrir, el juego puede AGREGAR datos nuevos, no cambiar ni borrar) */
+  const distintos = [], falta = (a, b, ruta) => { if (distintos.length > 20) return;
+    if (a && typeof a === 'object') { if (!b || typeof b !== 'object' || Array.isArray(a) !== Array.isArray(b)) { distintos.push(ruta); return }
+      if (Array.isArray(a) && a.length > b.length) { distintos.push(ruta + ' (más corto)'); return }
+      for (const k of Object.keys(a)) falta(a[k], b[k], ruta + '.' + k); return }
+    if ((ruta === 'world.mv' || ruta === '_guardado') && b >= a) return;   // contadores (cambios del mundo y número de guardado): al abrir una carrera suben solos, también en la 12.6.0
+    if (a !== b) distintos.push(`${ruta} (${JSON.stringify(a)} → ${JSON.stringify(b)})`) };
+  for (const k of Object.keys(viejo)) if (!CAMBIAN.has(k)) falta(viejo[k], nuevo[k], k);
+  const esperado = a.v3 === true && a.motor === 'v2' ? undefined : (a.motor === 'v2' ? 'v2' : 'v1');
+  const tag = `carrera ${a.elegido}`;
+  ok(d.abre, `${tag}: no se abrió`);
+  ok(['id', 'round', 'points', 'gf', 'ga', 'squad', 'budget', 'transfers'].every(k => a[k] === d[k]), `${tag}: datos distintos`);
+  ok(!distintos.length, `${tag}: campos guardados que cambiaron al abrirla: ${distintos.join(', ')}`);
+  ok(d.motor === 'v2' && d.v3 === true, `${tag}: no pasó al v3 (motor ${d.motor}, v3 ${d.v3})`);
+  ok(d.motorAnterior === esperado, `${tag}: motorAnterior ${d.motorAnterior} (se esperaba ${esperado})`);
+  ok(d.partidoV3 && !d.aviso2 && d.termino && d.marcadorOk && d.avanzo && d.guardadoV3, `${tag}: el partido siguiente no se jugó bien con el v3 ${JSON.stringify({ partidoV3: d.partidoV3, termino: d.termino, marcadorOk: d.marcadorOk, guardadoV3: d.guardadoV3 })}`);
+  delete d.enMemoria; despues.push({ elegido: a.elegido, antes: { motor: a.motor, v3: a.v3 }, ...d, squad: d.squad ? d.squad.split('|').length + ' jugadores' : null, camposDistintos: distintos });
+}
 await browser.close();
-const mismos = ['id', 'round', 'points', 'gf', 'ga', 'squad', 'budget', 'transfers'].every(k => antes[k] === despues[k]);
-const ok = mismos && despues.motor === 'v1' && despues.snapshot.length > 0 && despues.respaldo === 'copiada' && sigue && errors.length === 0;
-console.log('ACTUALIZACIÓN', ok ? 'OK' : 'FALLÓ');
-console.log(' antes  ', antes.title, JSON.stringify({ ...antes, squad: antes.squad.split('|').length + ' jugadores' }));
-console.log(' después', despues.title, JSON.stringify({ ...despues, squad: (despues.squad || '').split('|').length + ' jugadores' }));
-console.log(' datos idénticos:', mismos, '· copia automática:', despues.snapshot, '· respaldo:', despues.respaldo, '· errores:', errors);
-process.exit(ok ? 0 : 1);
+ok(!errors.length, `${errors.length} errores de JavaScript`);
+const res = { modo: MODO, ok: !fallas.length, antes: { title: antes.title, carreras: antes.carreras.map(c => ({ ...c, crudo: undefined, squad: c.squad.split('|').length + ' jugadores' })) }, boot, despues, errores: errors, fallas };
+mkdirSync('tests/out', { recursive: true }); writeFileSync(`tests/out/actualizacion-${MODO}.json`, JSON.stringify(res, null, 1));
+console.log(`ACTUALIZACIÓN desde ${antes.title} (${MODO}) → ${boot.title}`, res.ok ? 'OK' : 'FALLÓ');
+for (const d of despues) console.log(`  ${d.elegido}: antes motor=${d.antes.motor} v3=${d.antes.v3} → motor=${d.motor} v3=${d.v3} motorAnterior=${d.motorAnterior} · fecha ${d.round}, ${d.points} pts, ${d.squad} · campos distintos: ${d.camposDistintos.length} · próximo partido v3: ${d.partidoV3 ? 'sí' : 'NO'} (${d.termino ? 'terminó' : 'no terminó'})`);
+console.log('  copia automática:', boot.snapshot, '· respaldo:', boot.respaldo, '· errores:', errors.length);
+errors.slice(0, 10).forEach(e => console.log('ERROR:', e.slice(0, 300))); fallas.forEach(f => console.log('FALLA:', f));
+process.exit(res.ok ? 0 : 1);

@@ -1,8 +1,8 @@
-/* ===== MODO CARRERA 12.5 · PARTIDOS ENTRE CLUBES DE LA IA CON EL MOTOR v2 =====
-   En carreras con motor v2, los partidos de TU liga entre clubes de la IA se juegan con el mismo
-   motor que tus partidos: con la alineación real de cada club (su mejor once 4-3-3 y suplentes),
-   el nivel de su entrenador y la táctica según su estilo. Las demás ligas y copas siguen con el
-   modelo rápido (miles de partidos por temporada en el teléfono). */
+/* ===== MODO CARRERA · PARTIDOS ENTRE CLUBES DE LA IA CON EL MOTOR v2 =====
+   Los partidos de TU liga entre clubes de la IA se juegan con el motor v2: con la alineación real de cada club
+   (su mejor once 4-3-3 y suplentes), el nivel de su entrenador y la táctica según su estilo. Las demás ligas y
+   copas siguen con el modelo rápido de resultados (miles de partidos por temporada en el teléfono).
+   12.7: toda carrera queda con career.motor='v2' (el partido del usuario se juega con el v3). */
 (function(){
 'use strict';
 if(!window.MCMotor)return;

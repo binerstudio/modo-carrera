@@ -9,7 +9,7 @@
       una carrera se guarda una copia automática completa (IndexedDB, se conservan las últimas 15). */
 (function(){
 'use strict';
-const APP_VERSION='12.6.0';
+const APP_VERSION='12.7.0';
 const LS=window.localStorage;
 const K={schema:'mc_schema_version',app:'mc_app_version',players:'mc_players_v1',lastExport:'mc_last_export',lastSnap:'mc_last_snapshot'};
 const DATA_RE=/^(mc_|modo_carrera)/;
@@ -72,8 +72,15 @@ const CAREER_MIGRATIONS=[
   const H={"Portugal": {"Nacional": "CD Nacional"}, "Chile": {"Everton": "Everton de Viña del Mar"}, "Ecuador": {"Universidad Católica": "Universidad Católica (Ecuador)"}, "Colombia": {"Alianza FC": "Alianza FC (Colombia)"}, "Panamá": {"Alianza FC": "Alianza FC (Panamá)"}, "El Salvador": {"CD Platense": "Platense Zacatecoluca"}, "Bahamas": {"Dynamos FC": "Dynamos FC (Bahamas)", "United FC": "United FC (Bahamas)"}, "Trinidad y Tobago": {"Police FC": "Police FC (Trinidad y Tobago)"}, "Omán": {"Al-Nasr SC": "Al-Nasr (Omán)", "Al-Shabab SC": "Al-Shabab (Omán)"}}[c.country];if(H){const R2=H;const w2=o=>{if(Array.isArray(o)){for(let i=0;i<o.length;i++){const v=o[i];if(typeof v==='string'){if(R2[v])o[i]=R2[v]}else if(v&&typeof v==='object')w2(v)}return}
     for(const k of Object.keys(o)){const v=o[k];if(typeof v==='string'){if(R2[v])o[k]=R2[v]}else if(v&&typeof v==='object')w2(v)}};
    if(R2[c.club])c.club=R2[c.club];if(c.league&&typeof c.league==='object')w2(c.league);}
+ }},
+ {v:3,run(c){/* 12.7 (limpieza de motores): el motor v1 y la opción "Motor de partidos" ya no existen.
+   El partido del usuario se juega siempre con el v3 (por dentro motor='v2' y v3=true: el v2 simula el resto de la fecha).
+   No se borra nada: el motor que tenía la carrera queda anotado en motorAnterior. */
+  const antes=c.motor==='v2'?(c.v3===true?'v3':'v2'):'v1';
+  if(antes!=='v3'&&c.motorAnterior==null)c.motorAnterior=antes;
+  c.motor='v2';c.v3=true;
  }}
- /* Próximas versiones: {v:3,run(c){...}} */
+ /* Próximas versiones: {v:4,run(c){...}} */
 ];
 const CAREER_SCHEMA=CAREER_MIGRATIONS[CAREER_MIGRATIONS.length-1].v;
 function migrateCareer(c){

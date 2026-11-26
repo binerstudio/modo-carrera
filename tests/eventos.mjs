@@ -1,15 +1,18 @@
-/* MODO CARRERA · auditoría de eventos del motor v2 (12.7)
-   Juega N partidos y controla en cada uno:
+/* MODO CARRERA · auditoría de eventos de los partidos del usuario
+   12.7: el partido del usuario se juega con el v3; el v2 queda de reserva (si el v3 no se puede armar).
+   - Primero N3 partidos con el v3: identificadores, minutos, goles del relato = marcador y goleadores del equipo correcto.
+   - Después N partidos con el v2 (se fuerza que el v3 no se pueda armar: es el camino real de reserva, con su aviso),
+     con la auditoría completa de las jugadas escritas del v2. En cada uno se controla:
    - identificadores únicos y crecientes; minutos que no retroceden dentro de cada tiempo;
    - goles del relato = marcador; atajadas del relato = atajadas de la estadística;
    - cada remate/gol/atajada/gol anulado trae la jugada escrita y su resultado coincide con el evento;
    - la cadena de la jugada es continua (cada pase sale de quien tenía la pelota);
    - los protagonistas son del equipo correcto y no actúan después de ser expulsados o reemplazados;
    - la posesión de cada minuto usa jugadores del equipo que la tiene.
-   Uso: node tests/eventos.mjs <url> [partidos]                                                  */
+   Uso: node tests/eventos.mjs <url> [partidos v2] [partidos v3]                                                  */
 import { chromium } from 'playwright';
 import { mkdirSync, writeFileSync } from 'node:fs';
-const URL = process.argv[2] || 'http://localhost:8080/index.html', N = +(process.argv[3] || 30);
+const URL = process.argv[2] || 'http://localhost:8080/index.html', N = +(process.argv[3] || 30), N3 = +(process.argv[4] || 10);
 const errors = [];
 const browser = await chromium.launch();
 const page = await (await browser.newContext()).newPage();
@@ -19,23 +22,32 @@ page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/
 page.on('dialog', d => d.accept());
 await page.route(u => !u.href.startsWith(new globalThis.URL(URL).origin), r => r.abort());
 await page.goto(URL, { waitUntil: 'load' }); await page.waitForTimeout(1200);
-const res = await page.evaluate(N => {
+const res = await page.evaluate(([N, N3]) => {
   go('newcareer'); const c = document.getElementById('country'); c.value = 'Argentina'; fillClubs(); document.getElementById('clubChoice').value = 'River Plate';
-  window.MC_MOTOR_NUEVAS = 'v2'; createCareer();
-  const P = {}, add = (k, d) => { (P[k] = P[k] || []).push(d) }; let jug = 0, acciones = 0, remates = 0;
+  createCareer();
+  const P = {}, add = (k, d) => { (P[k] = P[k] || []).push(d) }; let jug = 0, jugV3 = 0, acciones = 0, remates = 0;
   const RES = { 'GOL': ['gol'], 'ATAJADA': ['atajada'], 'OCASI': ['afuera', 'palo'], 'ANULADO': ['anulado'] };
-  for (let n = 0; n < N; n++) {
-    if (mcSeasonOver()) break;
-    openMatch(); if (!match) break; const m = match;
+  const enVivo = MCMotorV3.enVivo, sinV3 = () => { throw new Error('prueba: auditoría del motor v2 (reserva)'); };
+  for (let n = 0; n < N + N3; n++) {
+    if (mcSeasonOver()) mcNewSeason();   // si la temporada se termina, se sigue en la próxima
+    const conV3 = n < N3; MCMotorV3.enVivo = conV3 ? enVivo : sinV3;
+    openMatch(); MCMotorV3.enVivo = enVivo; if (!match) break; const m = match;
     const ownNames = new Set(career.players.map(p => p.name)), rivNames = new Set((m.riv || []).concat(m.rivBench || []).map(e => e.name));
-    mcSimEnd(); jug++;
-    const E = m.events, tag = `${m.home}-${m.away}`;
+    mcSimEnd(); if (conV3) jugV3++; else jug++;
+    const E = m.events, tag = `${conV3 ? 'v3' : 'v2'} ${m.home}-${m.away}`;
+    if (conV3 !== !!m.v3) add('motor', `${tag}: se esperaba ${conV3 ? 'v3' : 'v2'}`);
+    if (!conV3 && !E.some(e => /MOTOR v2/.test(e.title))) add('aviso', `${tag}: sin el aviso de que se jugó con el v2`);
     /* ids y minutos */
     const ids = E.map(e => e.id); if (new Set(ids).size !== ids.length || ids.some((v, i) => i && v <= ids[i - 1])) add('ids', tag);
     let half = 1, last = -1; E.forEach(e => { if (/COMIENZA EL 2/.test(e.title)) { half = 2; last = 45 } if (e.min < last) add('minutos', `${tag} ${e.title} ${e.min}<${last}`); last = Math.max(last, e.min) });
     /* goles y atajadas */
     const go = E.filter(e => /GOL (LOCAL|VISITANTE)/.test(e.title)), gO = go.filter(e => e.side !== 'r').length, gR = go.filter(e => e.side === 'r').length;
     if (gO !== m.h || gR !== m.a) add('marcador', `${tag} relato ${gO}-${gR} vs ${m.h}-${m.a}`);
+    if (conV3) {   /* v3: goleadores del equipo correcto (los goles en contra son del rival) */
+      go.forEach(e => { const a = e.gol && e.gol.autor; if (!a) { add('sinAutor', `${tag} ${e.msg.slice(0, 60)}`); return }
+        if (/\(en contra\)$/.test(a)) return; const L = e.side === 'r' ? rivNames : ownNames; if (!L.has(a)) add('equipo', `${tag} gol de ${a}`) });
+      match.finished = true; continue;
+    }
     const sav = E.filter(e => e.title === 'ATAJADA').length + E.filter(e => /PENAL FALLADO/.test(e.title) && /ataja/i.test(e.msg)).length;
     if (sav !== (m.savesH || 0) + (m.savesA || 0)) add('atajadas', `${tag} relato ${sav} vs estadística ${(m.savesH || 0) + (m.savesA || 0)}`);
     /* jugadas escritas */
@@ -68,12 +80,13 @@ const res = await page.evaluate(N => {
     match.finished = true;
   }
   const res = {}; for (const k in P) res[k] = { n: P[k].length, ej: P[k].slice(0, 4) };
-  return { partidos: jug, remates, accionesPorJugada: +(acciones / Math.max(1, remates)).toFixed(2), problemas: res };
-}, N);
+  return { partidos: jug, partidosV3: jugV3, remates, accionesPorJugada: +(acciones / Math.max(1, remates)).toFixed(2), problemas: res };
+}, [N, N3]);
 await browser.close();
 const fallas = Object.entries(res.problemas).map(([k, v]) => `${k}: ${v.n} (${v.ej.join(' | ')})`);
 if (errors.length) fallas.push(`${errors.length} errores de JavaScript: ${errors.slice(0, 3).join(' | ')}`);
 mkdirSync('tests/out', { recursive: true }); writeFileSync('tests/out/eventos.json', JSON.stringify({ ...res, errores: errors, fallas }, null, 1));
-console.log(`AUDITORÍA DE EVENTOS · ${fallas.length ? 'FALLÓ' : 'OK'} · ${res.partidos} partidos · ${res.remates} jugadas escritas · ${res.accionesPorJugada} acciones por jugada`);
+if (res.partidosV3 < N3 || res.partidos < N) fallas.push(`se jugaron ${res.partidosV3} partidos con el v3 y ${res.partidos} con el v2 (se pedían ${N3} y ${N})`);
+console.log(`AUDITORÍA DE EVENTOS · ${fallas.length ? 'FALLÓ' : 'OK'} · ${res.partidosV3} partidos con el v3 · ${res.partidos} con el v2 (reserva) · ${res.remates} jugadas escritas · ${res.accionesPorJugada} acciones por jugada`);
 fallas.forEach(f => console.log('FALLA:', f.slice(0, 600)));
 process.exit(fallas.length ? 1 : 0);

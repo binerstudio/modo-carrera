@@ -1,6 +1,8 @@
 name: Pruebas de regresión
-# En cada push corren solo las pruebas livianas (~20 min). Las pesadas (1000 partidos, calibración de 3000+3600,
-# partido completo de 15 min) se corren a mano: Actions → "Pruebas de regresión" → Run workflow.
+# En cada push corren solo las pruebas livianas: motor v3, v3 en el juego, marcador, temporadas, auditoría de eventos y
+# actualización desde la 12.2.2 y desde la 12.6.0. Las pesadas (motores con 1000 partidos, regresión con semilla fija,
+# v3.html, cómo se ve el partido en el 2D, pantalla completa, partido de 15 min y calibración) se corren a mano:
+# Actions → "Pruebas de regresión" → Run workflow.
 on:
   push:
   workflow_dispatch:
@@ -10,10 +12,14 @@ jobs:
     permissions:
       contents: write
     timeout-minutes: 60
+    env:
+      A_MANO: ${{ github.event_name == 'workflow_dispatch' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with: { ref: ae7fc5f089be687cc4aba9797a7064f49fe42927, path: _base }  # 12.2.2: la versión que tenían los usuarios
+      - uses: actions/checkout@v4
+        with: { ref: 8e3c5db5fccf6b0ab259125489cfbdef5717ee1c, path: _actual }  # 12.6.0: la publicada antes de la limpieza de motores (v1, v2 y v3 a elección)
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - run: npm install --no-save playwright@1.48.2 && npx playwright install --with-deps chromium
@@ -23,33 +29,40 @@ jobs:
           mkdir -p /tmp/srvroot && ln -sfn "$PWD/_base" /tmp/srvroot/app
           (cd /tmp/srvroot && python3 -m http.server 8081 >/dev/null 2>&1 &)
           sleep 2
-      - name: Motor v2 · validación masiva (1000 partidos a mano; 300 en cada push)
-        run: node tests/motor.mjs ${{ github.event_name == 'workflow_dispatch' && 1000 || 300 }}
-      - name: Motor v3 · etapas 1-6 (1000 partidos a mano; 300 en cada push · fuerza, local, en vivo, sin saltos, festejos, cierre, arquero, táctica, reglas)
-        run: node tests/motor-v3.mjs ${{ github.event_name == 'workflow_dispatch' && 1000 || 300 }}
-      - name: Jugar temporadas con semilla fija
-        run: node tests/regresion.mjs http://localhost:8080/index.html ${{ github.ref_name }}
-      - name: Auditoría de eventos del motor v2 (30 partidos)
-        run: node tests/eventos.mjs http://localhost:8080/index.html 30
-      - name: Simulador 2D en vivo (capturas en el artefacto)
-        run: node tests/partido2d.mjs http://localhost:8080/index.html
-      - name: Página de prueba visual del motor v3 (v3.html, pelota parada, capturas)
-        run: node tests/v3html.mjs http://localhost:8080/v3.html
-      - name: Motor v3 en el juego (Ajustes, partido en vivo, cambios, fechas, guardado, vuelta a v2)
+      # ---------- livianas (en cada push) ----------
+      - name: Motor v3 · etapas 1-6 (300 partidos; 1000 a mano · fuerza, local, en vivo, sin saltos, festejos, cierre, arquero, táctica, reglas)
+        run: node tests/motor-v3.mjs ${{ env.A_MANO == 'true' && 1000 || 300 }}
+      - name: Motor v3 en el juego (siempre v3, partido en vivo, cambios, fechas, guardado; si el v3 no se arma, v2 con aviso)
         run: node tests/v3juego.mjs http://localhost:8080/index.html
-      - name: 2D del motor v3 · menú (partido completo 3 min a x1, mejores jugadas, simular), cinta real, 0 saltos, cortes, cierre, capturas
-        run: node tests/v3tv.mjs http://localhost:8080/index.html
-      - name: Motor v3 en el juego · un solo marcador (encabezado, gráfica de TV, eventos), local del mismo lado y reloj que espera al 2D (liga local/visitante, copa, neutral)
+      - name: Un solo marcador (encabezado, gráfica de TV, eventos), local del mismo lado y reloj que espera al 2D (liga local/visitante, copa, neutral)
         run: node tests/v3marcador.mjs http://localhost:8080/index.html
-      - name: 2D del motor v3 · pantalla completa en iPhone (vertical girada a horizontal, horizontal, sin franjas)
+      - name: Tres temporadas sin intervención (v3, IA y mercado)
+        run: node tests/temporadas.mjs http://localhost:8080/index.html 3
+      - name: Auditoría de eventos (10 partidos con el v3 y 30 con el v2 de reserva)
+        run: node tests/eventos.mjs http://localhost:8080/index.html 30 10
+      - name: Carrera guardada con la 12.2.2 se abre con esta versión y pasa al v3
+        run: node tests/actualizacion.mjs http://localhost:8081/app/index.html /tmp/srvroot/app "$PWD/_base" "$PWD" 12.2.2
+      - name: Carreras guardadas con la 12.6.0 (v1, v2 y v3) se abren con esta versión y pasan al v3
+        run: node tests/actualizacion.mjs http://localhost:8081/app/index.html /tmp/srvroot/app "$PWD/_actual" "$PWD" actual
+      # ---------- pesadas (solo a mano) ----------
+      - name: Motor v2 · validación masiva (1000 partidos; solo a mano)
+        if: env.A_MANO == 'true'
+        run: node tests/motor.mjs 1000
+      - name: Jugar temporadas con semilla fija, guardado, app instalable y almacenamiento lleno (solo a mano)
+        if: env.A_MANO == 'true'
+        run: node tests/regresion.mjs http://localhost:8080/index.html ${{ github.ref_name }}
+      - name: Página de prueba visual del motor v3 (v3.html, pelota parada, capturas; solo a mano)
+        if: env.A_MANO == 'true'
+        run: node tests/v3html.mjs http://localhost:8080/v3.html
+      - name: 2D del motor v3 · menú (partido completo 3 min a x1, mejores jugadas, simular), cinta real, 0 saltos, cortes, cierre, capturas (solo a mano)
+        if: env.A_MANO == 'true'
+        run: node tests/v3tv.mjs http://localhost:8080/index.html
+      - name: 2D del motor v3 · pantalla completa en iPhone (vertical girada a horizontal, horizontal, sin franjas; solo a mano)
+        if: env.A_MANO == 'true'
         run: node tests/v3pantalla.mjs http://localhost:8080/index.html
       - name: 2D del motor v3 · partido completo de 15 minutos (solo a mano; se mide a x4)
-        if: github.event_name == 'workflow_dispatch'
+        if: env.A_MANO == 'true'
         run: node tests/v3tv.mjs http://localhost:8080/index.html largo
-      - name: Tres temporadas sin intervención (IA y mercado)
-        run: node tests/temporadas.mjs http://localhost:8080/index.html 3
-      - name: Carrera guardada con la 12.2.2 se abre con esta versión
-        run: node tests/actualizacion.mjs http://localhost:8081/app/index.html /tmp/srvroot/app "$PWD/_base" "$PWD"
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: resultados, path: tests/out/ }

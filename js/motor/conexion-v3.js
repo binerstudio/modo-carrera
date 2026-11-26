@@ -1,19 +1,18 @@
-/* ===== MODO CARRERA · CONEXIÓN DEL MOTOR v3 CON EL JUEGO (etapa 5) =====
-   - Opcional: Configuración → General → Motor de partidos → "Simulado en cancha (v3)".
-   - Solo el partido del usuario se juega con el v3; el resto de la fecha y todo lo demás sigue igual que con el v2
-     (por eso la carrera queda internamente en v2 y se marca career.v3 = true).
-   - El partido avanza de a un minuto, en la cancha (MCMotorV3.enVivo), al ritmo del reloj del juego: los cambios y la
-     táctica que elige el usuario durante el partido entran en la cancha al instante.
+/* ===== MODO CARRERA · CONEXIÓN DEL MOTOR v3 CON EL JUEGO =====
+   - 12.7: el partido del usuario se juega SIEMPRE con el v3 (ya no se elige en Configuración). El resto de la fecha
+     sigue con el v2 (por eso la carrera queda internamente en motor='v2' con career.v3 = true).
+   - Si un partido no se puede armar en la cancha, se juega con el v2 y se avisa (evento "⚠ MOTOR v2" y un aviso).
+   - El partido avanza de a un minuto, en la cancha (MCMotorV3.enVivo), al ritmo del 2D: los cambios y la táctica que
+     elige el usuario durante el partido entran en la cancha al instante.
    - Lo que pasa en la cancha se traduce a lo que ya usa la pantalla del partido: marcador, relato (goles con su tipo,
      atajadas, tarjetas, lesiones, penales, offsides), estadísticas, jugadores y valoraciones. Las sanciones, lesiones
-     y el estado físico después del partido los sigue calculando el juego como siempre.
-   - No toca el motor v1, el v2 ni su conexión, ni las partidas guardadas (career.v3 es un dato nuevo y opcional). */
+     y el estado físico después del partido los sigue calculando el juego como siempre. */
 (function(){
 'use strict';
 if(!window.MCMotor||!window.MCMotorV3||!window.MCAtributos)return;
 const V3=window.MCMotorV3;
 const ESTADO=new WeakMap();          // match → estado del partido v3 (no se guarda: vive mientras dura el partido)
-const esV3=c=>!!(c&&c.v3&&c.motor==='v2');
+const esV3=c=>!!c;   // 12.7: toda carrera juega el partido del usuario con el v3
 window.mcEsV3=esV3;
 
 /* ---------- armado de los equipos para la cancha ---------- */
@@ -40,7 +39,7 @@ function preparar(m){
 const oMatch=window.createMatch;
 if(typeof oMatch==='function')window.createMatch=function(){
  const r=oMatch.apply(this,arguments);
- try{if(typeof career!=='undefined'&&esV3(career)&&match&&match.v2){preparar(match);
+ try{if(typeof career!=='undefined'&&esV3(career)&&match){if(!match.v2)throw new Error('el partido no tiene el contexto del v2');preparar(match);
   if(window.mcMatchEv)mcMatchEv(match,'🏟 MOTOR v3','Este partido se juega simulado en la cancha: 22 jugadores y la pelota, minuto a minuto.',false,'')}
  }catch(e){console.warn('MC motor v3',e);if(match){delete match.v3;ESTADO.delete(match)}
   /* que se sepa: este partido se juega con el v2 */
@@ -110,7 +109,7 @@ function minuto(m,API,S){
  S.hist.push({t:V.t(),minute:m.minute,lbl:m.lbl,st:{shotsH:m.shotsH,shotsA:m.shotsA,onH:m.onH,onA:m.onA,cornersH:m.cornersH,cornersA:m.cornersA,foulsH:m.foulsH,foulsA:m.foulsA,offH:m.offH,offA:m.offA,xgH:m.xgH,xgA:m.xgA,savesH:m.savesH,savesA:m.savesA,pos:m.pos}});
  /* minutos jugados */
  for(const side of ['o','r'])for(const e of listaDe(m,side)){const st=API.ps(m,e,side);if(st)st.on++}
- /* cambios planeados del rival y automáticos propios (igual que en v1/v2) */
+ /* cambios planeados del rival y automáticos propios (igual que en el v2) */
  if(half===2&&!fin){
   if(m.rivSubPlan&&m.rivSubPlan.length&&c.base>=m.rivSubPlan[0]){m.rivSubPlan.shift();API.subR(m)}
   if(m.autoSubs&&m.ownAutoDone<3&&c.base>=m.ownAutoPlan[m.ownAutoDone]){m.ownAutoDone++;API.subO(m)}
@@ -213,20 +212,4 @@ window.MCV3TV={de:m=>{const S=m&&m.v3?ESTADO.get(m):null;return S?S.tv:null},
  /* el menú elige "Mejores jugadas" antes de simular: desde ahí se guardan los recortes */
  mejores:(m,tipos)=>{const S=m&&m.v3?ESTADO.get(m):null;if(!S)return false;prepararClips(S,tipos);return true}};
 
-/* ---------- Configuración: agregar el v3 a "Motor de partidos" ---------- */
-try{
- if(typeof OP!=='undefined'&&Array.isArray(OP.motor)&&!OP.motor.some(x=>x[0]==='v3')){
-  OP.motor.push(['v3','En cancha (v3)']);
-  const oLoad=window.sLoad,oSave=window.sSave;
-  if(typeof oLoad==='function')window.sLoad=function(){const r=oLoad.apply(this,arguments);try{if(typeof career!=='undefined'&&esV3(career))draft.motor='v3'}catch(e){}return r};
-  if(typeof oSave==='function')window.sSave=function(){
-   const want=(typeof draft!=='undefined'&&draft)?draft.motor:null,antes=typeof career!=='undefined'&&esV3(career);
-   if(want==='v3')draft.motor='v2';             // por dentro la carrera sigue en v2 (el resto de la fecha no cambia)
-   const r=oSave.apply(this,arguments);
-   try{if(typeof career!=='undefined'&&career&&want){const ahora=want==='v3';if(ahora!==antes){career.v3=ahora;save();
-     if(ahora&&window.xToast)xToast('Motor v3 (simulado en cancha) activado desde el próximo partido')}}
-    if(want==='v3')draft.motor='v3'}catch(e){}
-   return r};
- }
-}catch(e){console.warn('MC motor v3 ajustes',e)}
 })();

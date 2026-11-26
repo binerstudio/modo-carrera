@@ -1,5 +1,6 @@
 /* MODO CARRERA · temporadas completas sin intervención del usuario (Etapa 3)
-   Crea una carrera con motor v2 + IA v2 y juega N temporadas seguidas sin tocar nada.
+   Crea una carrera (12.7: partido del usuario con el v3, el resto de la fecha con el v2) + IA v2 y juega N temporadas
+   seguidas sin tocar nada.
    Después de cada mercado verifica: economía sin valores absurdos, planteles con mínimos por puesto,
    ningún jugador en dos clubes, préstamos que vuelven, partidos de la IA con resultados normales,
    el plantel del usuario intacto y 0 errores de JavaScript.
@@ -20,19 +21,19 @@ await page.goto(URL, { waitUntil: 'load' }); await page.waitForTimeout(1500);
 const creada = await page.evaluate(({ PAIS, CLUB }) => {
   go('newcareer'); const c = document.getElementById('country'); if (![...c.options].some(o => o.value === PAIS)) c.add(new Option(PAIS, PAIS)); c.value = PAIS; fillClubs();
   document.getElementById('clubChoice').value = CLUB; document.getElementById('manager').value = 'Prueba IA';
-  window.MC_MOTOR_NUEVAS = 'v2'; window.MC_IA_NUEVAS = 'v2'; createCareer();
-  return { club: career.club, motor: career.motor, ia: career.ia, plantel: career.players.map(p => p.name).sort().join('|') };
+  window.MC_IA_NUEVAS = 'v2'; createCareer();
+  return { club: career.club, motor: career.motor, v3: career.v3, ia: career.ia, plantel: career.players.map(p => p.name).sort().join('|') };
 }, { PAIS, CLUB });
 const temporadas = [];
 for (let t = 0; t < N; t++) {
   const t0 = Date.now();
   const jugada = await page.evaluate(() => {
-    let g = 0, goles = 0, gEv = 0, gEvOk = 0; const s = career.season;
-    while (!mcSeasonOver() && g++ < 140) { openMatch(); if (!match) break; mcSimEnd(); goles += match.h + match.a;
+    let g = 0, goles = 0, gEv = 0, gEvOk = 0, v3 = 0; const s = career.season;
+    while (!mcSeasonOver() && g++ < 140) { openMatch(); if (!match) break; if (match.v3) v3++; mcSimEnd(); goles += match.h + match.a;
       match.events.filter(e => /GOL (LOCAL|VISITANTE)/.test(e.title)).forEach(e => { gEv++; if (e.gol && e.gol.autor) gEvOk++; }); match.finished = true; }
     const L = career.league, all = []; (L ? L.rounds : []).forEach(d => d.forEach(f => { if (f[2] != null) all.push(f) }));
     const gl = all.reduce((a, f) => a + f[2] + f[3], 0);
-    return { season: s, partidosUsuario: g, golesLiga: +(gl / Math.max(1, all.length)).toFixed(2), partidosLiga: all.length, goleadas5: all.filter(f => Math.abs(f[2] - f[3]) >= 5).length, golesConDetalle: `${gEvOk}/${gEv}` };
+    return { season: s, partidosUsuario: g, golesLiga: +(gl / Math.max(1, all.length)).toFixed(2), partidosLiga: all.length, goleadas5: all.filter(f => Math.abs(f[2] - f[3]) >= 5).length, golesConDetalle: `${gEvOk}/${gEv}`, partidosV3: v3 };
   });
   const before = await page.evaluate(() => career.players.map(p => p.name).sort().join('|'));
   await page.evaluate(() => mcNewSeason());
@@ -62,6 +63,7 @@ await browser.close();
 const fallas = [];
 temporadas.forEach((t, i) => {
   if (t.ia !== 'v2') fallas.push(`T${i + 1}: no se usó el mercado v2`);
+  if (t.partidosV3 !== t.partidosUsuario) fallas.push(`T${i + 1}: ${t.partidosV3} de ${t.partidosUsuario} partidos del usuario con el v3`);
   if (!(t.movimientos > 20)) fallas.push(`T${i + 1}: muy pocos movimientos (${t.movimientos})`);
   if ((t.tipos['préstamo'] || 0) > 150) fallas.push(`T${i + 1}: demasiados préstamos (${t.tipos['préstamo']})`);
   if (t.tamanoKB > 1100) fallas.push(`T${i + 1}: la partida pesa demasiado (${t.tamanoKB} KB)`);
@@ -75,12 +77,12 @@ temporadas.forEach((t, i) => {
   if (!t.plantelUsuarioIntacto) fallas.push(`T${i + 1}: la IA tocó el plantel del usuario`);
   const [ok, tot] = t.golesConDetalle.split('/').map(Number); if (tot && ok !== tot) fallas.push(`T${i + 1}: goles sin autor/asistencia en el relato (${t.golesConDetalle})`);
 });
-if (creada.motor !== 'v2' || creada.ia !== 'v2') fallas.push('La carrera no se creó con motor v2 + IA v2');
+if (creada.motor !== 'v2' || creada.v3 !== true || creada.ia !== 'v2') fallas.push('La carrera no se creó con v3 (motor v2 por dentro) + IA v2');
 if (errors.length) fallas.push(`${errors.length} errores de JavaScript`);
-const out = { creada: { club: creada.club, motor: creada.motor, ia: creada.ia }, temporadas, errores: errors.slice(0, 20), fallas, ok: !fallas.length };
+const out = { creada: { club: creada.club, motor: creada.motor, v3: creada.v3, ia: creada.ia }, temporadas, errores: errors.slice(0, 20), fallas, ok: !fallas.length };
 mkdirSync('tests/out', { recursive: true }); writeFileSync('tests/out/temporadas.json', JSON.stringify(out, null, 1));
-console.log(`TEMPORADAS SIN INTERVENCIÓN · ${out.ok ? 'OK' : 'FALLÓ'} · ${creada.club} · motor ${creada.motor} · IA ${creada.ia}`);
-temporadas.forEach((t, i) => console.log(`T${i + 1} (${t.season}): ${t.partidosUsuario} partidos, liga ${t.golesLiga} goles/p (${t.partidosLiga} partidos, goleadas5 ${t.goleadas5}), goles con detalle ${t.golesConDetalle} | mercado: ${t.movimientos} ${JSON.stringify(t.tipos)} ${t.dinero}M | eco ${JSON.stringify(t.eco)} | préstamos activos ${t.prestamosActivos} | mín plantel ${t.plantelMin} POR ${t.arquerosMin} DEF ${t.defMin} MED ${t.medMin} DEL ${t.delMin} | en dos clubes ${t.enDosCount} | usuario intacto ${t.plantelUsuarioIntacto} (salieron por retiro/préstamo: ${t.salieronDelPlantel.length}) | ${t.tamanoKB} KB | ${t.ms} ms\n   ej: ${t.ejemplos.join(' · ')}`));
+console.log(`TEMPORADAS SIN INTERVENCIÓN · ${out.ok ? 'OK' : 'FALLÓ'} · ${creada.club} · partido del usuario con el v3 (${creada.v3 ? 'sí' : 'NO'}) · resto de la fecha con el ${creada.motor} · IA ${creada.ia}`);
+temporadas.forEach((t, i) => console.log(`T${i + 1} (${t.season}): ${t.partidosUsuario} partidos, liga ${t.golesLiga} goles/p (${t.partidosLiga} partidos, goleadas5 ${t.goleadas5}), goles con detalle ${t.golesConDetalle} | con el v3 ${t.partidosV3}/${t.partidosUsuario} | mercado: ${t.movimientos} ${JSON.stringify(t.tipos)} ${t.dinero}M | eco ${JSON.stringify(t.eco)} | préstamos activos ${t.prestamosActivos} | mín plantel ${t.plantelMin} POR ${t.arquerosMin} DEF ${t.defMin} MED ${t.medMin} DEL ${t.delMin} | en dos clubes ${t.enDosCount} | usuario intacto ${t.plantelUsuarioIntacto} (salieron por retiro/préstamo: ${t.salieronDelPlantel.length}) | ${t.tamanoKB} KB | ${t.ms} ms\n   ej: ${t.ejemplos.join(' · ')}`));
 errors.slice(0, 10).forEach(e => console.log('  ', e.slice(0, 300)));
 fallas.forEach(f => console.log('FALLA:', f));
 process.exit(out.ok ? 0 : 1);

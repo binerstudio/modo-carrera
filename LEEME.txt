@@ -1,3 +1,13 @@
+MODO CARRERA 12.7.0 · LIMPIEZA DE MOTORES (todo lo demás se conserva)
+=====================================================================
+Detalle: INFORME_LIMPIEZA_MOTORES.md
+- Tu partido se juega SIEMPRE con el motor v3 (en cancha). Se sacó "Motor de partidos" de Configuración.
+- Se borró el motor v1 (clásico) y su prueba de huella. El 2D solo dibuja la cinta del v3.
+- El v2 queda por dentro: simula los partidos de la IA de tu liga y es la reserva si un partido tuyo no se puede
+  armar en la cancha (se juega con el v2 y aparece el aviso "⚠ MOTOR v2"). No aparece en ningún lado de la interfaz.
+- Las carreras guardadas con v1 o v2 pasan solas al v3 al abrirlas, sin perder datos (copia automática
+  "Antes de actualizar a la versión 12.7.0").
+
 MODO CARRERA 12.6.0 · SIMULADOR 2D ANIMADO (todo lo anterior se conserva)
 =======================================================================
 Detalle: INFORME_SIMULADOR_2D.md
