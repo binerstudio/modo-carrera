@@ -176,7 +176,7 @@ Las pruebas pesadas no se corrieron: quedan para correr a mano.
 - El armado del once de la IA (`js/ia/estado-ia.js`, Etapa 4) no se tocó en esta etapa.
 - Su regla de "nunca menos de 11" completa con el lesionado de baja más corta cuando no alcanzan los sanos. Si la Etapa 5 achicara de más algún plantel, eso podría pasar más seguido.
 - Le agregué a la prueba el detalle del caso (club, jugador, fechas de baja y sanos en el plantel) para que, si vuelve a pasar en el CI, quede escrito por qué.
-- Comparación con la Etapa 4 sin mis cambios: RESULTADO_E4.
+- Comparación con la Etapa 4 sin mis cambios: 2 corridas, 0 lesionados en el once. Con tan pocas corridas no se puede afirmar que la falla venga de antes ni que la cause esta etapa. Queda abierta: si el CI la vuelve a mostrar, el detalle dice qué club fue.
 
 **Corregido durante las pruebas:** en `mercado-ia.js` le había puesto a una función nueva el nombre `mcIAPlantel`, que ya existía en `estado-ia.js`. Como `estado-ia.js` carga después, los partidos seguían usando la de la Etapa 4 y no se afectaron. La mía pasó a llamarse `mcIAPlantelMercado`.
 
