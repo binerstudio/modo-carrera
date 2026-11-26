@@ -1,0 +1,46 @@
+{
+ "ok": true,
+ "base": 51893,
+ "porPosicion": {
+  "POR": 6265,
+  "DEF": 17223,
+  "MED": 15732,
+  "DEL": 12673
+ },
+ "fichasArmadas": 51893,
+ "sinEstilo": 13773,
+ "estilos": {
+  "Reflejos": 2619,
+  "Quite limpio": 7085,
+  "Juego aéreo": 6152,
+  "Inteligencia táctica": 1214,
+  "Lector del juego": 2658,
+  "Pulmón": 2956,
+  "Primer control": 4740,
+  "Pase preciso": 5027,
+  "Visionario": 3207,
+  "Centrador": 2648,
+  "Veloz": 6464,
+  "Explosivo": 6482,
+  "Pase largo": 2225,
+  "Gambeta": 5790,
+  "Definidor": 8627,
+  "Fuerte": 2327,
+  "Cañonero": 2989,
+  "Arquero con pies": 394,
+  "Estirada larga": 887,
+  "Marcador": 6708,
+  "Bien ubicado": 468,
+  "Manos seguras": 198
+ },
+ "plantelPropio": 25,
+ "otrosClubes": "407/407",
+ "clubes": "60/60",
+ "presupuesto": {
+  "min": 0,
+  "mediana": 4.18,
+  "max": 67.01
+ },
+ "errores": [],
+ "fallas": []
+}

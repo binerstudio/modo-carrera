@@ -1,0 +1,72 @@
+{
+ "modo": "12.2.2",
+ "ok": true,
+ "antes": {
+  "title": "MODO CARRERA 12.2",
+  "carreras": [
+   {
+    "elegido": "v1 (único)",
+    "id": "cmwxxktnk0a9u",
+    "motor": null,
+    "v3": null,
+    "round": 4,
+    "points": 7,
+    "gf": 7,
+    "ga": 6,
+    "squad": "25 jugadores",
+    "budget": 74,
+    "transfers": 0
+   }
+  ]
+ },
+ "boot": {
+  "title": "MODO CARRERA 12.10",
+  "version": "12.10.0",
+  "snapshot": [
+   "Antes de actualizar a la versión 12.10.0 (venía de 12.2)"
+  ],
+  "respaldo": "copiada",
+  "activa": "cmwxxktnk0a9u",
+  "motorEnAjustes": false
+ },
+ "despues": [
+  {
+   "elegido": "v1 (único)",
+   "antes": {
+    "motor": null,
+    "v3": null
+   },
+   "abre": true,
+   "id": "cmwxxktnk0a9u",
+   "motor": "v2",
+   "v3": true,
+   "motorAnterior": "v1",
+   "schema": 3,
+   "round": 4,
+   "points": 7,
+   "gf": 7,
+   "ga": 6,
+   "squad": "25 jugadores",
+   "budget": 74,
+   "transfers": 0,
+   "rotacion": false,
+   "fijos": 0,
+   "fichaAtributos": 30,
+   "fichaEstimado": true,
+   "fichaClub": true,
+   "partidoV3": true,
+   "aviso2": false,
+   "termino": true,
+   "marcadorOk": true,
+   "avanzo": true,
+   "guardadoV3": true,
+   "e5AlAbrir": false,
+   "panelE5": true,
+   "fichajeE5": "firmado",
+   "firmo": true,
+   "camposDistintos": []
+  }
+ ],
+ "errores": [],
+ "fallas": []
+}

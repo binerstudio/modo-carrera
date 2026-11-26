@@ -1,0 +1,1238 @@
+{
+ "N": 300,
+ "version": "3.0.0-e6",
+ "fallas": [],
+ "errores": [],
+ "tiempo": {
+  "promedioMs": 566.89,
+  "medianaMs": 567.91,
+  "maxMs": 1371.99,
+  "totalSeg": 255.1
+ },
+ "estadisticas": {
+  "golesPorPartido": 2.78,
+  "maxGoles": 13,
+  "local": 0.48,
+  "empate": 0.22,
+  "visitante": 0.3,
+  "rematesPorEquipo": 13.75,
+  "alArcoPct": 0.38,
+  "conversion": 0.1,
+  "xgPorPartido": 4.78,
+  "pasesPorEquipo": 450.96,
+  "precisionPases": 0.79,
+  "pasesAltosPct": 0.16,
+  "posesionLocalPromedio": 50.99,
+  "posesionDesvio": 3.76,
+  "cornersPorEquipo": 5.29,
+  "lateralesPorEquipo": 37.23,
+  "quitesPorEquipo": 40.3,
+  "intercepcionesPorEquipo": 79.09,
+  "gambetasPorEquipo": 13.77,
+  "gambetasExito": 0.42,
+  "cabezazosPorPartido": 54.85,
+  "atajadasPorPartido": 6.48,
+  "palosPorPartido": 0.19,
+  "minutosEnJuego": 77.64,
+  "kmPorJugadorDeCampo": 11.02,
+  "marcadores": [
+   "1-0 21.7%",
+   "2-1 12.7%",
+   "2-0 10.7%",
+   "0-0 8.7%",
+   "1-1 7.7%",
+   "4-1 7.0%",
+   "3-0 7.0%",
+   "3-1 6.0%"
+  ]
+ },
+ "determinismo": {
+  "mismaSemilla": true,
+  "semillasDistintasDistinto": true,
+  "huellas": [
+   "e041d538f753e874",
+   "9215e41f56994eb7",
+   "206cb9f607c5986d"
+  ],
+  "huellaTexto": "7fe398bcf479a5eb"
+ },
+ "nota": "Estadísticas de los partidos de liga (etapa 4: calibradas y verificadas contra rangos reales).",
+ "partidos": 450,
+ "partidosLiga": 300,
+ "forma": {
+  "con": {
+   "equipos": 600,
+   "largo": 45.56,
+   "ancho": 49.62,
+   "entreLineas": [
+    11.6,
+    20.86
+   ],
+   "alineacionLinea": 7.94
+  },
+  "sin": {
+   "equipos": 600,
+   "largo": 34.87,
+   "ancho": 39.4,
+   "entreLineas": [
+    9.16,
+    16.22
+   ],
+   "alineacionLinea": 3.1
+  }
+ },
+ "tacticas": {
+  "partidosPorSerie": 24,
+  "equipo": "Arsenal",
+  "rival": "Chelsea",
+  "series": {
+   "bloqueAlto": {
+    "alturaLinea": 33.01,
+    "alturaBloque": 42.73,
+    "recupCampoRival": 29,
+    "alturaRecuperacion": 32.24,
+    "pasesPorPosesion": 1.84,
+    "pelotazos": 13.08,
+    "ancho": 49.48,
+    "contrapresiones": 12.13,
+    "repliegues": 141.58,
+    "pases": 370.46,
+    "goles": 3.58,
+    "contrasRival": 6.29,
+    "golesRecibidos": 2.13,
+    "partidos": 24
+   },
+   "bloqueBajo": {
+    "alturaLinea": 25.78,
+    "alturaBloque": 35.7,
+    "recupCampoRival": 20.38,
+    "alturaRecuperacion": 28.47,
+    "pasesPorPosesion": 1.89,
+    "pelotazos": 12.92,
+    "ancho": 49.07,
+    "contrapresiones": 15.33,
+    "repliegues": 126.5,
+    "pases": 353.21,
+    "goles": 2.42,
+    "contrasRival": 3,
+    "golesRecibidos": 2.04,
+    "partidos": 24
+   },
+   "presionAlta": {
+    "alturaLinea": 31.83,
+    "alturaBloque": 42.28,
+    "recupCampoRival": 29.46,
+    "alturaRecuperacion": 34.04,
+    "pasesPorPosesion": 2,
+    "pelotazos": 10.21,
+    "ancho": 49.91,
+    "contrapresiones": 108.54,
+    "repliegues": 45.96,
+    "pases": 406.88,
+    "goles": 3,
+    "contrasRival": 4.13,
+    "golesRecibidos": 1.88,
+    "partidos": 24
+   },
+   "presionBaja": {
+    "alturaLinea": 29.63,
+    "alturaBloque": 39.55,
+    "recupCampoRival": 19.42,
+    "alturaRecuperacion": 28.78,
+    "pasesPorPosesion": 1.91,
+    "pelotazos": 15.96,
+    "ancho": 49.32,
+    "contrapresiones": 0,
+    "repliegues": 134.71,
+    "pases": 337.83,
+    "goles": 2.75,
+    "contrasRival": 4.08,
+    "golesRecibidos": 2.79,
+    "partidos": 24
+   },
+   "directo": {
+    "alturaLinea": 29.64,
+    "alturaBloque": 39.88,
+    "recupCampoRival": 23.25,
+    "alturaRecuperacion": 31.45,
+    "pasesPorPosesion": 1.74,
+    "pelotazos": 25.83,
+    "ancho": 49.56,
+    "contrapresiones": 19.75,
+    "repliegues": 137,
+    "pases": 349.13,
+    "goles": 2.71,
+    "contrasRival": 3.88,
+    "golesRecibidos": 1.88,
+    "partidos": 24
+   },
+   "posesion": {
+    "alturaLinea": 30,
+    "alturaBloque": 40.25,
+    "recupCampoRival": 23.54,
+    "alturaRecuperacion": 29.91,
+    "pasesPorPosesion": 3,
+    "pelotazos": 7.25,
+    "ancho": 49.54,
+    "contrapresiones": 22.71,
+    "repliegues": 120.67,
+    "pases": 569.96,
+    "goles": 1.63,
+    "contrasRival": 5.17,
+    "golesRecibidos": 2.13,
+    "partidos": 24
+   },
+   "abierto": {
+    "alturaLinea": 30.92,
+    "alturaBloque": 41.12,
+    "recupCampoRival": 23.58,
+    "alturaRecuperacion": 32.01,
+    "pasesPorPosesion": 2.07,
+    "pelotazos": 9.83,
+    "ancho": 53.39,
+    "contrapresiones": 12.04,
+    "repliegues": 129.54,
+    "pases": 395.75,
+    "goles": 3.04,
+    "contrasRival": 3.75,
+    "golesRecibidos": 2.29,
+    "partidos": 24
+   },
+   "cerrado": {
+    "alturaLinea": 30.2,
+    "alturaBloque": 40.33,
+    "recupCampoRival": 22.29,
+    "alturaRecuperacion": 30.55,
+    "pasesPorPosesion": 1.99,
+    "pelotazos": 10.25,
+    "ancho": 39.42,
+    "contrapresiones": 14.88,
+    "repliegues": 135.04,
+    "pases": 386.88,
+    "goles": 2.92,
+    "contrasRival": 3.96,
+    "golesRecibidos": 2.04,
+    "partidos": 24
+   },
+   "presionAltaEstilo": {
+    "alturaLinea": 32.81,
+    "alturaBloque": 42.96,
+    "recupCampoRival": 28.13,
+    "alturaRecuperacion": 32.62,
+    "pasesPorPosesion": 1.95,
+    "pelotazos": 9.92,
+    "ancho": 49.21,
+    "contrapresiones": 99.67,
+    "repliegues": 58.88,
+    "pases": 401.29,
+    "goles": 3.46,
+    "contrasRival": 5.21,
+    "golesRecibidos": 1.88,
+    "partidos": 24
+   },
+   "defensivo": {
+    "alturaLinea": 28.09,
+    "alturaBloque": 38.37,
+    "recupCampoRival": 21.33,
+    "alturaRecuperacion": 30.81,
+    "pasesPorPosesion": 1.94,
+    "pelotazos": 11.5,
+    "ancho": 51,
+    "contrapresiones": 0,
+    "repliegues": 147.58,
+    "pases": 369.58,
+    "goles": 2.96,
+    "contrasRival": 2.13,
+    "golesRecibidos": 2.04,
+    "partidos": 24
+   }
+  },
+  "pruebas": [
+   {
+    "prueba": "Bloque alto vs bajo: altura de la línea sin pelota",
+    "campo": "alturaLinea",
+    "bloqueAlto": 33.01,
+    "bloqueBajo": 25.78,
+    "ok": true,
+    "criterio": "al menos 4 m más alta"
+   },
+   {
+    "prueba": "Bloque alto vs bajo: altura del bloque sin pelota",
+    "campo": "alturaBloque",
+    "bloqueAlto": 42.73,
+    "bloqueBajo": 35.7,
+    "ok": true,
+    "criterio": "al menos 4 m más alto"
+   },
+   {
+    "prueba": "Presión alta vs baja: recuperaciones en campo rival",
+    "campo": "recupCampoRival",
+    "presionAlta": 29.46,
+    "presionBaja": 19.42,
+    "ok": true,
+    "criterio": "al menos 15 % más"
+   },
+   {
+    "prueba": "Presión alta vs baja: altura media de recuperación",
+    "campo": "alturaRecuperacion",
+    "presionAlta": 34.04,
+    "presionBaja": 28.78,
+    "ok": true,
+    "criterio": "al menos 2 m más arriba"
+   },
+   {
+    "prueba": "Posesión vs directo: pases por posesión",
+    "campo": "pasesPorPosesion",
+    "posesion": 3,
+    "directo": 1.74,
+    "ok": true,
+    "criterio": "al menos 30 % más"
+   },
+   {
+    "prueba": "Directo vs posesión: pelotazos",
+    "campo": "pelotazos",
+    "directo": 25.83,
+    "posesion": 7.25,
+    "ok": true,
+    "criterio": "al menos 50 % más"
+   },
+   {
+    "prueba": "Ancho alto vs bajo: ancho del equipo con pelota",
+    "campo": "ancho",
+    "abierto": 53.39,
+    "cerrado": 39.42,
+    "ok": true,
+    "criterio": "al menos 4 m más ancho"
+   },
+   {
+    "prueba": "Bloque alto vs bajo: recibe más contraataques",
+    "campo": "contrasRival",
+    "bloqueAlto": 6.29,
+    "bloqueBajo": 3,
+    "ok": true,
+    "criterio": "al menos 15 % más contras del rival"
+   },
+   {
+    "prueba": "Presión alta (estilo): al perder presiona en vez de replegarse",
+    "campo": "contrapresiones",
+    "presionAltaEstilo": 99.67,
+    "defensivo": 0,
+    "ok": true,
+    "criterio": "contrapresión solo con presión alta"
+   }
+  ]
+ },
+ "formaciones": {
+  "4-3-3": {
+   "marcador": "4-1",
+   "defensores": 4,
+   "largoSin": 35.5,
+   "anchoCon": 50.53
+  },
+  "4-2-3-1": {
+   "marcador": "4-3",
+   "defensores": 4,
+   "largoSin": 34.06,
+   "anchoCon": 50.01
+  },
+  "4-4-2": {
+   "marcador": "4-1",
+   "defensores": 4,
+   "largoSin": 33.62,
+   "anchoCon": 47.72
+  },
+  "3-5-2": {
+   "marcador": "3-0",
+   "defensores": 3,
+   "largoSin": 33.45,
+   "anchoCon": 47.4
+  },
+  "5-3-2": {
+   "marcador": "5-3",
+   "defensores": 5,
+   "largoSin": 31.84,
+   "anchoCon": 41.13
+  },
+  "4-1-4-1": {
+   "marcador": "2-1",
+   "defensores": 4,
+   "largoSin": 32.01,
+   "anchoCon": 47.44
+  },
+  "3-4-3": {
+   "marcador": "3-3",
+   "defensores": 3,
+   "largoSin": 32.05,
+   "anchoCon": 47.78
+  }
+ },
+ "reglas": {
+  "porPartido": {
+   "faltas": 25.26,
+   "amarillas": 4.033,
+   "rojas": 0.153,
+   "penales": 0.35,
+   "penalesGol": 0.25,
+   "offsides": 3.533,
+   "corners": 10.587,
+   "lesiones": 0.693,
+   "cambios": 8.507,
+   "tirosLibres": 13.037,
+   "tirosLibresDirectos": 0.353,
+   "ventajas": 13.2,
+   "descuento1": 2.583,
+   "descuento2": 6.733,
+   "conversionPenales": 0.714
+  },
+  "limites": {
+   "maxCambiosEquipo": 5,
+   "maxVentanasEquipo": 3,
+   "minimoJugadoresEnCancha": 9,
+   "suspendidos": 0
+  },
+  "expulsion": {
+   "conRoja": {
+    "pts": 1.167,
+    "dif": -0.292,
+    "xgPropio": 3.304,
+    "xgRival": 3.983,
+    "posesion": 48.542,
+    "partidos": 24
+   },
+   "sinRoja": {
+    "pts": 1.917,
+    "dif": 1.042,
+    "xgPropio": 4.031,
+    "xgRival": 3.435,
+    "posesion": 51.833,
+    "partidos": 24
+   }
+  }
+ },
+ "calibracion": [
+  {
+   "estadistica": "Goles por partido",
+   "valor": 2.7833,
+   "rango": [
+    2.2,
+    3
+   ],
+   "ok": true
+  },
+  {
+   "estadistica": "Local gana",
+   "valor": 0.48,
+   "rango": [
+    0.38,
+    0.52
+   ],
+   "ok": true
+  },
+  {
+   "estadistica": "Empate",
+   "valor": 0.2167,
+   "rango": [
+    0.2,
+    0.32
+   ],
+   "ok": true
+  },
+  {
+   "estadistica": "Visitante gana",
+   "valor": 0.3033,
+   "rango": [
+    0.24,
+    0.38
+   ],
+   "ok": true
+  },
+  {
+   "estadistica": "Remates por equipo",
+   "valor": 13.7533,
+   "rango": [
+    9,
+    15
+   ],
+   "ok": true
+  },
+  {
+   "estadistica": "Remates al arco",
+   "valor": 0.3788,
+   "rango": [
+    0.28,
+    0.42
+   ],
+   "ok": true
+  },
+  {
+   "estadistica": "Conversión",
+   "valor": 0.1012,
+   "rango": [
+    0.08,
+    0.14
+   ],
+   "ok": true
+  },
+  {
+   "estadistica": "Pases por equipo",
+   "valor": 450.9617,
+   "rango": [
+    400,
+    500
+   ],
+   "ok": true
+  },
+  {
+   "estadistica": "Acierto de pases",
+   "valor": 0.792,
+   "rango": [
+    0.75,
+    0.85
+   ],
+   "ok": true
+  },
+  {
+   "estadistica": "Posesión del mejor equipo",
+   "valor": 0.5163,
+   "rango": [
+    0.5,
+    0.65
+   ],
+   "ok": true
+  },
+  {
+   "estadistica": "Córners por equipo",
+   "valor": 5.2933,
+   "rango": [
+    3.5,
+    6.5
+   ],
+   "ok": true
+  },
+  {
+   "estadistica": "Faltas por equipo",
+   "valor": 12.63,
+   "rango": [
+    9,
+    15
+   ],
+   "ok": true
+  },
+  {
+   "estadistica": "Amarillas por equipo",
+   "valor": 2.0167,
+   "rango": [
+    1.3,
+    2.8
+   ],
+   "ok": true
+  },
+  {
+   "estadistica": "Rojas por partido",
+   "valor": 0.1533,
+   "rango": [
+    0.04,
+    0.3
+   ],
+   "ok": true
+  },
+  {
+   "estadistica": "Penales por partido",
+   "valor": 0.35,
+   "rango": [
+    0.15,
+    0.45
+   ],
+   "ok": true
+  },
+  {
+   "estadistica": "Offsides por equipo",
+   "valor": 1.7667,
+   "rango": [
+    1,
+    3.2
+   ],
+   "ok": true
+  },
+  {
+   "estadistica": "Partidos con 4+ de diferencia",
+   "valor": 0.04,
+   "rango": [
+    0,
+    0.06
+   ],
+   "ok": true
+  },
+  {
+   "estadistica": "Partidos con 10+ goles",
+   "valor": 0.0033,
+   "rango": [
+    0,
+    0.004
+   ],
+   "ok": true
+  }
+ ],
+ "local": {
+  "gana": 0.48,
+  "visitante": 0.303,
+  "diferencia": 0.177
+ },
+ "fuerza": {
+  "muySuperior": {
+   "partidos": 120,
+   "gana": 0.708,
+   "empata": 0.15
+  },
+  "superior": {
+   "partidos": 120,
+   "gana": 0.417,
+   "empata": 0.258
+  },
+  "parejo": {
+   "partidos": 120,
+   "gana": 0.367,
+   "empata": 0.317
+  }
+ },
+ "fisica": {
+  "raso15": {
+   "recorridoM": 71.5,
+   "frenaSiempre": true,
+   "sedetiene": true
+  },
+  "alto": {
+   "alturaMaxM": 4.78,
+   "primerPiqueM": 29.59,
+   "segundoPiqueM": 35.97,
+   "alturasPicos": [
+    4.78,
+    0.89,
+    0.17
+   ]
+  },
+  "velPaseRaso": {
+   "10m": 11,
+   "30m": 15.7
+  }
+ },
+ "atributos": {
+  "origen": [
+   "estimado"
+  ],
+  "vmaxMin": 3.09,
+  "vmaxMax": 7.5,
+  "sinCinta": true,
+  "sinMCAtributos": {
+   "ok": true,
+   "origen": "grl"
+  }
+ },
+ "enVivo": {
+  "igualQueSimular": true,
+  "minutos": 100,
+  "marcador": "2-1",
+  "cambio": {
+   "hecho": true,
+   "entro": true,
+   "terminado": true
+  }
+ },
+ "etapa6": {
+  "partidos": 20,
+  "saltosJugadores": 0,
+  "saltosPelota": 0,
+  "primerSalto": null,
+  "esperasForzadas": 0,
+  "goles": 60,
+  "festejos": 57,
+  "conAbrazo": 57,
+  "arbitroFueraDeLugar": 0,
+  "arbitroKmPorPartido": 21.7,
+  "escenaDeCierre": 20,
+  "velocidadMaximaEnElCierre": 1.49,
+  "festejoMaxEnAreaChica": 2,
+  "festejoEnAreaChicaA8s": 0,
+  "festejosLejosDelBanderin": [],
+  "golesDeCorner": 7,
+  "jugadoresEnElAreaEnLaRepeticion": [
+   13,
+   13,
+   11,
+   14,
+   13,
+   13,
+   13
+  ],
+  "golesErrorArquero": 0.065,
+  "origenGoles": {
+   "area": 0.575,
+   "corner": 0.115,
+   "penal": 0.09,
+   "rebote": 0.077,
+   "en_contra": 0.061,
+   "centro": 0.031,
+   "individual": 0.03,
+   "cabezazo": 0.01,
+   "contra": 0.007,
+   "afuera": 0.005
+  },
+  "arqueros": {
+   "corr": 0.74,
+   "desvioY": 2.64,
+   "lineaCerca": 3.49,
+   "lineaLejos": 8.59,
+   "peorCorr": 0.67
+  },
+  "reanudaciones": {
+   "saque_centro": {
+    "n": 99,
+    "mal": 0,
+    "ejemplo": null
+   },
+   "tiro_libre": {
+    "n": 250,
+    "mal": 0,
+    "ejemplo": null
+   },
+   "saque_arco": {
+    "n": 322,
+    "mal": 0,
+    "ejemplo": null
+   },
+   "lateral": {
+    "n": 1465,
+    "mal": 0,
+    "ejemplo": null
+   },
+   "corner": {
+    "n": 202,
+    "mal": 0,
+    "ejemplo": null
+   }
+  }
+ },
+ "ejemplo": {
+  "partido": "3K FC 1-0 AC Port of Spain",
+  "stats": {
+   "posesion": [
+    51,
+    49
+   ],
+   "pases": [
+    516,
+    471
+   ],
+   "pasesOk": [
+    374,
+    343
+   ],
+   "pasesAltos": [
+    93,
+    81
+   ],
+   "remates": [
+    20,
+    5
+   ],
+   "alArco": [
+    9,
+    1
+   ],
+   "atajadas": [
+    1,
+    7
+   ],
+   "bloqueos": [
+    0,
+    0
+   ],
+   "palos": [
+    0,
+    0
+   ],
+   "corners": [
+    16,
+    3
+   ],
+   "laterales": [
+    41,
+    44
+   ],
+   "saquesArco": [
+    5,
+    12
+   ],
+   "quites": [
+    25,
+    25
+   ],
+   "intercepciones": [
+    93,
+    81
+   ],
+   "gambetas": [
+    24,
+    20
+   ],
+   "gambetasOk": [
+    12,
+    9
+   ],
+   "cabezazos": [
+    27,
+    19
+   ],
+   "xg": [
+    3.02,
+    0.87
+   ],
+   "minutosEnJuego": 73,
+   "posesiones": [
+    200,
+    200
+   ],
+   "pasesPorPosesion": [
+    2.58,
+    2.35
+   ],
+   "recuperaciones": [
+    145,
+    137
+   ],
+   "recupCampoRival": [
+    52,
+    32
+   ],
+   "alturaRecuperacion": [
+    43.64,
+    35.56
+   ],
+   "pelotazos": [
+    18,
+    17
+   ],
+   "desmarques": [
+    42,
+    51
+   ],
+   "paredes": [
+    4,
+    6
+   ],
+   "cambiosFrente": [
+    30,
+    42
+   ],
+   "contras": [
+    12,
+    6
+   ],
+   "contrapresiones": [
+    0,
+    28
+   ],
+   "repliegues": [
+    137,
+    117
+   ],
+   "faltas": [
+    6,
+    13
+   ],
+   "amarillas": [
+    0,
+    1
+   ],
+   "rojas": [
+    0,
+    0
+   ],
+   "penales": [
+    0,
+    0
+   ],
+   "penalesGol": [
+    0,
+    0
+   ],
+   "offsides": [
+    3,
+    0
+   ],
+   "tirosLibres": [
+    6,
+    7
+   ],
+   "tirosLibresDirectos": [
+    0,
+    0
+   ],
+   "lesiones": [
+    0,
+    1
+   ],
+   "cambios": [
+    4,
+    5
+   ],
+   "despejes": [
+    54,
+    62
+   ],
+   "centros": [
+    6,
+    3
+   ],
+   "origenGoles": {
+    "area": 1
+   },
+   "golesErrorArquero": [
+    0,
+    0
+   ],
+   "forzados": 0,
+   "ventanas": [
+    3,
+    3
+   ],
+   "ventajas": [
+    7,
+    1
+   ],
+   "enCancha": [
+    11,
+    11
+   ],
+   "minimoEnCancha": [
+    11,
+    11
+   ],
+   "descuento": [
+    2,
+    6
+   ]
+  },
+  "goles": [
+   {
+    "t": 12022,
+    "parte": 1,
+    "min": 21,
+    "seg": 1202,
+    "tipo": "gol",
+    "equipo": 0,
+    "jugador": "Glen Kariuki",
+    "jid": 9,
+    "origen": "area",
+    "clave": null,
+    "asistClave": null,
+    "enContra": false,
+    "errorArquero": false,
+    "arqueroP": null,
+    "asistencia": "David Simiyu",
+    "aid": 10,
+    "marcador": [
+     1,
+     0
+    ],
+    "xg": 0.197,
+    "festejo": 150,
+    "x": 105.3,
+    "y": 36.2
+   }
+  ],
+  "remates": [
+   {
+    "t": 3441,
+    "parte": 1,
+    "min": 6,
+    "seg": 344,
+    "tipo": "remate",
+    "equipo": 0,
+    "jugador": "Henry Eli Oballa",
+    "jid": 8,
+    "aPuerta": false,
+    "cabeza": false,
+    "xg": 0.019,
+    "dist": 26.1,
+    "arquero": "Jaden Ramlogan",
+    "tiroLibre": false,
+    "x": 103,
+    "y": 8.5
+   },
+   {
+    "t": 6790,
+    "parte": 1,
+    "min": 12,
+    "seg": 679,
+    "tipo": "remate",
+    "equipo": 0,
+    "jugador": "David Simiyu",
+    "jid": 10,
+    "aPuerta": false,
+    "cabeza": false,
+    "xg": 0.014,
+    "dist": 31.2,
+    "arquero": "Jaden Ramlogan",
+    "tiroLibre": false,
+    "x": 78.1,
+    "y": 48.9
+   },
+   {
+    "t": 8265,
+    "parte": 1,
+    "min": 14,
+    "seg": 826,
+    "tipo": "remate",
+    "equipo": 0,
+    "jugador": "Glen Kariuki",
+    "jid": 9,
+    "aPuerta": true,
+    "cabeza": false,
+    "xg": 0.014,
+    "dist": 31.3,
+    "arquero": "Jaden Ramlogan",
+    "tiroLibre": false,
+    "x": 77.2,
+    "y": 47.4
+   },
+   {
+    "t": 10344,
+    "parte": 1,
+    "min": 18,
+    "seg": 1034,
+    "tipo": "remate",
+    "equipo": 0,
+    "jugador": "Robinson Kamura",
+    "jid": 1,
+    "aPuerta": false,
+    "cabeza": true,
+    "xg": 0.115,
+    "dist": 10.6,
+    "arquero": "Jaden Ramlogan",
+    "tiroLibre": false,
+    "x": 94.4,
+    "y": 35.2
+   },
+   {
+    "t": 11616,
+    "parte": 1,
+    "min": 20,
+    "seg": 1161,
+    "tipo": "remate",
+    "equipo": 0,
+    "jugador": "Glen Kariuki",
+    "jid": 9,
+    "aPuerta": false,
+    "cabeza": true,
+    "xg": 0.065,
+    "dist": 12.2,
+    "arquero": "Jaden Ramlogan",
+    "tiroLibre": false,
+    "x": 99.4,
+    "y": 22.6
+   },
+   {
+    "t": 12019,
+    "parte": 1,
+    "min": 21,
+    "seg": 1201,
+    "tipo": "remate",
+    "equipo": 0,
+    "jugador": "Glen Kariuki",
+    "jid": 9,
+    "aPuerta": true,
+    "cabeza": false,
+    "xg": 0.197,
+    "dist": 8.6,
+    "arquero": "Jaden Ramlogan",
+    "tiroLibre": false,
+    "x": 101.4,
+    "y": 41.6
+   },
+   {
+    "t": 16927,
+    "parte": 1,
+    "min": 29,
+    "seg": 1692,
+    "tipo": "remate",
+    "equipo": 0,
+    "jugador": "Henry Eli Oballa",
+    "jid": 8,
+    "aPuerta": false,
+    "cabeza": true,
+    "xg": 0.017,
+    "dist": 23.4,
+    "arquero": "Jaden Ramlogan",
+    "tiroLibre": false,
+    "x": 93.5,
+    "y": 14.5
+   },
+   {
+    "t": 17401,
+    "parte": 1,
+    "min": 30,
+    "seg": 1740,
+    "tipo": "remate",
+    "equipo": 1,
+    "jugador": "Sheldon Pierre",
+    "jid": 21,
+    "aPuerta": false,
+    "cabeza": false,
+    "xg": 0.013,
+    "dist": 29.4,
+    "arquero": "Onesmus Kevenluke Otiala",
+    "tiroLibre": false,
+    "x": 2.8,
+    "y": 5
+   },
+   {
+    "t": 21498,
+    "parte": 1,
+    "min": 36,
+    "seg": 2149,
+    "tipo": "remate",
+    "equipo": 0,
+    "jugador": "Glen Kariuki",
+    "jid": 9,
+    "aPuerta": true,
+    "cabeza": false,
+    "xg": 0.066,
+    "dist": 18.5,
+    "arquero": "Jaden Ramlogan",
+    "tiroLibre": false,
+    "x": 88.8,
+    "y": 26.2
+   },
+   {
+    "t": 21748,
+    "parte": 1,
+    "min": 37,
+    "seg": 2174,
+    "tipo": "remate",
+    "equipo": 0,
+    "jugador": "Victor Matete",
+    "jid": 3,
+    "aPuerta": false,
+    "cabeza": true,
+    "xg": 0.089,
+    "dist": 12.3,
+    "arquero": "Jaden Ramlogan",
+    "tiroLibre": false,
+    "x": 92.6,
+    "y": 33.4
+   }
+  ],
+  "cuadros": 11792,
+  "hz": 2,
+  "cuadro100": {
+   "t": 500,
+   "pelota": {
+    "x": 102.6,
+    "y": 5.4,
+    "z": 0,
+    "dueno": 5,
+    "enJuego": true
+   },
+   "jugadores": [
+    [
+     14.2,
+     31.5
+    ],
+    [
+     90.2,
+     11.2
+    ],
+    [
+     49,
+     19.9
+    ],
+    [
+     49,
+     37.2
+    ],
+    [
+     49,
+     42.9
+    ],
+    [
+     102.1,
+     5.3
+    ],
+    [
+     52,
+     25
+    ],
+    [
+     73.2,
+     41
+    ],
+    [
+     87.4,
+     13.6
+    ],
+    [
+     93.1,
+     30
+    ],
+    [
+     99.4,
+     44.5
+    ],
+    [
+     103.2,
+     31.4
+    ],
+    [
+     94.2,
+     41
+    ],
+    [
+     91.6,
+     32
+    ],
+    [
+     87.5,
+     16.8
+    ],
+    [
+     94.9,
+     11.2
+    ],
+    [
+     91.3,
+     26.4
+    ],
+    [
+     89.2,
+     10.4
+    ],
+    [
+     93.9,
+     9.2
+    ],
+    [
+     75.1,
+     41.7
+    ],
+    [
+     68.6,
+     23.5
+    ],
+    [
+     98.2,
+     5.9
+    ]
+   ],
+   "arbitro": [
+    88.9,
+    17.4
+   ],
+   "salientes": [
+    null,
+    null,
+    null
+   ]
+  }
+ }
+}

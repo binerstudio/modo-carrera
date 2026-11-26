@@ -1,0 +1,134 @@
+{
+ "ok": true,
+ "carrera": {
+  "motor": "v2",
+  "v3": true,
+  "opcionMotor": false,
+  "filaMotor": false,
+  "esV3": true,
+  "version": "3.0.0-e6"
+ },
+ "previo": {
+  "v3": true,
+  "v2": true,
+  "previa": true,
+  "aviso": true
+ },
+ "vivo": {
+  "minuto": 38,
+  "fase": "first",
+  "h": 1,
+  "a": 0,
+  "tiros": [
+   2,
+   1
+  ],
+  "pos": 62
+ },
+ "cambio": {
+  "hecho": true,
+  "entra": "Santiago Beltrán",
+  "clave": "o12"
+ },
+ "fin": {
+  "done": true,
+  "h": 2,
+  "a": 0,
+  "golesRelato": [
+   2,
+   0
+  ],
+  "tiros": [
+   9,
+   3
+  ],
+  "alArco": [
+   3,
+   0
+  ],
+  "pos": 57,
+  "ratings": 15,
+  "historial": 1,
+  "ultimo": {
+   "result": "W",
+   "h": 2,
+   "a": 0,
+   "opp": "Platense",
+   "venue": "h",
+   "season": 2026,
+   "round": 1,
+   "shots": [
+    9,
+    3
+   ],
+   "pos": 57
+  },
+  "minuto": 96,
+  "tiposGol": [
+   "area",
+   "area"
+  ],
+  "entroCambio": true,
+  "eventos": 37
+ },
+ "fechas": {
+  "res": [
+   [
+    "River Plate",
+    "Defensa y Justicia",
+    3,
+    0
+   ],
+   [
+    "River Plate",
+    "Liverpool Montevideo",
+    2,
+    1
+   ],
+   [
+    "River Plate",
+    "Central Córdoba",
+    3,
+    1
+   ],
+   [
+    "River Plate",
+    "Defensa y Justicia",
+    0,
+    0
+   ],
+   [
+    "River Plate",
+    "Lanús",
+    0,
+    1
+   ]
+  ],
+  "v3": 5,
+  "round": 4,
+  "jugados": 60,
+  "porFecha": 15,
+  "id": "cmwxx3y7y5uv5",
+  "points": 9
+ },
+ "recarga": {
+  "id": "cmwxx3y7y5uv5",
+  "round": 4,
+  "points": 9,
+  "v3": true,
+  "motor": "v2"
+ },
+ "vuelta": {
+  "partidoV3": false,
+  "v2": true,
+  "aviso": true,
+  "con2D": false,
+  "termino": true,
+  "marcadorOk": true,
+  "siguienteV3": true,
+  "v3career": true,
+  "motor": "v2"
+ },
+ "errores": [],
+ "fallas": []
+}

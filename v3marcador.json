@@ -1,0 +1,65 @@
+{
+ "ok": true,
+ "casos": [
+  {
+   "nombre": "liga de local",
+   "venue": "h",
+   "local": "River Plate",
+   "visita": "Platense",
+   "comp": "LIGA · FECHA 1",
+   "muestras": 146,
+   "malos": 0,
+   "velocidadVistaMax": 8.31,
+   "adelantoEncabezado": 0,
+   "adelantoReloj": -1,
+   "finCon2D": 96
+  },
+  {
+   "nombre": "liga de visitante",
+   "venue": "a",
+   "local": "Defensa y Justicia",
+   "visita": "River Plate",
+   "comp": "LIGA · FECHA 2",
+   "muestras": 160,
+   "malos": 0,
+   "velocidadVistaMax": 7.88,
+   "adelantoEncabezado": 0,
+   "adelantoReloj": -1,
+   "finCon2D": 96
+  },
+  {
+   "nombre": "copa (de visitante)",
+   "venue": "a",
+   "local": "Platense",
+   "visita": "River Plate",
+   "comp": "COPA DE PRUEBA · OCTAVOS",
+   "muestras": 141,
+   "malos": 0,
+   "velocidadVistaMax": 7.85,
+   "adelantoEncabezado": 0,
+   "adelantoReloj": 0,
+   "finCon2D": 96
+  },
+  {
+   "nombre": "cancha neutral",
+   "venue": "n",
+   "local": "River Plate",
+   "visita": "Nacional",
+   "comp": "Copa Libertadores · Fase de grupos · fecha 1",
+   "muestras": 110,
+   "malos": 0,
+   "velocidadVistaMax": 7.39,
+   "adelantoEncabezado": 0,
+   "adelantoReloj": -1,
+   "finCon2D": 96
+  }
+ ],
+ "simular": {
+  "done": true,
+  "ms": 635,
+  "h": 1,
+  "a": 0
+ },
+ "errores": [],
+ "fallas": []
+}

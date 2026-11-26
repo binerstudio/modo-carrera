@@ -1,0 +1,523 @@
+{
+ "datos": {
+  "divisiones": 28,
+  "clubes": 515,
+  "jugadores": 12856,
+  "escudosReales": 507,
+  "escudosGenericos": 8,
+  "conColores": 427,
+  "carreras": [
+   [
+    "ENG2",
+    "Birmingham City",
+    25,
+    24,
+    46,
+    "ok"
+   ],
+   [
+    "ENG3",
+    "Doncaster Rovers",
+    25,
+    24,
+    46,
+    "ok"
+   ],
+   [
+    "ENG4",
+    "Oldham Athletic",
+    25,
+    24,
+    46,
+    "ok"
+   ],
+   [
+    "ENG5",
+    "Woking",
+    25,
+    24,
+    46,
+    "ok"
+   ],
+   [
+    "ESP2",
+    "Celta Fortuna",
+    25,
+    22,
+    42,
+    "ok"
+   ],
+   [
+    "ESP3A",
+    "Pontevedra",
+    25,
+    20,
+    38,
+    "ok"
+   ],
+   [
+    "ESP3B",
+    "Algeciras",
+    25,
+    20,
+    38,
+    "ok"
+   ],
+   [
+    "ESP4A",
+    "Ourense CF",
+    25,
+    18,
+    34,
+    "ok"
+   ],
+   [
+    "ESP4B",
+    "Barcelona Atlètic",
+    25,
+    18,
+    34,
+    "ok"
+   ],
+   [
+    "ESP4C",
+    "Mallorca B",
+    25,
+    18,
+    34,
+    "ok"
+   ],
+   [
+    "ESP4D",
+    "Tenerife B",
+    25,
+    18,
+    34,
+    "ok"
+   ],
+   [
+    "ESP4E",
+    "Ávila",
+    25,
+    18,
+    34,
+    "ok"
+   ],
+   [
+    "ITA2",
+    "Carrarese",
+    25,
+    20,
+    38,
+    "ok"
+   ],
+   [
+    "ITA3A",
+    "Lumezzane",
+    25,
+    20,
+    38,
+    "ok"
+   ],
+   [
+    "ITA3B",
+    "Vado",
+    25,
+    20,
+    38,
+    "ok"
+   ],
+   [
+    "ITA3C",
+    "Casertana",
+    25,
+    20,
+    38,
+    "ok"
+   ],
+   [
+    "GER2",
+    "Energie Cottbus",
+    25,
+    18,
+    34,
+    "ok"
+   ],
+   [
+    "GER3",
+    "Würzburger Kickers",
+    25,
+    20,
+    38,
+    "ok"
+   ],
+   [
+    "FRA2",
+    "Annecy",
+    25,
+    18,
+    34,
+    "ok"
+   ],
+   [
+    "FRA3",
+    "Fleury",
+    25,
+    18,
+    34,
+    "ok"
+   ],
+   [
+    "POR2",
+    "Tondela",
+    25,
+    18,
+    34,
+    "ok"
+   ],
+   [
+    "POR3A",
+    "Varzim",
+    25,
+    10,
+    18,
+    "ok"
+   ],
+   [
+    "POR3B",
+    "Lusitano Évora",
+    25,
+    10,
+    18,
+    "ok"
+   ],
+   [
+    "NED2",
+    "De Graafschap",
+    25,
+    20,
+    38,
+    "ok"
+   ],
+   [
+    "BEL2",
+    "Francs Borains",
+    25,
+    15,
+    30,
+    "ok"
+   ],
+   [
+    "SCO2",
+    "Inverness Caledonian Thistle",
+    25,
+    10,
+    36,
+    "ok"
+   ],
+   [
+    "SCO3",
+    "East Kilbride",
+    25,
+    10,
+    36,
+    "ok"
+   ],
+   [
+    "TUR2",
+    "İstanbulspor",
+    25,
+    20,
+    38,
+    "ok"
+   ]
+  ],
+  "enBase": {
+   "Inglaterra": 2400,
+   "España": 3800,
+   "Italia": 2000,
+   "Alemania": 950,
+   "Francia": 900,
+   "Portugal": 950,
+   "Países Bajos": 500,
+   "Bélgica": 375,
+   "Escocia": 500,
+   "Turquía": 500
+  },
+  "nivel": [
+   [
+    "ENG2",
+    71.2
+   ],
+   [
+    "ENG3",
+    66.1
+   ],
+   [
+    "ENG4",
+    62
+   ],
+   [
+    "ENG5",
+    58.4
+   ],
+   [
+    "ESP2",
+    69.8
+   ],
+   [
+    "ESP3A",
+    64
+   ],
+   [
+    "ESP3B",
+    64.3
+   ],
+   [
+    "ESP4A",
+    59
+   ],
+   [
+    "ESP4B",
+    58.7
+   ],
+   [
+    "ESP4C",
+    58.7
+   ],
+   [
+    "ESP4D",
+    58.8
+   ],
+   [
+    "ESP4E",
+    58.7
+   ],
+   [
+    "ITA2",
+    67.1
+   ],
+   [
+    "ITA3A",
+    61.5
+   ],
+   [
+    "ITA3B",
+    60.6
+   ],
+   [
+    "ITA3C",
+    61.4
+   ],
+   [
+    "GER2",
+    68.9
+   ],
+   [
+    "GER3",
+    64.2
+   ],
+   [
+    "FRA2",
+    67
+   ],
+   [
+    "FRA3",
+    60.8
+   ],
+   [
+    "POR2",
+    60.1
+   ],
+   [
+    "POR3A",
+    55
+   ],
+   [
+    "POR3B",
+    55.2
+   ],
+   [
+    "NED2",
+    63.5
+   ],
+   [
+    "BEL2",
+    62
+   ],
+   [
+    "SCO2",
+    60.7
+   ],
+   [
+    "SCO3",
+    56.2
+   ],
+   [
+    "TUR2",
+    65.6
+   ]
+  ],
+  "malos": [],
+  "nMalos": 0
+ },
+ "sinIntervencion": {
+  "inicio": {
+   "club": "Birmingham City",
+   "country": "Inglaterra · EFL Championship",
+   "peso": 112539
+  },
+  "temporadas": [
+   {
+    "temporada": 2026,
+    "partidos": 48,
+    "pos": 22,
+    "comps": [],
+    "mal": [],
+    "nMal": 0,
+    "stats": {
+     "bajaron": 56,
+     "subieron": 39,
+     "playoffs": 0,
+     "filiales": 0
+    },
+    "pesoKB": 250,
+    "dvKB": 2.6,
+    "movimientos": 122,
+    "miClub": [
+     "ENG2",
+     "ENG3",
+     "Descenso directo"
+    ],
+    "country": "Inglaterra · EFL League One",
+    "ligaOk": true,
+    "ms": 42030
+   },
+   {
+    "temporada": 2027,
+    "partidos": 48,
+    "pos": 2,
+    "comps": [],
+    "mal": [],
+    "nMal": 0,
+    "stats": {
+     "bajaron": 56,
+     "subieron": 39,
+     "playoffs": 0,
+     "filiales": 0
+    },
+    "pesoKB": 369,
+    "dvKB": 4.3,
+    "movimientos": 118,
+    "miClub": [
+     "ENG3",
+     "ENG2",
+     "Ascenso directo"
+    ],
+    "country": "Inglaterra · EFL Championship",
+    "ligaOk": true,
+    "ms": 40692
+   },
+   {
+    "temporada": 2028,
+    "partidos": 49,
+    "pos": 21,
+    "comps": [],
+    "mal": [],
+    "nMal": 0,
+    "stats": {
+     "bajaron": 56,
+     "subieron": 39,
+     "playoffs": 0,
+     "filiales": 0
+    },
+    "pesoKB": 474,
+    "dvKB": 4,
+    "movimientos": 120,
+    "miClub": null,
+    "country": "Inglaterra · EFL Championship",
+    "ligaOk": true,
+    "ms": 43089
+   }
+  ],
+  "crecimientoKB": 364
+ },
+ "pierdeTodo": {
+  "g": 48,
+  "pos": 24,
+  "seen": [],
+  "comps": [],
+  "antes": "Inglaterra · EFL League One",
+  "despues": "Inglaterra · EFL League Two",
+  "previsto": "ENG4",
+  "mov": [
+   "ENG3",
+   "ENG4",
+   "Descenso directo"
+  ],
+  "nMal": 0,
+  "mal": [],
+  "ligaOk": true,
+  "jugable": true
+ },
+ "ganaTodo": {
+  "g": 45,
+  "pos": 1,
+  "seen": [],
+  "comps": [],
+  "antes": "España · Primera Federación · Grupo 2",
+  "despues": "España · Segunda División",
+  "previsto": "ESP2",
+  "mov": [
+   "ESP3B",
+   "ESP2",
+   "Ascenso directo"
+  ],
+  "nMal": 0,
+  "mal": [],
+  "ligaOk": true,
+  "jugable": true
+ },
+ "primeraBaja": {
+  "g": 43,
+  "pos": 18,
+  "seen": [],
+  "comps": [],
+  "antes": "Alemania",
+  "despues": "Alemania · 2. Bundesliga",
+  "previsto": "GER2",
+  "mov": [
+   "GER1",
+   "GER2",
+   "Descenso directo"
+  ],
+  "nMal": 0,
+  "mal": [],
+  "ligaOk": true,
+  "jugable": true
+ },
+ "playoff": {
+  "g": 49,
+  "pos": 5,
+  "seen": [
+   "Playoff de ascenso del Championship · Cuartos de final"
+  ],
+  "comps": [
+   {
+    "n": "Playoff de ascenso del Championship",
+    "champ": "Cardiff City"
+   }
+  ],
+  "antes": "Inglaterra · EFL Championship",
+  "despues": "Inglaterra · EFL Championship",
+  "previsto": null,
+  "mov": null,
+  "nMal": 0,
+  "mal": [],
+  "ligaOk": true,
+  "jugable": true
+ },
+ "errores": [],
+ "fallas": [],
+ "ok": true
+}

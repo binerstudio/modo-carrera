@@ -1,0 +1,369 @@
+{
+ "ok": true,
+ "reglas": {
+  "contrato1suplente": 6.18,
+  "contrato4clave": 14.56,
+  "conDeuda": 9.14,
+  "estable": 10.75,
+  "contratoBaja": true,
+  "deudaBaja": true,
+  "cuotasValenMenos": true
+ },
+ "rondas": {
+  "jugador": "Facundo Cambeses",
+  "club": "Racing Club",
+  "pide": {
+   "A": 6.81,
+   "min": 6.61
+  },
+  "imp": "clave",
+  "anos": 4,
+  "eco": {
+   "b": 15.36,
+   "sv": 58.75
+  },
+  "rondas": [
+   {
+    "t": "contra",
+    "r": 1,
+    "pide": 6.61,
+    "final": false
+   },
+   {
+    "t": "contra",
+    "r": 2,
+    "pide": 6.61,
+    "final": false
+   },
+   {
+    "t": "rechaza",
+    "r": 3,
+    "pide": null,
+    "final": true
+   }
+  ],
+  "max": 3
+ },
+ "ridicula": {
+  "rondas": [
+   {
+    "t": "rechaza",
+    "r": 1,
+    "final": false
+   },
+   {
+    "t": "rechaza",
+    "r": 2,
+    "final": false
+   },
+   {
+    "t": "rechaza",
+    "r": 3,
+    "final": true
+   }
+  ],
+  "despuesDeCortar": "rechaza",
+  "estado": "rota"
+ },
+ "compra": {
+  "jugador": "Ezequiel Cannavo",
+  "club": "Racing Club",
+  "oferta": {
+   "monto": 2.42,
+   "cuotas": 3,
+   "bonos": [
+    {
+     "tipo": "goles",
+     "meta": 3,
+     "monto": 0.7
+    },
+    {
+     "tipo": "partidos",
+     "meta": 200,
+     "monto": 0.4
+    }
+   ]
+  },
+  "club_": "acepta",
+  "jugador_": "firmado",
+  "motivo": null,
+  "partes": [
+   0.82,
+   0.8,
+   0.8
+  ],
+  "comision": 0.24,
+  "pagadoAlFirmar": 1.06,
+  "esperado": 1.06,
+  "enPlantel": true,
+  "clausula": 9,
+  "cuotasPend": [
+   {
+    "d": 2026,
+    "m": 0.8,
+    "n": "2/3"
+   },
+   {
+    "d": 2027,
+    "m": 0.8,
+    "n": "3/3"
+   }
+  ],
+  "bonos": [
+   {
+    "t": "goles",
+    "desde": 2026,
+    "hasta": 2027
+   },
+   {
+    "t": "partidos",
+    "desde": 2026,
+    "hasta": 2027
+   }
+  ]
+ },
+ "clubChico": {
+  "jugador": "Kylian Mbappé",
+  "club": "Real Madrid",
+  "clausula": "acepta",
+  "jugador_": "rechaza",
+  "motivo": "No quiere jugar en un club de ese nivel (club chico para él)",
+  "final": true,
+  "noFichado": true
+ },
+ "titularidad": {
+  "rol": "suplente",
+  "t": "rechaza",
+  "motivo": "Quiere ser titular y en tu plantel sería suplente",
+  "final": true
+ },
+ "sueldoBajo": {
+  "jugador": "Leonel Pérez",
+  "rondas": [
+   {
+    "t": "contra",
+    "r": 1,
+    "motivo": "el sueldo es bajo, tendría poca titularidad"
+   },
+   {
+    "t": "contra",
+    "r": 2,
+    "motivo": "el sueldo es bajo, tendría poca titularidad"
+   },
+   {
+    "t": "rechaza",
+    "r": 3,
+    "motivo": "No le convienen las condiciones: el sueldo es bajo, tendría poca titularidad"
+   }
+  ],
+  "noFichado": true
+ },
+ "clausulaUsuario": {
+  "jugador": "Gastén Lodico",
+  "club": "Racing Club",
+  "clausula": 8.55,
+  "club_": "acepta",
+  "jugador_": "firmado",
+  "motivo": null,
+  "pago": 9.23,
+  "fichado": true
+ },
+ "clausulaIA": {
+  "jugador": "Tobías Andrada",
+  "club": "Platense",
+  "r": {
+   "jug": "Tobías Andrada",
+   "club": "Platense",
+   "monto": 1.5
+  },
+  "cobrado": 1.5,
+  "salio": true,
+  "plantel": [
+   27,
+   26
+  ]
+ },
+ "venta": {
+  "jugador": "Aníbal Moreno",
+  "club": "Corinthians",
+  "oferta": 7.18,
+  "cuotas": 1,
+  "hist": [
+   {
+    "t": "contra",
+    "monto": 7.18,
+    "r": 2
+   },
+   {
+    "t": "acepta",
+    "monto": null,
+    "r": null
+   }
+  ],
+  "vendido": true,
+  "ventas": [
+   {
+    "jug": "Aníbal Moreno",
+    "club": "Corinthians",
+    "pct": 20,
+    "s": 2026,
+    "monto": 7.18,
+    "cobrada": 2026,
+    "cobro": 4
+   }
+  ],
+  "recompras": [
+   {
+    "id": "rmwxxdyiq",
+    "jug": "Aníbal Moreno",
+    "club": "Corinthians",
+    "precio": 11.2,
+    "hasta": 2027,
+    "estado": "caducada"
+   }
+  ]
+ },
+ "ofertas": 3,
+ "futuraVenta": {
+  "cobrado": 4,
+  "esperado": 4
+ },
+ "s0": 2026,
+ "cuotasEsperadas": [
+  0.82,
+  0.8,
+  0.8
+ ],
+ "estadoAntes": {
+  "budget": 202.39,
+  "players": 25
+ },
+ "cierres": [
+  {
+   "cierre": 2026,
+   "pendientesAntes": [
+    {
+     "d": 2026,
+     "m": 0.8
+    },
+    {
+     "d": 2027,
+     "m": 0.8
+    }
+   ],
+   "pagadosEnEsteCierre": [
+    {
+     "t": "cuota",
+     "d": 2026,
+     "m": 0.8
+    }
+   ],
+   "bonos": [
+    {
+     "tipo": "goles",
+     "estado": "vigente",
+     "sp": null
+    },
+    {
+     "tipo": "partidos",
+     "estado": "vigente",
+     "sp": null
+    }
+   ],
+   "ultimo": {
+    "s": 2026,
+    "cuotasPagadas": 1,
+    "cuotasCobradas": 0,
+    "pagado": 0.8,
+    "cobrado": 0,
+    "bonosPagados": 0,
+    "bonosVencidos": 0
+   },
+   "budgetAntes": 202.39,
+   "budgetDespues": 201.59
+  },
+  {
+   "cierre": 2027,
+   "pendientesAntes": [
+    {
+     "d": 2027,
+     "m": 0.8
+    }
+   ],
+   "pagadosEnEsteCierre": [
+    {
+     "t": "cuota",
+     "d": 2027,
+     "m": 0.8
+    },
+    {
+     "t": "bono",
+     "d": 2027,
+     "m": 0.7
+    }
+   ],
+   "bonos": [
+    {
+     "tipo": "goles",
+     "estado": "pagado",
+     "sp": 2027
+    },
+    {
+     "tipo": "partidos",
+     "estado": "vencido",
+     "sp": 2027
+    }
+   ],
+   "ultimo": {
+    "s": 2027,
+    "cuotasPagadas": 1,
+    "cuotasCobradas": 0,
+    "pagado": 1.5,
+    "cobrado": 0,
+    "bonosPagados": 1,
+    "bonosVencidos": 1
+   },
+   "budgetAntes": 201.59,
+   "budgetDespues": 200.09
+  },
+  {
+   "cierre": 2028,
+   "pendientesAntes": [],
+   "pagadosEnEsteCierre": [],
+   "bonos": [
+    {
+     "tipo": "goles",
+     "estado": "pagado",
+     "sp": 2027
+    },
+    {
+     "tipo": "partidos",
+     "estado": "vencido",
+     "sp": 2027
+    }
+   ],
+   "ultimo": {
+    "s": 2028,
+    "cuotasPagadas": 0,
+    "cuotasCobradas": 0,
+    "pagado": 0,
+    "cobrado": 0,
+    "bonosPagados": 0,
+    "bonosVencidos": 0
+   },
+   "budgetAntes": 200.09,
+   "budgetDespues": 200.09
+  }
+ ],
+ "pantallas": {
+  "panel": true,
+  "panelTexto": "Compromisos del mercadoETAPA 5\n A pagar (cuotas)€0 milA cobrar (cuotas)€0 milBonos posibles€0 milCapacidad para cuotas€231,6 MPagos que vencen por temporadaNo hay cuotas pendientes.Bonos por objetivos",
+  "tieneSecciones": true,
+  "botonEnviar": true,
+  "modalCompra": true,
+  "avisoTrasClic": "✓ Racing Club aceptó. Ahora negociá con el jugador."
+ },
+ "tamanoKB": 625,
+ "errores": [],
+ "fallas": []
+}

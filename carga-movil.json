@@ -1,0 +1,36 @@
+{
+ "url": "http://localhost:8080/index.html",
+ "msHastaLoad": 3322,
+ "msHastaVisible": 3504,
+ "kbAlAbrir": 4244,
+ "archivos": 52,
+ "escudosDescargados": 0,
+ "kbEscudos": 0,
+ "jugadores": 51893,
+ "dbMs": 2533,
+ "heapMB": 57,
+ "ligas": 217,
+ "errores": [],
+ "masPesados": [
+  "data/mundo.js 2507 KB",
+  "css/mc12-diseno.css 200 KB",
+  "js/mc12-diseno.js 178 KB",
+  "assets/estadio/tribuna.jpg 152 KB",
+  "js/motor/motor-v3.js 112 KB",
+  "js/core/01-base-v4.js 94 KB",
+  "data/jugadores.js 93 KB",
+  "js/partido2d/vista2d.js 84 KB"
+ ],
+ "conCarreraPrimera": {
+  "ms": 12343,
+  "club": "Arsenal",
+  "jugadores": 54290,
+  "heapMB": 57
+ },
+ "conCarreraDivision": {
+  "ms": 12093,
+  "club": "Wrexham",
+  "jugadores": 54290,
+  "heapMB": 57
+ }
+}

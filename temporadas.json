@@ -1,0 +1,283 @@
+{
+ "creada": {
+  "club": "River Plate",
+  "motor": "v2",
+  "v3": true,
+  "ia": "v2"
+ },
+ "temporadas": [
+  {
+   "est": {
+    "rivalesConFisico": 38,
+    "rivalesSinArquero": 0,
+    "rivalesMenos11": 0,
+    "lesionadosEnCancha": 0,
+    "maxLesionados": 18,
+    "fitMin": 44,
+    "partidosIA": 406,
+    "onceIAmal": 0,
+    "invierno": {
+     "total": 75,
+     "tipos": {
+      "traspaso": 60,
+      "préstamo": 15
+     }
+    }
+   },
+   "season": 2026,
+   "partidosUsuario": 38,
+   "golesLiga": 2.49,
+   "partidosLiga": 435,
+   "goleadas5": 1,
+   "golesConDetalle": "79/79",
+   "partidosV3": 38,
+   "temporada": 2026,
+   "ia": "v2",
+   "movimientos": 305,
+   "tipos": {
+    "vuelve de préstamo": 15,
+    "traspaso": 240,
+    "préstamo": 50
+   },
+   "dinero": 657.8,
+   "ejemplos": [
+    "Nico Paz: Como → Nottingham Forest (72.73M)",
+    "Malick Thiaw: Newcastle → Crystal Palace (44.14M)",
+    "Andreas Schjelderup: Benfica → Sunderland (32.91M)",
+    "Jacobo Ramón: Como → Al-Hilal (31.06M)"
+   ],
+   "eco": {
+    "clubes": 382,
+    "noNumericos": 0,
+    "min": 0.69,
+    "mediana": 6.73,
+    "max": 364.9
+   },
+   "prestamosActivos": 50,
+   "plantelMin": 23,
+   "arquerosMin": 1,
+   "defMin": 7,
+   "medMin": 6,
+   "delMin": 4,
+   "enDosClubes": [],
+   "enDosCount": 0,
+   "tamanoKB": 486,
+   "e5": {
+    "clubes": 382,
+    "negativos": 0,
+    "quiebra": 0,
+    "peor": [
+     "West Ham 12.62M (plantel 206.72M)",
+     "Everton 39.06M (plantel 522.65M)"
+    ],
+    "deudaMax": 36.37,
+    "cuotasPendientes": 13,
+    "atrasadas": 0,
+    "bonosAtrasados": 0,
+    "pagos": {
+     "cuotas": 1,
+     "monto": 12.61,
+     "bonos": 5,
+     "bonosMonto": 5.57,
+     "bonosNo": 0
+    },
+    "com": 50.7,
+    "enCuotas": 13,
+    "clausulas": 0,
+    "usuario": {
+     "budget": 117,
+     "e5": false
+    }
+   },
+   "plantelUsuarioIntacto": true,
+   "salieronDelPlantel": [
+    "Nicolás Otamendi"
+   ],
+   "ms": 34764
+  },
+  {
+   "est": {
+    "rivalesConFisico": 36,
+    "rivalesSinArquero": 0,
+    "rivalesMenos11": 0,
+    "lesionadosEnCancha": 0,
+    "maxLesionados": 23,
+    "fitMin": 42,
+    "partidosIA": 406,
+    "onceIAmal": 0,
+    "invierno": {
+     "total": 76,
+     "tipos": {
+      "traspaso": 60,
+      "préstamo": 16
+     }
+    }
+   },
+   "season": 2027,
+   "partidosUsuario": 36,
+   "golesLiga": 2.58,
+   "partidosLiga": 435,
+   "goleadas5": 0,
+   "golesConDetalle": "58/58",
+   "partidosV3": 36,
+   "temporada": 2027,
+   "ia": "v2",
+   "movimientos": 534,
+   "tipos": {
+    "vuelve de préstamo": 65,
+    "libre": 140,
+    "retiro": 39,
+    "traspaso": 240,
+    "préstamo": 50
+   },
+   "dinero": 372.7,
+   "ejemplos": [
+    "Lisandro Martínez: Manchester United → Newcastle (35.8M)",
+    "Robin Roefs: Sunderland → Roma (32.21M)",
+    "Valentin Atangana: Al-Ahli → Newcastle (29.15M)",
+    "Evan Ndicka: Roma → Sunderland (28.48M)"
+   ],
+   "eco": {
+    "clubes": 675,
+    "noNumericos": 0,
+    "min": 0.11,
+    "mediana": 4.67,
+    "max": 473
+   },
+   "prestamosActivos": 50,
+   "plantelMin": 21,
+   "arquerosMin": 2,
+   "defMin": 6,
+   "medMin": 5,
+   "delMin": 4,
+   "enDosClubes": [],
+   "enDosCount": 0,
+   "tamanoKB": 721,
+   "e5": {
+    "clubes": 675,
+    "negativos": 0,
+    "quiebra": 0,
+    "peor": [
+     "Metz 4.07M (plantel 108.83M)",
+     "Fortaleza 1.61M (plantel 38.48M)"
+    ],
+    "deudaMax": 13.5,
+    "cuotasPendientes": 6,
+    "atrasadas": 0,
+    "bonosAtrasados": 0,
+    "pagos": {
+     "cuotas": 14,
+     "monto": 110.35,
+     "bonos": 9,
+     "bonosMonto": 12.28,
+     "bonosNo": 1
+    },
+    "com": 26.02,
+    "enCuotas": 5,
+    "clausulas": 0,
+    "usuario": {
+     "budget": 158,
+     "e5": false
+    }
+   },
+   "plantelUsuarioIntacto": true,
+   "salieronDelPlantel": [],
+   "ms": 33005
+  },
+  {
+   "est": {
+    "rivalesConFisico": 36,
+    "rivalesSinArquero": 0,
+    "rivalesMenos11": 0,
+    "lesionadosEnCancha": 0,
+    "maxLesionados": 18,
+    "fitMin": 42,
+    "partidosIA": 406,
+    "onceIAmal": 0,
+    "invierno": {
+     "total": 75,
+     "tipos": {
+      "traspaso": 60,
+      "préstamo": 15
+     }
+    }
+   },
+   "season": 2028,
+   "partidosUsuario": 36,
+   "golesLiga": 2.44,
+   "partidosLiga": 435,
+   "goleadas5": 0,
+   "golesConDetalle": "48/48",
+   "partidosV3": 36,
+   "temporada": 2028,
+   "ia": "v2",
+   "movimientos": 518,
+   "tipos": {
+    "vuelve de préstamo": 65,
+    "libre": 140,
+    "retiro": 23,
+    "traspaso": 240,
+    "préstamo": 50
+   },
+   "dinero": 381.3,
+   "ejemplos": [
+    "Caleb Yirenkyi: Coventry City → Galatasaray (47.65M)",
+    "Mile Svilar: Roma → Barcelona (38.93M)",
+    "Gonçalo Inácio: Sporting CP → Celtic (26.77M)",
+    "Raphael Onyedika: Eintracht Frankfurt → Napoli (21.74M)"
+   ],
+   "eco": {
+    "clubes": 880,
+    "noNumericos": 0,
+    "min": -5.6,
+    "mediana": 4.19,
+    "max": 515.81
+   },
+   "prestamosActivos": 50,
+   "plantelMin": 22,
+   "arquerosMin": 2,
+   "defMin": 6,
+   "medMin": 6,
+   "delMin": 4,
+   "enDosClubes": [],
+   "enDosCount": 0,
+   "tamanoKB": 931,
+   "e5": {
+    "clubes": 880,
+    "negativos": 0,
+    "quiebra": 0,
+    "peor": [
+     "Nottingham Forest 28.93M (plantel 815.46M)",
+     "Everton 34.81M (plantel 737.97M)"
+    ],
+    "deudaMax": 12.65,
+    "cuotasPendientes": 6,
+    "atrasadas": 0,
+    "bonosAtrasados": 0,
+    "pagos": {
+     "cuotas": 8,
+     "monto": 54.43,
+     "bonos": 6,
+     "bonosMonto": 8.21,
+     "bonosNo": 4
+    },
+    "com": 30.35,
+    "enCuotas": 5,
+    "clausulas": 0,
+    "usuario": {
+     "budget": 192,
+     "e5": false
+    }
+   },
+   "plantelUsuarioIntacto": true,
+   "salieronDelPlantel": [
+    "Giovanni González",
+    "Marcos Acuña"
+   ],
+   "ms": 33355
+  }
+ ],
+ "errores": [],
+ "fallas": [],
+ "ok": true
+}
