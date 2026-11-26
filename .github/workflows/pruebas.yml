@@ -36,7 +36,7 @@ jobs:
         run: node tests/v3juego.mjs http://localhost:8080/index.html
       - name: Un solo marcador (encabezado, gráfica de TV, eventos), local del mismo lado y reloj que espera al 2D (liga local/visitante, copa, neutral)
         run: node tests/v3marcador.mjs http://localhost:8080/index.html
-      - name: Tres temporadas sin intervención (v3, IA y mercado; Etapa 4: mercado de invierno, cansancio y lesiones de la IA)
+      - name: Tres temporadas sin intervención (v3, IA y mercado; Etapa 4 · mercado de invierno, cansancio y lesiones de la IA)
         run: node tests/temporadas.mjs http://localhost:8080/index.html 3
       - name: Etapa 4 · ficha del jugador para los 51.893 jugadores de la base, tu plantel, otros clubes y ficha del club
         run: node tests/ficha.mjs http://localhost:8080/index.html 400
