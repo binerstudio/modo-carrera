@@ -113,7 +113,7 @@ Se abre desde **Mundo → Clubes** (con selector de liga y club) o tocando un cl
 
 ## 4. Pruebas
 
-Todas las corrí de verdad en esta máquina. El CI liviano de GitHub corre con cada push; el resultado está en la sección 6. Las pruebas pesadas no se corrieron (quedan "solo a mano", como siempre).
+Las corrí de verdad, primero en esta máquina y después en el CI liviano de GitHub (sección 6). Las pruebas pesadas no se corrieron (quedan "solo a mano", como siempre).
 
 **Ficha** (`tests/ficha.mjs`, nueva): **OK**
 
@@ -181,7 +181,19 @@ Todas las corrí de verdad en esta máquina. El CI liviano de GitHub corre con c
 
 ## 6. CI en GitHub
 
-RESULTADOS_CI
+Corrida liviana **en verde**: [run 45838302994](https://github.com/binerstudio/modo-carrera/actions/runs/45838302994), commit `99d8704`; la corrida 45838106363 del commit `70d1c03` también dio verde. Las pruebas pesadas **no se corrieron**: quedan "solo a mano", como pediste.
+
+| Prueba | Resultado en GitHub |
+|---|---|
+| Motor v3 (300 partidos) | OK |
+| Motor v3 en el juego | OK |
+| Un solo marcador | OK |
+| Tres temporadas sin intervención (con lo de la Etapa 4) | **OK**. Goles por partido: 2,58 / 2,54 / 2,63. Invierno: 75 movimientos por temporada. Rivales con su físico: 38/38, 42/42 y 36/36. Onces de la IA mal armados: 0 de 1.218. Lesionados en cancha: 0. Peso: 479 / 717 / 924 KB. Errores de JavaScript: 0 |
+| Ficha | **OK**. Base: 51.893/51.893. Tu plantel: 25/25. Otros clubes: 407/407. Clubes: 54/54 |
+| Rotación | **OK**. Casos forzados: 11/11. Planteles al azar: 200/200. Temporada sin rotación: físico 79,8 y 52 pts (4.º). Con rotación: físico 84,3 y 49 pts (2.º), 45 rotaciones |
+| Auditoría de eventos | OK |
+| **Actualización desde la 12.2.2** | **OK**. 0 campos distintos, copia "Antes de actualizar a la versión 12.8.0 (venía de 12.2)", rotación apagada, ficha y ficha del club abren, el próximo partido se juega con el v3 |
+| Actualización desde la 12.6.0 (carreras v1, v2 y v3) | **OK**. 0 campos distintos en las 3 carreras |
 
 ## 7. Pendientes
 
