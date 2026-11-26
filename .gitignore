@@ -2,3 +2,8 @@
 tests/out/v3tv*
 tests/out/v3marcador*
 tests/out/v3pantalla*
+tests/out/actualizacion-*
+tests/out/eventos.json
+tests/out/temporadas.json
+tests/out/v3juego.json
+tests/out/v3-juego-partido.png
